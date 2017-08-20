@@ -1,4 +1,4 @@
-﻿/*
+/*
 *****************************************************************************************************************************************************************************
 *********************************************************************** Licensing Information *******************************************************************************
 *****************************************************************************************************************************************************************************
@@ -1516,19 +1516,43 @@ Optionsmenu:
 	checkvars = CPN,MET,CHK,Search,Table
 	GuiWIdth = 824 
 	GuiHeight = 430
-	;gosub, Load_Settings
+gosub, Load_Settings
 	GuiNumber = 2
 	;activeMonitorInfo( amony,Amonx,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
 	Amonh /=2
 	amonw /=2
 	amonx := amonx + (amonw/2)
 	amony := amony + (amonh/2)
+		sleep 200
 	
-	
-	sleep 200
-	
+		;~ Hotkey_array = CPNhotkey,MEtHotkey,CHKHotkey,SearchHotkey,TableHotkey
+		Loop, Parse, checkvars,`,
+	{
+		loop, 6
+		{
+		
+			;~ msgbox, % a_loopfield
+		If  %a_loopfield%hotkey =  F%A_Index%
+			{
+				If A_Index = 6
+					{
+						%a_loopfield% = %A_index%
+						continue
+					}
+				Else
+				{
+				;~ Stringreplace, temp, a_loopfield,HotKey,,
+				%A_loopfield% = %A_Index%
+				 ;~ MsgBox, temp is %Temp%
+				continue			
+				}
+			}
+	}
+}
+MsgBox, cpn is %cpn%`n met is %met% 
+;~ gui,Submit,NoHide
 	;Settimer, Quickview, 2000
-	;Gui, submit, nohide
+
 	Gui, %GuiNumber%:Add, Groupbox, Section xm+5 ym+19 w800 h400
 	Gui, %GuiNumber%:Add, Groupbox, xs+10 ys+19 w470 h60
 	;Gui,2:Submit, NoHide
@@ -1635,10 +1659,12 @@ Optionsmenu:
 	; For autoCPN Fill
 	Gui, %GuiNumber%:Add, Groupbox, xs+500 ys+200 w300 h125, CPN Autofill Options
 	Gui, %GuiNumber%:Add, Checkbox, checked%autocheckbox% xp+10 yp+20 vautocheckbox, Autoscroll down for CPN fill (ESC Key stops Autoscrolling)
-;	Gosub, SetOPtions
+	;~ Gosub, SetOPtions
 	gui,%GuiNumber%:submit, nohide
 	;Gui, %GuiNumber%:Add, Picture, x0 y0 w%GuiWIdth% h%GuiHeight% +0x4000000, %GuiBackground%
+		Gui, submit, nohide
 	Gui,%GuiNumber%:Show,  w%GuiWIdth% h%GuiHeight%, Arbortext Hotkeys V%Version_Number%
+	 
 	return
 }
 
@@ -2193,49 +2219,7 @@ return
 	IniWrite, %CHKEnable%, C:\ArbortextMacros\ArbortextMacroSettings.ini, Hotkeys, CHKEnable
 	IniWrite, %SearchEnable%, C:\ArbortextMacros\ArbortextMacroSettings.ini, Hotkeys, SearchEnable
 	IniWrite, %TableEnable%, C:\ArbortextMacros\ArbortextMacroSettings.ini, Hotkeys, TableEnable
-	
-	;Writes the Status of the CPN Radio buttons
-	IniWrite, %CPNF1%, C:\ArbortextMacros\ArbortextMacroSettings.ini, CPNRadio, CPNF1
-	IniWrite, %CPNF2%, C:\ArbortextMacros\ArbortextMacroSettings.ini, CPNRadio, CPNF2
-	IniWrite, %CPNF3%, C:\ArbortextMacros\ArbortextMacroSettings.ini, CPNRadio, CPNF3
-	IniWrite, %CPNF4%, C:\ArbortextMacros\ArbortextMacroSettings.ini, CPNRadio, CPNF4
-	IniWrite, %CPNF5%, C:\ArbortextMacros\ArbortextMacroSettings.ini, CPNRadio, CPNF5
-	IniWrite, %CPNUN%, C:\ArbortextMacros\ArbortextMacroSettings.ini, CPNRadio, CPNUN
-	
-	
-	;Writes the Status of the Metric to English Table
-	IniWrite, %METF1%, C:\ArbortextMacros\ArbortextMacroSettings.ini, METRadio, METF1
-	IniWrite, %METF2%, C:\ArbortextMacros\ArbortextMacroSettings.ini, METRadio, METF2
-	IniWrite, %METF3%, C:\ArbortextMacros\ArbortextMacroSettings.ini, METRadio, METF3
-	IniWrite, %METF4%, C:\ArbortextMacros\ArbortextMacroSettings.ini, METRadio, METF4
-	IniWrite, %METF5%, C:\ArbortextMacros\ArbortextMacroSettings.ini, METRadio, METF5
-	IniWrite, %METUN%, C:\ArbortextMacros\ArbortextMacroSettings.ini, METRadio, METUN
-	
-	
-	;Writes the Status of the Check in /out/validate menu
-	IniWrite, %CHKF1%, C:\ArbortextMacros\ArbortextMacroSettings.ini, CHKRadio, CHKF1
-	IniWrite, %CHKF2%, C:\ArbortextMacros\ArbortextMacroSettings.ini, CHKRadio, CHKF2
-	IniWrite, %CHKF3%, C:\ArbortextMacros\ArbortextMacroSettings.ini, CHKRadio, CHKF3
-	IniWrite, %CHKF4%, C:\ArbortextMacros\ArbortextMacroSettings.ini, CHKRadio, CHKF4
-	IniWrite, %CHKF5%, C:\ArbortextMacros\ArbortextMacroSettings.ini, CHKRadio, CHKF5
-	IniWrite, %CHKUN%, C:\ArbortextMacros\ArbortextMacroSettings.ini, CHKRadio, CHKUN
-	
-	;Writes the Status of the Search window hotkey
-	IniWrite, %SearchF1%, C:\ArbortextMacros\ArbortextMacroSettings.ini, SearchRadio, SearchF1
-	IniWrite, %SearchF2%, C:\ArbortextMacros\ArbortextMacroSettings.ini, SearchRadio, SearchF2
-	IniWrite, %SearchF3%, C:\ArbortextMacros\ArbortextMacroSettings.ini, SearchRadio, SearchF3
-	IniWrite, %SearchF4%, C:\ArbortextMacros\ArbortextMacroSettings.ini, SearchRadio, SearchF4
-	IniWrite, %SearchF5%, C:\ArbortextMacros\ArbortextMacroSettings.ini, SearchRadio, SearchF5
-	IniWrite, %SearchUN%, C:\ArbortextMacros\ArbortextMacroSettings.ini, SearchRadio, SearchUN
-	
-	;Writes the Status of the Table  hotkey
-	IniWrite, %TableF1%, C:\ArbortextMacros\ArbortextMacroSettings.ini, TableRadio, TableF1
-	IniWrite, %TableF2%, C:\ArbortextMacros\ArbortextMacroSettings.ini, TableRadio, TableF2
-	IniWrite, %TableF3%, C:\ArbortextMacros\ArbortextMacroSettings.ini, TableRadio, TableF3
-	IniWrite, %TableF4%, C:\ArbortextMacros\ArbortextMacroSettings.ini, TableRadio, TableF4
-	IniWrite, %TableF5%, C:\ArbortextMacros\ArbortextMacroSettings.ini, TableRadio, TableF5
-	IniWrite, %TableUN%, C:\ArbortextMacros\ArbortextMacroSettings.ini, TableRadio, TableUN
-	
+		
 	;Writes the status of the userhotkeys
 	IniWrite, %CPNHotKey%, C:\ArbortextMacros\ArbortextMacroSettings.ini, DeclareHotKey, CPNHotKey
 	IniWrite, %METHotKey%, C:\ArbortextMacros\ArbortextMacroSettings.ini, DeclareHotKey, METHotKey
@@ -2249,7 +2233,8 @@ return
 	IniWrite, %Section3%, C:\ArbortextMacros\ArbortextMacroSettings.ini, Canvas, Section3
 	
 	IniWrite, %autocheckbox%, C:\ArbortextMacros\ArbortextMacroSettings.ini, Autofull, autocheckbox
-	
+
+
 	GoSub, Load_Settings
 	Gosub, SetHotKeys
 	
@@ -2265,61 +2250,28 @@ return
 
 Load_Settings:
 {
-	;Loads checkbox status
+
+Loop, Parse, checkvars,`,
+{
+	
+	
+}
+
+;Loads checkbox status
 	IniRead, CPNStatus, C:\ArbortextMacros\ArbortextMacroSettings.ini, Hotkeys, CPNEnable
 	IniRead, MetStatus, C:\ArbortextMacros\ArbortextMacroSettings.ini, Hotkeys, METEnable
 	IniRead, CHKStatus, C:\ArbortextMacros\ArbortextMacroSettings.ini, Hotkeys, CHKEnable
 	IniRead, SearchStatus, C:\ArbortextMacros\ArbortextMacroSettings.ini, Hotkeys, SearchEnable
 	IniRead, TableStatus, C:\ArbortextMacros\ArbortextMacroSettings.ini, Hotkeys, TableEnable
 	
-	;Loads CPN Radio button status
-	IniRead, CPNf1Status, C:\ArbortextMacros\ArbortextMacroSettings.ini, CPNRadio, CPNF1
-	IniRead, CPNf2Status, C:\ArbortextMacros\ArbortextMacroSettings.ini, CPNRadio, CPNF2
-	IniRead, CPNf3Status, C:\ArbortextMacros\ArbortextMacroSettings.ini, CPNRadio, CPNF3
-	IniRead, CPNf4Status, C:\ArbortextMacros\ArbortextMacroSettings.ini, CPNRadio, CPNF4
-	IniRead, CPNf5Status, C:\ArbortextMacros\ArbortextMacroSettings.ini, CPNRadio, CPNF5
-	IniRead, CPNUNStatus, C:\ArbortextMacros\ArbortextMacroSettings.ini, CPNRadio, CPNUN
-	
-	;Loads Metric to Eng Radio button status
-	IniRead, METf1Status, C:\ArbortextMacros\ArbortextMacroSettings.ini, METRadio, METF1
-	IniRead, METf2Status, C:\ArbortextMacros\ArbortextMacroSettings.ini, METRadio, METF2
-	IniRead, METf3Status, C:\ArbortextMacros\ArbortextMacroSettings.ini, METRadio, METF3
-	IniRead, METf4Status, C:\ArbortextMacros\ArbortextMacroSettings.ini, METRadio, METF4
-	IniRead, METf5Status, C:\ArbortextMacros\ArbortextMacroSettings.ini, METRadio, METF5
-	IniRead, METUNStatus, C:\ArbortextMacros\ArbortextMacroSettings.ini, METRadio, METUN
-	
-	;Loads CHK Radio button status
-	IniRead, CHKf1Status, C:\ArbortextMacros\ArbortextMacroSettings.ini, CHKRadio, CHKF1
-	IniRead, CHKf2Status, C:\ArbortextMacros\ArbortextMacroSettings.ini, CHKRadio, CHKF2
-	IniRead, CHKf3Status, C:\ArbortextMacros\ArbortextMacroSettings.ini, CHKRadio, CHKF3
-	IniRead, CHKf4Status, C:\ArbortextMacros\ArbortextMacroSettings.ini, CHKRadio, CHKF4
-	IniRead, CHKf5Status, C:\ArbortextMacros\ArbortextMacroSettings.ini, CHKRadio, CHKF5
-	IniRead, CHKUNStatus, C:\ArbortextMacros\ArbortextMacroSettings.ini, CHKRadio, CHKUN
-	
-	;Loads Search Radio button status
-	IniRead, Searchf1Status, C:\ArbortextMacros\ArbortextMacroSettings.ini, SearchRadio, SearchF1
-	IniRead, Searchf2Status, C:\ArbortextMacros\ArbortextMacroSettings.ini, SearchRadio, SearchF2
-	IniRead, Searchf3Status, C:\ArbortextMacros\ArbortextMacroSettings.ini, SearchRadio, SearchF3
-	IniRead, Searchf4Status, C:\ArbortextMacros\ArbortextMacroSettings.ini, SearchRadio, SearchF4
-	IniRead, Searchf5Status, C:\ArbortextMacros\ArbortextMacroSettings.ini, SearchRadio, SearchF5
-	IniRead, SearchUNStatus, C:\ArbortextMacros\ArbortextMacroSettings.ini, SearchRadio, SearchUN
-	
-	
-	;Loads Table Radio button status
-	IniRead, Tablef1Status, C:\ArbortextMacros\ArbortextMacroSettings.ini, TableRadio, TableF1
-	IniRead, Tablef2Status, C:\ArbortextMacros\ArbortextMacroSettings.ini, TableRadio, TableF2
-	IniRead, Tablef3Status, C:\ArbortextMacros\ArbortextMacroSettings.ini, TableRadio, TableF3
-	IniRead, Tablef4Status, C:\ArbortextMacros\ArbortextMacroSettings.ini, TableRadio, TableF4
-	IniRead, Tablef5Status, C:\ArbortextMacros\ArbortextMacroSettings.ini, TableRadio, TableF5
-	IniRead, TableUNStatus, C:\ArbortextMacros\ArbortextMacroSettings.ini, TableRadio, TableUN
-	
+
 	; Loads the hotkey variables
 	
-	IniRead, CPNHotKey, C:\ArbortextMacros\ArbortextMacroSettings.ini, DeclareHotKey, CPNHotKey
-	IniRead, METHotKey, C:\ArbortextMacros\ArbortextMacroSettings.ini, DeclareHotKey, METHotKey
-	IniRead, CHKHotKey, C:\ArbortextMacros\ArbortextMacroSettings.ini, DeclareHotKey, CHKHotKey
-	IniRead, SearchHotKey, C:\ArbortextMacros\ArbortextMacroSettings.ini, DeclareHotKey, SearchHotKey
-	IniRead, TableHotKey, C:\ArbortextMacros\ArbortextMacroSettings.ini, DeclareHotKey, TableHotKey
+	IniRead, CPNHotKey, C:\ArbortextMacros\Config.ini, DeclareHotKey, CPNHotKey
+	IniRead, METHotKey, C:\ArbortextMacros\Config.ini, DeclareHotKey, METHotKey
+	IniRead, CHKHotKey, C:\ArbortextMacros\Config.ini, DeclareHotKey, CHKHotKey
+	IniRead, SearchHotKey, C:\ArbortextMacros\Config.ini, DeclareHotKey, SearchHotKey
+	IniRead, TableHotKey, C:\ArbortextMacros\Config.ini, DeclareHotKey, TableHotKey
 	
 	; Loads the canvas section variables
 	IniRead, Section1, C:\ArbortextMacros\ArbortextMacroSettings.ini, Canvas, Section1
@@ -2327,6 +2279,8 @@ Load_Settings:
 	IniRead, Section3, C:\ArbortextMacros\ArbortextMacroSettings.ini, Canvas, Section3
 	
 	IniRead, autocheckbox, C:\ArbortextMacros\ArbortextMacroSettings.ini, Autofull, autocheckbox
+	
+
 	return
 }
 
