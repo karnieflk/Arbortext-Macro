@@ -1526,30 +1526,8 @@ gosub, Load_Settings
 		sleep 200
 	
 		;~ Hotkey_array = CPNhotkey,MEtHotkey,CHKHotkey,SearchHotkey,TableHotkey
-		Loop, Parse, checkvars,`,
-	{
-		loop, 6
-		{
-		
-			;~ msgbox, % a_loopfield
-		If  %a_loopfield%hotkey =  F%A_Index%
-			{
-				If A_Index = 6
-					{
-						%a_loopfield% = %A_index%
-						continue
-					}
-				Else
-				{
-				;~ Stringreplace, temp, a_loopfield,HotKey,,
-				%A_loopfield% = %A_Index%
-				 ;~ MsgBox, temp is %Temp%
-				continue			
-				}
-			}
-	}
-}
-MsgBox, cpn is %cpn%`n met is %met% 
+
+;~ MsgBox, cpn is %cpn%`n met is %met% 
 ;~ gui,Submit,NoHide
 	;Settimer, Quickview, 2000
 
@@ -1660,11 +1638,38 @@ MsgBox, cpn is %cpn%`n met is %met%
 	Gui, %GuiNumber%:Add, Groupbox, xs+500 ys+200 w300 h125, CPN Autofill Options
 	Gui, %GuiNumber%:Add, Checkbox, checked%autocheckbox% xp+10 yp+20 vautocheckbox, Autoscroll down for CPN fill (ESC Key stops Autoscrolling)
 	;~ Gosub, SetOPtions
-	gui,%GuiNumber%:submit, nohide
+	;~ gui,%GuiNumber%:submit, nohide
 	;Gui, %GuiNumber%:Add, Picture, x0 y0 w%GuiWIdth% h%GuiHeight% +0x4000000, %GuiBackground%
-		Gui, submit, nohide
-	Gui,%GuiNumber%:Show,  w%GuiWIdth% h%GuiHeight%, Arbortext Hotkeys V%Version_Number%
-	 
+		;~ Gui, submit, nohide
+				Loop, Parse, checkvars,`,
+	{
+ 		loop, 6
+		{
+		
+			;~ msgbox, % a_loopfield
+		If  %a_loopfield%hotkey =  F%A_Index%
+			{
+				If A_Index = 6
+					{
+						%a_loopfield% = %A_index%
+						GuiControl,2:,%A_LoopField%UN,1
+						;~ MsgBox, %A_loopfield% is UN
+						continue
+					}
+				Else
+				{
+				;~ Stringreplace, temp, a_loopfield,HotKey,,
+				%A_loopfield% = %A_Index%
+				GuiControl,2:, %A_LoopField%F%A_Index%,1
+				;~ MsgBox, %A_loopfield% is  loop %A_index%
+				 ;~ MsgBox, temp is %Temp%
+				continue			
+				}
+			}
+	}
+	;~ Gui,2:Submit,NoHide
+}
+Gui,%GuiNumber%:Show,  w%GuiWIdth% h%GuiHeight%, Arbortext Hotkeys V%Version_Number%
 	return
 }
 
