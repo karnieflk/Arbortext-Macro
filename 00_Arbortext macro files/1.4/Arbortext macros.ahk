@@ -22,7 +22,13 @@ Updates to script from Version 1.3
 ***************************************
 Updated Code a bit
 	- combined a bunch of the individual files to make it one large file
+	- Reduced amount of code needed and redundancies
+	
 Added config file to help ease in updating for future proofing
+Added option to stop asking for startup
+	- changed startup question to ask just to throw in a shortcut to the file. No more adding it into the folder needed
+	
+
 
 
 /*
@@ -100,10 +106,10 @@ IfNotExist, %Root_Folder_Location%\ProgramImages
 	FileCreateDir, %Root_Folder_Location%\ProgramImages
 }
 
-IfNotExist, %Root_Folder_Location%\ArbortextMacroSettings.ini
+IfNotExist, %Root_Folder_Location%\Config.ini
 {
 	;below takes the files fron the marcosn folder on computer and embeds them into the exe file. 
-	FileInstall, C:\ArbortextMacrosn\ArbortextMacroSettings.ini, %Root_Folder_Location%\ArbortextMacroSettings.ini
+	FileInstall, C:\ArbortextMacrosn\Config.ini, %Root_Folder_Location%\Config.ini
 	Firstrun = 1
 }
 
@@ -142,34 +148,31 @@ IfExist,%Root_Folder_Location%\Change Log.txt
 
 If Reload = 0
 {
-	Filename := "Arbortext Macros"
-	Folder := A_Startup
-	loop, %folder%\*.*
-	{
-		If A_LoopFileName Contains %Filename%
+	If Startup_Folder_Question = 1
+	{}
+		else
+		{		
+		Filename := "Arbortext Macros"
+		Folder := A_Startup
+		loop, %folder%\*.*
 		{
-			;msgbox, foudn name %A_LoopFileName%
-			Foundfile = 1
-			Break
-		}}
-	
-	
-	;IfNotExist %A_Startup%\Arbortext macros*.exe | .ahk | .ink
-	If foundfile !=1
-	{
-		activeMonitorInfo( amony,Amonx,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
-		Amonh /=2
-		amonw /=2
-		amonx := amonx + (amonw/2)
-		amony := amony + (amonh/2)
-		Settimer, winmovemsgbox, 50
-		Titletext := "Do you want to open the Startup folder so that you can put the progam in it"
-		msgbox, 262148,No Startup File, Arbortext Macros is not in startup folder. Do you want to open the Startup folder so that you can put the progam in it?
-		
-		IfMsgBox Yes
+			If A_LoopFileName Contains %Filename%
+			{
+				;msgbox, foudn name %A_LoopFileName%
+				Foundfile = 1
+				Break
+			}}		
+		If foundfile !=1
 		{
-			Run, %A_StartUp%
-		}}}   
+			activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
+			GUi, add, text,,Arbortext Macros is not in startup folder. Do you want to Create a shortcut in  the Startup folder?
+			GUi, add, button,gcreate_shortcut,Create shortcut in Startup folder
+			GUi, add, button,gcancel,No 
+			GUi, add, Checkbox, vStartup_Folder_Question,Do Not ask me again
+			Gui, Show, x%amonx% y%amony%, No Startup File
+		}
+		}
+}   
 
 ; Creates Menu for gui screen
 Menu, BBBB, Add, &Check For Update , Versioncheck
@@ -182,6 +185,7 @@ Menu, BBBB, Add, &Check For Update , Versioncheck
 	
 	Menu, MyMenuBar, Add, &File, :BBBB
 	Menu, MyMenuBar, Add, &Help, :DDDD
+	
 	
 /*
 *********************************************************************************************************************************
@@ -211,9 +215,9 @@ canvascount = 0
 
 
 ;below checks for the settings text document, if it not there, it makes one
-if not (FileExist(Root_Folder_Location "\ArbortextMacroSettings.ini"))
+if not (FileExist(Root_Folder_Location "\Config.ini"))
 {
-	FileAppend,,%Root_Folder_Location%\ArbortextMacroSettings.ini
+	FileAppend,,%Root_Folder_Location%\Config.ini
 	Firstrun = 1
 	Gosub, Default_Settings
 }
@@ -221,7 +225,7 @@ if not (FileExist(Root_Folder_Location "\ArbortextMacroSettings.ini"))
 
 Create_Tray_Menu()  ; goes to Createmenu function
 sleep 500 ;sets a .5 sec delay
-Gosub, Load_Settings ; Loads Ini file settings
+Load_ini_file(inifile)
 sleep 500 ;sets a .5 sec delay
 Gosub, SetHotKeys ;Set hotkeys from ini file settings
 sleep 500 ;sets a .5 sec delay
@@ -249,6 +253,21 @@ process, close, % process.ProcessId ; kills the process (closed the program)
 Return ; this stops the script so that is does not continue automatically
 
 
+create_shortcut:
+{
+		FileCreateShortcut, %A_Scriptfullpath%, %A_startup%\Arbortext Macros.lnk, C:\,%A_ScriptFullPath%, Arbortext Macros
+		gosub, Cancel
+	return
+}
+
+Cancel:
+{
+	Gui,Submit,NoHide
+	;~ MsgBox, % Startup_Folder_Question
+	Write_ini_file(inifile)
+	Gui, Destroy
+	return
+}
 
 /*		
 /=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
@@ -310,6 +329,7 @@ Quickmarkgo:
 
 CheckoutIE: ; send the keys to perform an IE check out (Alt + O, then H)
 {
+	
 	Send %Arbortext_Check_Out_IE%
 	return
 }
@@ -322,30 +342,35 @@ CheckinIE: ; send the keys to perform an IE check in (A;t + 0, then I)
 
 ValidateIE: ; Send the keys to perform an IE validate (Alt + C, then DOwn twice, then enter)
 {
+	
 	Send %Validate_IE%
 	return
 }
 
 MetricTolerance() ;Function for the keys to get the Metric tolerance menu (Alt + C, then down, then enter, then down 3 times, then enter)
 {
+	global
 	Send %Metric_Tolerance%  ; sends keystrokes to window
 	return
 }
 
 EnglishTolerance() ; function to send the keys for an english tag tolerance menu (Alt + C, then down, then enter, then Down twice, then enter)
 {
+	global
 	Send %English_Tolerance%  ; sends keystrokes to window
 	Return
 }
 
 MetricNorm() ; Function to send the keys for a NON- tolerance metric menu (Alt + C, then down arrow, enter, then down arrow, then enter)
 {
+	global
 	Send %Metric_No_Tolerance% ; sends keystrokes to window
 	Return
 }
 
 Englishnorm() ; Function to send the keys for a NON-TOlerance English menu (Alt + C, then DOwn arrow, then enter twice)
 {
+	global
 	Send %English_No_Tolerance%  ; sends keystrokes to window
 	Return
 }
@@ -454,9 +479,8 @@ CPNRapidautofill:
 	exitapp ; exits this verison of the app
 	*/
 	
-	Iniread, Scrolldown,%Root_Folder_Location%\ArbortextMacroSettings.ini, Autofull, autocheckbox
 	
-	If Scrolldown = 1
+	If CPN_AutoSearch = 1
 	{
 	;msgbox, send scrolldown
 	Run,%Root_Folder_Location%\CPNSearch.exe /Scrolldown
@@ -622,7 +646,7 @@ METRapidTotal:
 			}		
 			
 			
-			#If ; turns of only works in search window
+			#If ; turns off only works in search window
 			return
 		}
 		
@@ -693,7 +717,173 @@ METRapidTotal:
 			Return
 		}
 		
-		#include Gui for tables.ahk
+TableChoiceGUI:
+{
+Escapedgui = 0
+If GuiNumber !=0
+	Gui , %GuiNumber%:Destroy
+
+GuiNumber = 7
+	GuiWIdth = 500
+	GuiHeight = 300
+	activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
+	Gui , %GuiNumber%:Destroy
+	
+Gui, %GuiNumber%:add, GroupBox,w100 h70,Table Size
+Gui, %GuiNumber%:add, Radio, Checked xp+10 yp+20 gTableWidthCheck vTable_Width_GroupC, Column Wide
+Gui, %GuiNumber%:add, Radio, xp yp+20  gTableWidthCheck vTable_Width_GroupW, Page Wide
+Gui,%GuiNumber%: add, GroupBox, Xp+100 yp-40 w175 h50, Rows
+Gui, %GuiNumber%:add, Text, xp+10 yp+25, Rows:
+Gui,%GuiNumber%: add, Edit,  xp+32 yp-4 w50 Number Limit4, 
+Gui, %GuiNumber%:add, UpDown, Range1-3001  vUserrows,20
+Gui, %GuiNumber%:Font, CRed
+Gui, %GuiNumber%:Add, Text, xp+52 w75 Vmaxlimit, Max is 3000 Rows 
+Gui, %GuiNumber%:Font, 
+Gui, %GuiNumber%:add, Button, Default xp-100 yp+190 h40 w250 gTablemaker, Make My Table
+
+gui, %GuiNumber%:add, tab2,xp-100 yp-130 w390 h120 VTabnum, Parts Tables | Troubleshooting Tables | Tooling Tables | Spec Tables
+Gui,  %GuiNumber%:tab,1
+Gui, %GuiNumber%:add,  Radio,Checked xp+10 yp+30 gPartsTablecheck vpartstable2,2 Column (Qty, Part Name)
+Gui, %GuiNumber%:add, Radio,yp+20 gPartsTablecheck vpartstable3,3 Column (Item, Qty, Part Name)
+Gui, %GuiNumber%:add, Radio,yp+20 gPartsTablecheck vpartstable5,5 Column (Item, Qty, New Part Number, Part Name, Former Part Number)
+
+Gui, %GuiNumber%:tab,2
+Gui, %GuiNumber%:add, Radio,yp-40 gTroubleshootingcheck vj1939 , J1939 Code Description 
+Gui, %GuiNumber%:add, Radio,yp+20 gTroubleshootingcheck vTroubleshotingtbl,Troubleshooting
+
+
+Gui,  %GuiNumber%:Tab, 3
+Gui, %GuiNumber%:add, Radio, yp-20 gToolingTablecheck vtooltbl, Tooling Table 
+
+Gui,  %GuiNumber%:Tab, 4
+Gui, %GuiNumber%:add, Radio,yp gSpectablecheck vSpectable, Specification Table
+
+Gui, %GuiNumber%:Show, x%amonx% y%amonY% w%GuiWIdth% h%GuiHeight%, Table Selection
+Guicontrol,%GuiNumber%:hide, maxlimit
+Pgwd = No
+Tabletype = C2
+Return
+}
+
+
+
+7GuiEscape:
+7Guiclose:
+{
+UnPausescript()
+Gui, 7:destroy
+Escapedgui = 1
+return
+}
+
+toolingtaBLECHECK:
+{
+Gui,7:submit, nohide
+
+iF (tooltbl)
+{
+tabletype = toolingtable
+guicontrol,,Table_Width_GroupW,1
+Pgwd = Yes
+}
+Return
+}
+
+Tablemaker:
+{
+Gui,7:submit, nohide
+GuicontrolGet, Userrows
+If Userarrows > 3000
+{
+Guicontrol,%GuiNumber%:Show, maxlimit
+Sleep 100
+Guicontrol,%GuiNumber%:hide, maxlimit
+Sleep 100
+Guicontrol,%GuiNumber%:Show, maxlimit
+Sleep 100
+Guicontrol,%GuiNumber%:hide, maxlimit
+Sleep 100
+Guicontrol,%GuiNumber%:Show, maxlimit
+return
+}
+
+Else if Userarrows < 3001
+guicontrol, %GuiNumber%:hide, maxlimit
+
+UnPausescript()
+Gui, 7:Destroy
+Return
+}
+
+Troubleshootingcheck:
+{
+Gui,7:submit, nohide
+
+If (j1939)
+{
+Tabletype = jcode
+guicontrol,,Table_Width_GroupW,1
+Pgwd = Yes
+}
+If (Troubleshotingtbl)
+{
+tabletype = Troubleshoot
+guicontrol,,Table_Width_GroupW,1
+Pgwd = Yes
+}
+Return
+}
+
+TableWidthCheck:
+{
+Gui,7:submit, nohide
+
+If (Table_Width_GroupC)
+{
+Pgwd = No
+}
+
+If (Table_Width_GroupW)
+{
+Pgwd = Yes
+}
+
+Return
+}
+
+PartsTablecheck:
+{
+Gui,7:submit, nohide
+
+
+If (partstable2)
+Tabletype = C2
+
+If (partstable3)
+Tabletype = C3
+
+If (partstable5)
+{
+Tabletype = C5
+guicontrol,,Table_Width_GroupW,1
+Pgwd = Yes
+}
+Return
+}
+
+Spectablecheck:
+{
+Gui,7:submit, nohide
+
+If (Spectable)
+{
+Tabletype = Spec
+guicontrol,,Table_Width_GroupW,1
+Pgwd = Yes
+}
+Return
+}
+
 		
 	
 		TableRapid:
@@ -888,8 +1078,10 @@ TableVSP:
 	Return
 }
 
-Createtable() ; CreateTabel function
+
+Createtable() ; CreateTable function
 {
+	global
 	Temptag = %clipboardall% 
 	;msgbox, tabletype is %Tabletype% `n Pgwd is %Pgwd%
 	Gui 6:Destroy ; gets rid of the gui screen
@@ -897,7 +1089,7 @@ Createtable() ; CreateTabel function
 	clipboard =   ; clears the clipboard contents
 	Send {AltDown}{ShiftDown}{t}{ShiftUP}{altup} ; send the Alt+Shift+ T to the computer.
 	sleep 500 ; pauses script for .5 seconds
-	WinwaitActive, %Table_Insert_Title%,,5 ; waits for the Table INsert window to be active
+	WinwaitActive , %Table_Insert_Title% ,,5 ; waits for the Table INsert window to be active
 	sleep 500 ; pauses script for .5 seconds
 	send {Enter} ; sends Enter to computer
 	Sleep 500 ; pauses script for .5 seconds
@@ -955,6 +1147,7 @@ Createtable() ; CreateTabel function
 	newwordftnote := NewStrfront newwordftnote
 	;msgbox, newword is %newword%`, newwordftnote is %newwordftnote%
 	gosub, TableChoiceGUI
+	Sleep 500
 	Pausescript()
 	If Pgwd = Yes ; checks if the PGwd variable is yes
 	{
@@ -1352,6 +1545,7 @@ Createtable() ; CreateTabel function
 		
 		SetHotKeys:
 		{
+			;~ MsgBox, hotkeys
 			+++SetTitleMatchMode, 3 ; window title has to match exactly with text
 			Hotkey, IfWinActive, %Search_Window_Title% ; hotkey only works in search window
 			Hotkey, $%SearchHotKey%, SearchRapidArbor ; makes the contents of the searchhotkey variable go to SearchrapidSearch subroutine
@@ -1384,6 +1578,8 @@ Createtable() ; CreateTabel function
 ;This makes up the win+alt screen
 Guiscreen:
 {
+	
+	
 	If GuiNumber !=0 ; If guiscreeen vairable is not 0
 	Gui , %GuiNumber%:Destroy ; closes the gui screen
 ;Below is making the menu for the gui screen
@@ -1392,20 +1588,13 @@ Guiscreen:
 	GuiWIdth = 824  ;sets the width of the gui screen
 	GuiHeight =500 ; Sets the height of the gui screen
 
-	activeMonitorInfo( amony,Amonx,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
+	activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
 
 	Gui , %GuiNumber%:Destroy ; in case the guiscren was not destroyed already to clear and issues with duplicate variables
-	Amonh /=2 ; some math to get the gui screen in the center of the window
-	amonw /=2 ; more match to center screen
-	
-	amonx := amonx + (amonw/2) ; still math to get the final screen placement
-	amony := amony + (amonh/2) ; last bit of math for now
-	
 	
 	sleep 200 ; pauses script for 200 miliseconds
 	Settimer, Quickview, 2000 ; Sets up a timer to close window after 2 seconds on not active
-	Gosub, Load_Settings ; loads the settings from the ini files
-	;gosub, GuiTab1 ; goes to teh guitab subroutine
+	Load_ini_file(inifile) ; loads the settings from the ini files
 
 	Gui , %GuiNumber%:Add, groupbox, xm+21 ym+15 Section w235 h95, 
 	Gui, %GuiNumber%:font,C131980 Bold Underline s12
@@ -1446,7 +1635,7 @@ Guiscreen:
 	Gui,%GuiNumber%:font,C801319 Norm s8
 	Gui,%GuiNumber%:Add, Text, xs+3 ys+35 w208 h65, Opens and Sets up Graphic Search Window In Arbortext and from Canvas Image Check In Screen. If in Canvas, click in Gnumber Box at check in window, then press hotkey.
 	
-		
+	
 	; 2nd column
 	
 	Gui , %GuiNumber%:Add, groupbox, xm+270 ym+15 Section w510 h140, 
@@ -1486,7 +1675,7 @@ Guiscreen:
 	Gui, %GuiNumber%:Add, Text, xs+3 ys+10 , WIN + B
 	
 	Gui, %GuiNumber%:font,C1d79b8 Norm s8
-	Gui , %GuiNumber%:Add, Text,  xs+3 ys+30, Bring Image Browser Window in Arbortext to Front
+	Gui , %GuiNumber%:Add, Text,  xs+3 ys+30, Bring  Browser Window in Arbortext to Front
 	
 	Gui, %GuiNumber%:font,Cb81d79 Bold Underline s11
 	Gui , %GuiNumber%:Add, groupbox, xm+270 ym+380 Section w255 h50, 
@@ -1500,7 +1689,7 @@ Guiscreen:
 	Gui, %GuiNumber%:Add, Text, xs+3 ys+10, WIN + H
 	
 	Gui, %GuiNumber%:font,C1d79b8 Norm s8
-	Gui , %GuiNumber%:Add, Text, xs+3 ys+30, Bring Windchill - Home Tab to Front
+	Gui , %GuiNumber%:Add, Text, xs+3 ys+30, Bring Windchill Chrome to Front
 	
 	
 	Gui, %GuiNumber%:Menu, MyMenuBar
@@ -1513,23 +1702,19 @@ Guiscreen:
 
 Optionsmenu:
 {
+Settimer, Quickview, Off
+	
+		If GuiNumber !=0 ; If guiscreeen vairable is not 0
+	Gui , %GuiNumber%:Destroy ; closes the gui screen
+	
 	checkvars = CPN,MET,CHK,Search,Table
 	GuiWIdth = 824 
 	GuiHeight = 430
-gosub, Load_Settings
+	Load_ini_file(inifile)
 	GuiNumber = 2
-	;activeMonitorInfo( amony,Amonx,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
-	Amonh /=2
-	amonw /=2
-	amonx := amonx + (amonw/2)
-	amony := amony + (amonh/2)
-		sleep 200
+	activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
 	
-		;~ Hotkey_array = CPNhotkey,MEtHotkey,CHKHotkey,SearchHotkey,TableHotkey
-
-;~ MsgBox, cpn is %cpn%`n met is %met% 
-;~ gui,Submit,NoHide
-	;Settimer, Quickview, 2000
+		sleep 200
 
 	Gui, %GuiNumber%:Add, Groupbox, Section xm+5 ym+19 w800 h400
 	Gui, %GuiNumber%:Add, Groupbox, xs+10 ys+19 w470 h60
@@ -1541,12 +1726,12 @@ gosub, Load_Settings
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F4
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F5
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w55 h20 , Unassigned
-	Gui, %GuiNumber%:Add, Radio, Checked%CPNF1Status% xp-150 yp+20 w15 h20 vCpn gCPNRad  ,CPNF1
-	Gui, %GuiNumber%:Add, Radio, Checked%CPNF2Status% xp+30 yp w15 h20  gCPNRad,CPNF2
-	Gui, %GuiNumber%:Add, Radio, Checked%CPNF3Status% xp+30 yp w15 h20   gCPNRad, CPNF3
-	Gui, %GuiNumber%:Add, Radio, Checked%CPNF4Status% xp+30 yp w15 h20   gCPNRad, CPNF4
-	Gui, %GuiNumber%:Add, Radio, Checked%CPNF5Status% xp+30 yp w15 h20  gCPNRad, CPNF5
-	Gui, %GuiNumber%:Add, Radio, Checked%CPNUNStatus% xp+50 yp w15 h20   gCPNRad, CPNUN
+	Gui, %GuiNumber%:Add, Radio,  xp-150 yp+20 w15 h20 vCpn gCPNRad  ,CPNF1
+	Gui, %GuiNumber%:Add, Radio,  xp+30 yp w15 h20  gCPNRad,CPNF2
+	Gui, %GuiNumber%:Add, Radio,  xp+30 yp w15 h20   gCPNRad, CPNF3
+	Gui, %GuiNumber%:Add, Radio,  xp+30 yp w15 h20   gCPNRad, CPNF4
+	Gui, %GuiNumber%:Add, Radio,  xp+30 yp w15 h20  gCPNRad, CPNF5
+	Gui, %GuiNumber%:Add, Radio,  xp+50 yp w15 h20   gCPNRad, CPNUN
 	
 	; Metric to English Table Gui Options
 	
@@ -1559,12 +1744,12 @@ gosub, Load_Settings
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F5
 	
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w55 h20 , Unassigned
-	Gui, %GuiNumber%:Add, Radio, Checked%METF1Status% xp-150 yp+20 w15 h20 vMET gCPNRad  ,METF1
-	Gui, %GuiNumber%:Add, Radio, Checked%METF2Status% xp+30 yp w15 h20   gCPNRad ,METF2
-	Gui, %GuiNumber%:Add, Radio, Checked%METF3Status% xp+30 yp w15 h20   gCPNRad , METF3
-	Gui, %GuiNumber%:Add, Radio, Checked%METF4Status% xp+30 yp w15 h20  gCPNRad , METF4
-	Gui, %GuiNumber%:Add, Radio, Checked%METF5Status% xp+30 yp w15 h20   gCPNRad , METF5
-	Gui, %GuiNumber%:Add, Radio, Checked%METUNStatus% xp+50 yp w15 h20  gCPNRad, METUN
+	Gui, %GuiNumber%:Add, Radio,  xp-150 yp+20 w15 h20 vMET gCPNRad  ,METF1
+	Gui, %GuiNumber%:Add, Radio,  xp+30 yp w15 h20   gCPNRad ,METF2
+	Gui, %GuiNumber%:Add, Radio,  xp+30 yp w15 h20   gCPNRad , METF3
+	Gui, %GuiNumber%:Add, Radio,  xp+30 yp w15 h20  gCPNRad , METF4
+	Gui, %GuiNumber%:Add, Radio,  xp+30 yp w15 h20   gCPNRad , METF5
+	Gui, %GuiNumber%:Add, Radio,  xp+50 yp w15 h20  gCPNRad, METUN
 	
 	; Check in - check out - validate GUI options
 	
@@ -1577,12 +1762,12 @@ gosub, Load_Settings
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F5
 	
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w55 h20 , Unassigned
-	Gui, %GuiNumber%:Add, Radio, Checked%CHKF1Status% xp-150 yp+20 w15 h20 vCHK gCPNRad ,CHKF1
-	Gui, %GuiNumber%:Add, Radio, Checked%CHKF2Status% xp+30 yp w15 h20   gCPNRad ,CHKF2
-	Gui, %GuiNumber%:Add, Radio, Checked%CHKF3Status% xp+30 yp w15 h20   gCPNRad,CHKF3
-	Gui, %GuiNumber%:Add, Radio, Checked%CHKF4Status% xp+30 yp w15 h20  gCPNRad, CHKF4
-	Gui, %GuiNumber%:Add, Radio, Checked%CHKF5Status% xp+30 yp w15 h20  gCPNRad , CHKF5
-	Gui, %GuiNumber%:Add, Radio, Checked%CHKUNStatus% xp+50 yp w15 h20   gCPNRad,CHKUN
+	Gui, %GuiNumber%:Add, Radio,  xp-150 yp+20 w15 h20 vCHK gCPNRad ,CHKF1
+	Gui, %GuiNumber%:Add, Radio,  xp+30 yp w15 h20   gCPNRad ,CHKF2
+	Gui, %GuiNumber%:Add, Radio,  xp+30 yp w15 h20   gCPNRad,CHKF3
+	Gui, %GuiNumber%:Add, Radio,  xp+30 yp w15 h20  gCPNRad, CHKF4
+	Gui, %GuiNumber%:Add, Radio,  xp+30 yp w15 h20  gCPNRad , CHKF5
+	Gui, %GuiNumber%:Add, Radio,  xp+50 yp w15 h20   gCPNRad,CHKUN
 	
 	;Search function Gui Options
 	
@@ -1594,12 +1779,12 @@ gosub, Load_Settings
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F4
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F5
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w55 h20 , Unassigned
-	Gui, %GuiNumber%:Add, Radio, Checked%SearchF1Status% xp-150 yp+20 w15 h20 vSearch gCPNRad ,SearchF1
-	Gui, %GuiNumber%:Add, Radio, Checked%SearchF2Status% xp+30 yp w15 h20  gCPNRad ,SearchF2
-	Gui, %GuiNumber%:Add, Radio, Checked%SearchF3Status% xp+30 yp w15 h20  gCPNRad , SearchF3
-	Gui, %GuiNumber%:Add, Radio, Checked%SearchF4Status% xp+30 yp w15 h20  gCPNRad , SearchF4
-	Gui, %GuiNumber%:Add, Radio, Checked%SearchF5Status% xp+30 yp w15 h20  gCPNRad , SearchF5
-	Gui, %GuiNumber%:Add, Radio, Checked%SearchUNStatus% xp+50 yp w15 h20  gCPNRad ,SearchUN
+	Gui, %GuiNumber%:Add, Radio,  xp-150 yp+20 w15 h20 vSearch gCPNRad ,SearchF1
+	Gui, %GuiNumber%:Add, Radio,  xp+30 yp w15 h20  gCPNRad ,SearchF2
+	Gui, %GuiNumber%:Add, Radio,  xp+30 yp w15 h20  gCPNRad , SearchF3
+	Gui, %GuiNumber%:Add, Radio,  xp+30 yp w15 h20  gCPNRad , SearchF4
+	Gui, %GuiNumber%:Add, Radio,  xp+30 yp w15 h20  gCPNRad , SearchF5
+	Gui, %GuiNumber%:Add, Radio,  xp+50 yp w15 h20  gCPNRad ,SearchUN
 	
 	; Tables Gui options
 	
@@ -1611,14 +1796,16 @@ gosub, Load_Settings
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F4
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F5
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w55 h20 , Unassigned
-	Gui, %GuiNumber%:Add, Radio, Checked%TableF1Status% xp-150 yp+20 w15 h20 VTable gCPNRad ,TableF1
-	Gui, %GuiNumber%:Add, Radio, Checked%TableF2Status% xp+30 yp w15 h20   gCPNRad ,TableF2
-	Gui, %GuiNumber%:Add, Radio, Checked%TableF3Status% xp+30 yp w15 h20  gCPNRad  , TableF3
-	Gui, %GuiNumber%:Add, Radio, Checked%TableF4Status% xp+30 yp w15 h20   gCPNRad , TableF4
-	Gui, %GuiNumber%:Add, Radio, Checked%TableF5Status% xp+30 yp w15 h20  gCPNRad,TableF5
-	Gui, %GuiNumber%:Add, Radio, Checked%TableUNStatus% xp+50 yp w15 h20   gCPNRad ,TableUN
+	Gui, %GuiNumber%:Add, Radio,  xp-150 yp+20 w15 h20 VTable gCPNRad ,TableF1
+	Gui, %GuiNumber%:Add, Radio,  xp+30 yp w15 h20   gCPNRad ,TableF2
+	Gui, %GuiNumber%:Add, Radio,  xp+30 yp w15 h20  gCPNRad  , TableF3
+	Gui, %GuiNumber%:Add, Radio,  xp+30 yp w15 h20   gCPNRad , TableF4
+	Gui, %GuiNumber%:Add, Radio,  xp+30 yp w15 h20  gCPNRad,TableF5
+	Gui, %GuiNumber%:Add, Radio,  xp+50 yp w15 h20   gCPNRad ,TableUN
+	
+	;Buttons for gui screen
 	Gui, %GuiNumber%:Add, Button, xs+10 yp+30 w60 h60 h30 , Default Settings
-	Gui, %GuiNumber%:Add, Button, xp+100 yp w60 h60 h30 , Save Settings
+	Gui, %GuiNumber%:Add, Button, xp+100 yp w60 h60 h30  gSettings_Save , Save Settings
 	Gui, %GuiNumber%:Add, Button, xp+290 yp w60 w75 h30 , Reset CPN Autofill Search
 	
 	
@@ -1636,12 +1823,9 @@ gosub, Load_Settings
 	
 	; For autoCPN Fill
 	Gui, %GuiNumber%:Add, Groupbox, xs+500 ys+200 w300 h125, CPN Autofill Options
-	Gui, %GuiNumber%:Add, Checkbox, checked%autocheckbox% xp+10 yp+20 vautocheckbox, Autoscroll down for CPN fill (ESC Key stops Autoscrolling)
-	;~ Gosub, SetOPtions
-	;~ gui,%GuiNumber%:submit, nohide
-	;Gui, %GuiNumber%:Add, Picture, x0 y0 w%GuiWIdth% h%GuiHeight% +0x4000000, %GuiBackground%
-		;~ Gui, submit, nohide
-				Loop, Parse, checkvars,`,
+	Gui, %GuiNumber%:Add, Checkbox,  xp+10 yp+20 checked%CPN_AutoSearch% vCPN_AutoSearch, Autoscroll down for CPN fill (ESC Key stops Autoscrolling)
+
+Loop, Parse, checkvars,`,
 	{
  		loop, 6
 		{
@@ -1667,9 +1851,10 @@ gosub, Load_Settings
 				}
 			}
 	}
-	;~ Gui,2:Submit,NoHide
+
 }
-Gui,%GuiNumber%:Show,  w%GuiWIdth% h%GuiHeight%, Arbortext Hotkeys V%Version_Number%
+Gui,%GuiNumber%:Show,  x%Amonx% y%Amony% w%GuiWIdth% h%GuiHeight%, Arbortext Hotkeys V%Version_Number%
+	Settimer, Quickview, 2000
 	return
 }
 
@@ -1681,11 +1866,7 @@ Aboutmenu:
 	GuiNumber = 3
 	GuiWIdth = 600 
 	GuiHeight = 240
-	activeMonitorInfo( amony,Amonx,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
-	Amonh /=2
-	amonw /=2
-	amonx := amonx + (amonw/2)
-	amony := amony + (amonh/2)
+	activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
 	Gui, %guiNumber%:Destroy
 	sleep 200
 	Gui, %GuiNumber%:Add, Groupbox, x5 y10 w590 h210
@@ -1702,7 +1883,6 @@ Aboutmenu:
 	gui, %GuiNumber%:font, s8
 	gui, %GuiNumber%:add, Text, xp+250 yp+35  BackgroundTrans, This program was created by
 	gui, %GuiNumber%:add, Text, xp yp+25  BackgroundTrans, and is maintained by Jarett Karnia
-	;Gui, %GuiNumber%:Add, Picture, x0 y0 w%GuiWIdth% h%GuiHeight% +0x4000000, %GuiBackground%
 	Gui, %GuiNumber%:Show, x%amonx% y%amony% w%GuiWIdth% h%GuiHeight% , Arbortext Hotkeys V%Version_Number%
 	Settimer, Quickview, 2000
 	return
@@ -1715,11 +1895,7 @@ Warningsgui:
 	Gui , %GuiNumber%:Destroy
 	GuiNumber = 5
 	gui %GuiNumber%: destroy
-	activeMonitorInfo( amony,Amonx,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
-	Amonh /=2
-	amonw /=2
-	amonx := amonx + (amonw/2)
-	amony := amony + (amonh/2)
+	activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
 	
 	Gui, %GuiNumber%:Add, Text,x10 y10,Pick which type of Warning that you want to search for, or type in Warning Number below.
 	Gui, %GuiNumber%:Add, ListBox, vMyListBox gMyListBoxs w270 r27
@@ -1762,13 +1938,13 @@ Warningsgui:
 
 Copytable(Tabletext)
 {
-	;  x%Amonx% Y%Amony%
+
 	If GuiNumber !=0
 	Gui , %GuiNumber%:Destroy
 	
 	GuiNumber = 6
 	Gui , %GuiNumber%:Destroy
-	activeMonitorInfo(amonY,AmonX,AmonW,AmonH,mx,my) ;gets the coordinates of the screen where the mouse is located.
+	activeMonitorInfo(Amonx,Amony,AmonW,AmonH,mx,my) ;gets the coordinates of the screen where the mouse is located.
 	Amonx := amonx + 50
 	Amony := amony + 50
 	
@@ -1804,23 +1980,23 @@ Copyallguitext:
 }
 
 
-autofillcheckboxsave:
-{
-gui,%GuiNumber%:Submit, Nohide
+;~ autofillcheckboxsave:
+;~ {
+;~ gui,%GuiNumber%:Submit, Nohide
+;~ MsgBox, % autocheckbox
+;~ GuiControlGet, autocheckbox
 
-GuiControlGet, autocheckbox
+;~ If (autocheckbox)
+;~ Scrolldown = 1
 
-If (autocheckbox)
-Scrolldown = 1
-
-Else 
-scrolldown = 0
+;~ Else 
+;~ scrolldown = 0
 
 
-GuiControlGet, autocheckbox
-IniWrite, %autocheckbox%, %Root_Folder_Location%\ArbortextMacroSettings.ini, Autofull, autocheckbox
-Return
-}
+;~ GuiControlGet, autocheckbox
+;~ IniWrite, %autocheckbox%, %Root_Folder_Location%\ArbortextMacroSettings.ini, Autofull, autocheckbox
+;~ Return
+;~ }
 
 Howto:
 {
@@ -1833,11 +2009,8 @@ Howto:
 
 Delete_images:
 {
-	activeMonitorInfo( amony,Amonx,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
-	Amonh /=2
-	amonw /=2
-	amonx := amonx + (amonw/2)
-	amony := amony + (amonh/2)
+	activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
+	
 	Settimer, winmovemsgbox, 50
 	Titletext := "Are you sure you want to reset the Cpn Search?"
 	Msgbox, 4,,Are you sure you want to reset the Cpn Search?
@@ -1903,8 +2076,8 @@ Quickview:
 2GuiEscape:
 2guiclose:
 {
-	gosub,Settings_save
-	gosub, SetHotKeys
+Gui 2:Submit
+Write_ini_file(inifile)
 	gui, 2:destroy
 	Return
 }
@@ -2007,16 +2180,9 @@ GuiSubmit:
 	Gui, 1:Submit, Nohide
 	Gui, 2:Submit, Nohide
 	;GoSub, Settings_save
-	gosub, SetHotKeys
-	Gui, 1:Submit, Nohide
-	Gui, 2:Submit, Nohide
+	;~ gosub, SetHotKeys
 	return
 }
-
-
-
-
-
 
 CPNRad:
 {
@@ -2030,7 +2196,6 @@ CPNRad:
 
 	Loop, parse, checkvars,`,
 {	
-	NAme := A_LoopField %A_loopField%
 	newValue%A_loopField% := A_LoopField  %A_loopfield%
 
 	If  (Oldvalue%A_LoopField% = newValue%A_loopField%)
@@ -2038,6 +2203,7 @@ CPNRad:
 	else	{
 			Changedvalue := A_LoopField
 			Key := %A_LoopField%
+			%a_loopfield%Hotkey := "F" Key
 		break
 			}
 }
@@ -2208,84 +2374,11 @@ return
 				
 				Settings_save:
 {
-	if not (FileExist(Root_Folder_Location "\ArbortextMacroSettings.ini")) ; if ini file isnt there it makes one
-	{
-		FileAppend,, %Root_Folder_Location%\ArbortextMacroSettings.ini
-		Firstrun = 1
-		Sleep 1000
-		GOsub, Default_Settings
-	}
-	Gui, 1:Submit, Nohide ;so the options and hotkey gui screen updates
+	Gui, 1:Submit, Nohide ;so the options and hotkey gui screen variables are updated
 	Gui, 2:Submit, Nohide
-	
-	;Checking what hotkeys that is enabled/disabled, and store it into variables
-	IniWrite, %CpnEnable%, C:\ArbortextMacros\ArbortextMacroSettings.ini, Hotkeys, CpnEnable
-	IniWrite, %METEnable%, C:\ArbortextMacros\ArbortextMacroSettings.ini, Hotkeys, METEnable
-	IniWrite, %CHKEnable%, C:\ArbortextMacros\ArbortextMacroSettings.ini, Hotkeys, CHKEnable
-	IniWrite, %SearchEnable%, C:\ArbortextMacros\ArbortextMacroSettings.ini, Hotkeys, SearchEnable
-	IniWrite, %TableEnable%, C:\ArbortextMacros\ArbortextMacroSettings.ini, Hotkeys, TableEnable
-		
-	;Writes the status of the userhotkeys
-	IniWrite, %CPNHotKey%, C:\ArbortextMacros\ArbortextMacroSettings.ini, DeclareHotKey, CPNHotKey
-	IniWrite, %METHotKey%, C:\ArbortextMacros\ArbortextMacroSettings.ini, DeclareHotKey, METHotKey
-	IniWrite, %CHKHotKey%, C:\ArbortextMacros\ArbortextMacroSettings.ini, DeclareHotKey, CHKHotKey
-	IniWrite, %SearchHotKey%, C:\ArbortextMacros\ArbortextMacroSettings.ini, DeclareHotKey, SearchHotKey
-	IniWrite, %TableHotKey%, C:\ArbortextMacros\ArbortextMacroSettings.ini, DeclareHotKey, TableHotKey
-	
-	;Writes teh canvase service screen options
-	IniWrite, %Section1%, C:\ArbortextMacros\ArbortextMacroSettings.ini, Canvas, Section1
-	IniWrite, %Section2%, C:\ArbortextMacros\ArbortextMacroSettings.ini, Canvas, Section2
-	IniWrite, %Section3%, C:\ArbortextMacros\ArbortextMacroSettings.ini, Canvas, Section3
-	
-	IniWrite, %autocheckbox%, C:\ArbortextMacros\ArbortextMacroSettings.ini, Autofull, autocheckbox
-
-
-	GoSub, Load_Settings
-	Gosub, SetHotKeys
-	
-	
-	
-	return
-}
-/*		
-/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== Loads INI File Section ======/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-*/
-
-Load_Settings:
-{
-
-Loop, Parse, checkvars,`,
-{
-	
-	
-}
-
-;Loads checkbox status
-	IniRead, CPNStatus, C:\ArbortextMacros\ArbortextMacroSettings.ini, Hotkeys, CPNEnable
-	IniRead, MetStatus, C:\ArbortextMacros\ArbortextMacroSettings.ini, Hotkeys, METEnable
-	IniRead, CHKStatus, C:\ArbortextMacros\ArbortextMacroSettings.ini, Hotkeys, CHKEnable
-	IniRead, SearchStatus, C:\ArbortextMacros\ArbortextMacroSettings.ini, Hotkeys, SearchEnable
-	IniRead, TableStatus, C:\ArbortextMacros\ArbortextMacroSettings.ini, Hotkeys, TableEnable
-	
-
-	; Loads the hotkey variables
-	
-	IniRead, CPNHotKey, C:\ArbortextMacros\Config.ini, DeclareHotKey, CPNHotKey
-	IniRead, METHotKey, C:\ArbortextMacros\Config.ini, DeclareHotKey, METHotKey
-	IniRead, CHKHotKey, C:\ArbortextMacros\Config.ini, DeclareHotKey, CHKHotKey
-	IniRead, SearchHotKey, C:\ArbortextMacros\Config.ini, DeclareHotKey, SearchHotKey
-	IniRead, TableHotKey, C:\ArbortextMacros\Config.ini, DeclareHotKey, TableHotKey
-	
-	; Loads the canvas section variables
-	IniRead, Section1, C:\ArbortextMacros\ArbortextMacroSettings.ini, Canvas, Section1
-	IniRead, Section2, C:\ArbortextMacros\ArbortextMacroSettings.ini, Canvas, Section2
-	IniRead, Section3, C:\ArbortextMacros\ArbortextMacroSettings.ini, Canvas, Section3
-	
-	IniRead, autocheckbox, C:\ArbortextMacros\ArbortextMacroSettings.ini, Autofull, autocheckbox
-	
-
+	Write_ini_file(inifile)
+	Sleep 500
+	Load_ini_file(inifile)	
 	return
 }
 
@@ -2307,11 +2400,8 @@ Default_Settings: ; sets the settings to the default ones
 	Gui, 2:Submit, Nohide
 	If Firstrun <> 1
 	{
-		activeMonitorInfo( amony,Amonx,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
-		Amonh /=2
-		amonw /=2
-		amonx := amonx + (amonw/2)
-		amony := amony + (amonh/2)
+		activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
+
 		Settimer, winmovemsgbox, 50
 		Titletext := "Are you sure you want to set the hotkeys to their default values"
 		Msgbox,4,, Are you sure you want to set the hotkeys to their default values?
@@ -2332,12 +2422,11 @@ Default_Settings: ; sets the settings to the default ones
 	Section1 = 72A
 	Section2 = 72a
 	Section3 = 72a
-	autocheckbox = 0
-	;~ GoSub, Guitab1
+	autocheckbox = 1
+
 	
-	Gosub, Settings_Save
-	Sleep 100
-	Sleep 100
+	Write_ini_file(inifile)
+	Sleep 200
 	SetTimer, Quickview, 1000
 		return
 }              
@@ -2624,10 +2713,10 @@ Loop %monCount%
 { 	SysGet, curMon, Monitor, %a_index%
 if ( mouseX >= curMonLeft and mouseX <= curMonRight and mouseY >= curMonTop and mouseY <= curMonBottom )
 {
-aX      := curMonLeft
-ay      := curMonTop
-aHeight := curMonBottom - curMonTop
-aWidth  := curMonRight  - curMonLeft
+aHeight := (curMonBottom - curMonTop) / 2
+aWidth  := (curMonRight  - curMonLeft) / 2
+aX      := curMonLeft + (aWidth / 2)
+ay      := curMonTop + (aHeight/ 2)
 return
 }
 }
@@ -2636,14 +2725,16 @@ return
 
 	Pausescript()
 		{
-			Menu,Tray,Icon, %Root_Folder_Location%"\icons\paused.ico", ,1
+			global
+			Menu,Tray,Icon, %Root_Folder_Location%\icons\paused.ico, ,1
 			Pause,on
 			Return
 		}
 
 		UnPausescript()
 	{
-		Menu,Tray,Icon, %Root_Folder_Location%"\icons\am.ico", ,1
+		global
+		Menu,Tray,Icon, %Root_Folder_Location%\icons\am.ico, ,1
 		Pause,off
 		Return
 		}
@@ -2652,8 +2743,6 @@ return
 			{
 				Msgbox, Unless otherwise stated, All content of this script unless otherwise noted was created by Jarett Karnia for the use of Caterpillar, Inc `n This script Can be used and modified as needed. But Must give credit to Orginal creaters of the content (including the libraries) and state what was changed from the orginal source code.
 				Return
-			
-			
 			}
 		
 #`::Listlines              
@@ -2666,17 +2755,15 @@ return
 **********************************************************************************************************************************
 */
 
+left Off here
 Updatechecker:
 {
 	;below is just in case the ini file isnt there. it makes a new one
-	if not (FileExist("C:\ArbortextMacros\ArbortextMacroSettings.ini"))
+	if not (FileExist(Root_Folder_Location"\config.ini"))
 	{
-		FileAppend,, C:\ArbortextMacros\ArbortextMacroSettings.ini
-		activeMonitorInfo( amony,Amonx,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
-		Amonh /=2
-		amonw /=2
-		amonx := amonx + (amonw/2)
-		amony := amony + (amonh/2)
+		FileAppend,,%Root_Folder_Location%"\config.ini"
+		activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
+
 		Settimer, winmovemsgbox, 50
 		Titletext := "Looks like This may be the first time running this application. Do you want to check for an update"
 		Msgbox,4,%A_Space%Arbortext Macro Updater, %A_Space%Looks like This may be the first time running this application. Do you want to check for an update?
@@ -2684,7 +2771,7 @@ Updatechecker:
 		{
 			gosub, Versioncheck
 		}else  {
-			IniWrite, 14,  C:\ArbortextMacros\ArbortextMacroSettings.ini,update,updaterate
+		updaterate = 14
 		}}
 	
 	;if file does exist, then it reads the ini file for the last update check and how often it plans to update.
@@ -2697,11 +2784,8 @@ Updatechecker:
 		EnvSub, NumberOfDays, %INIDate% , Days 	; this does a date calc, in days
 		If NumberOfDays > %Updaterate% )	; More than 14 days
 		{
-			activeMonitorInfo( amony,Amonx,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
-			Amonh /=2
-			amonw /=2
-			amonx := amonx + (amonw/2)
-			amony := amony + (amonh/2)
+			activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
+		
 			Settimer, winmovemsgbox, 50
 			Titletext := "days since the last update check.`n`n Would you like to check for a new update"
 			MsgBox,4,%A_Space%Arbortext Macro Updater, It has been %NumberOfDays% days since the last update check.`n`n Would you like to check for a new update?`n`n
@@ -2716,11 +2800,8 @@ Updatechecker:
 
 Versioncheck:
 {
-	activeMonitorInfo( amony,Amonx,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
-	Amonh /=2
-	amonw /=2
-	amonx := amonx + (amonw/2)
-	amony := amony + (amonh/2)
+	activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
+
 	Settimer, winmovemsgbox, 50
 	Titletext := "Arbortext Macro Updater"
 	Cliptemp = %clipboardall% ; sets the clipboard to a temp variable
