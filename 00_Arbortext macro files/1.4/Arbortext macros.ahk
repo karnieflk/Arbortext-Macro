@@ -28,6 +28,8 @@ Added config file to help ease in updating for future proofing
 Added option to stop asking for startup
 	- changed startup question to ask just to throw in a shortcut to the file. No more adding it into the folder needed
 	
+	- Added option to search by User name in search in Arbortext only using the F4 button
+	
 
 
 
@@ -54,6 +56,12 @@ SetDefaultMouseSpeed, 0 ; makes mouse instant
 ;SetWinDelay, 0 ; makes window functions instant
 ;SetControlDelay, 0 ; speeds up script
 
+IfNotExist, c:\arbortextmacros\config.ini
+{
+	;below takes the files fron the marcosn folder on computer and embeds them into the exe file. 
+	FileInstall, C:\ArbortextMacrosn\Config.ini, C:\ArbortextMacros\Config.ini
+	Firstrun = 1
+}
 
 inifile = c:\arbortextmacros\config.ini
 Load_ini_file(inifile)
@@ -106,12 +114,7 @@ IfNotExist, %Root_Folder_Location%\ProgramImages
 	FileCreateDir, %Root_Folder_Location%\ProgramImages
 }
 
-IfNotExist, %Root_Folder_Location%\Config.ini
-{
-	;below takes the files fron the marcosn folder on computer and embeds them into the exe file. 
-	FileInstall, C:\ArbortextMacrosn\Config.ini, %Root_Folder_Location%\Config.ini
-	Firstrun = 1
-}
+
 
 FileInstall, C:\ArbortextMacrosn\How to use Arbortext Macros.pdf, %Root_Folder_Location%\How to use Arbortext Macros.pdf,1
 
@@ -175,13 +178,14 @@ If Reload = 0
 }   
 
 ; Creates Menu for gui screen
-Menu, BBBB, Add, &Check For Update , Versioncheck
+	Menu, BBBB, Add, &Check For Update , Versioncheck
 	Menu, BBBB, Add, &Options, Optionsmenu
 	Menu, BBBB, Add,
 	Menu, BBBB, Add, &Exit, exitprogram
 	
 	Menu, DDDD, Add, &How To Use, HowTo
 	Menu, DDDD, Add, &About , Aboutmenu
+	Menu, DDDD, Add, &Configuration, Config_screen
 	
 	Menu, MyMenuBar, Add, &File, :BBBB
 	Menu, MyMenuBar, Add, &Help, :DDDD
@@ -210,18 +214,6 @@ Ptoken = 0 ; sets the Ptoken variable to 0.
 guinumber = 0 ; set this variable to 0
 SkipUnitstag = 0 ; Sets teh variable to 0
 canvascount = 0
-
-
-
-
-;below checks for the settings text document, if it not there, it makes one
-if not (FileExist(Root_Folder_Location "\Config.ini"))
-{
-	FileAppend,,%Root_Folder_Location%\Config.ini
-	Firstrun = 1
-	Gosub, Default_Settings
-}
-
 
 Create_Tray_Menu()  ; goes to Createmenu function
 sleep 500 ;sets a .5 sec delay
@@ -539,14 +531,13 @@ METRapidTotal:
 		Sleep 200 ; Delays to app .200 seconds
 		Send {U} ;sends the U keystroke to the computer
 	}
-	
-	
-	;Findtags() ; goes to the find tags function
+
 	KeyWait, LButton, D T10 ; Waits for the Left mouse button to be pressed down. T10 is options for timeout after 10 seconds and continues down the script
 	If ErrorLevel = 1 ; IF the 10 second timeout happens, it creates ErrorLevel = 1, this catches the timeout for the KeyWait command
 	{
 		Return ; exits the METRapid subroutine
 	}
+	
 	
 	MouseGetPos tx, ty ;Gets the position there you clicked in the tag
 	sleep 50 ; sleeps for 50 milliseconds
@@ -639,7 +630,11 @@ METRapidTotal:
 			}
 			+++SetTitleMatchMode,2
 			ErrorLevel = 0 ; reset errorlevel variable to 0
-			ErrorLevel := GraphicsSearchSetup() ; runs the GraphicsSearchSetup function and gets the return value of 1 or 0
+			If s=Search_b=By = Name
+			ErrorLevel := GraphicsSearchSetup(Search_By) ; runs the GraphicsSearchSetup function and gets the return value of 1 or 0
+			else			
+			ErrorLevel := GraphicsSearchSetup(Search_By) ; runs the GraphicsSearchSetup function and gets the return value of 1 or 0
+			
 			If ErrorLevel = 1 ; if the search window is not open. GraphicsSearchSetup() will return a 1, if it opens successfully, function will return a 0
 			{
 				Exit ; stops the subroutine
@@ -2390,44 +2385,48 @@ return
 */
 Default_Settings: ; sets the settings to the default ones
 {
-	SetTimer, Quickview, Off
-	if not (FileExist(Root_Folder_Location "\ArbortextMacroSettings.ini"))
-	{
-		FileAppend,,%Root_Folder_Location%\ArbortextMacroSettings.ini
-		Firstrun = 1
-	}
-	Gui, 1:Submit, Nohide
-	Gui, 2:Submit, Nohide
-	If Firstrun <> 1
-	{
-		activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
+	;~ SetTimer, Quickview, Off
+	;~ if not (FileExist(Root_Folder_Location "\ArbortextMacroSettings.ini"))
+	;~ {
+		;~ FileAppend,,%Root_Folder_Location%\ArbortextMacroSettings.ini
+		;~ Firstrun = 1
+	;~ }
+	;~ Gui, 1:Submit, Nohide
+	;~ Gui, 2:Submit, Nohide
+	;~ If Firstrun <> 1
+	;~ {
+		;~ activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
 
-		Settimer, winmovemsgbox, 50
-		Titletext := "Are you sure you want to set the hotkeys to their default values"
-		Msgbox,4,, Are you sure you want to set the hotkeys to their default values?
-		IfMsgbox no
-		return
-	}
-	GuiControl,, CPNF1, 1
-	GuiControl,, METF2, 1
-	GuiControl,, CHKF3, 1
-	GuiControl,, SearchF4, 1
-	GuiControl,, TableF5, 1
+		;~ Settimer, winmovemsgbox, 50
+		;~ Titletext := "Are you sure you want to set the hotkeys to their default values"
+		;~ Msgbox,4,, Are you sure you want to set the hotkeys to their default values?
+		;~ IfMsgbox no
+		;~ return
+	;~ }
+	;~ GuiControl,, CPNF1, 1
+	;~ GuiControl,, METF2, 1
+	;~ GuiControl,, CHKF3, 1
+	;~ GuiControl,, SearchF4, 1
+	;~ GuiControl,, TableF5, 1
 	
-	CPNHotKey = F1
-	METHotKey = F2
-	CHKHotKey = F3
-	SearchHotKey = F4
-	TableHotKey = F5
-	Section1 = 72A
-	Section2 = 72a
-	Section3 = 72a
-	autocheckbox = 1
+	;~ CPNHotKey = F1
+	;~ METHotKey = F2
+	;~ CHKHotKey = F3
+	;~ SearchHotKey = F4
+	;~ TableHotKey = F5
+	;~ Section1 = 72A
+	;~ Section2 = 72a
+	;~ Section3 = 72a
+	;~ autocheckbox = 1
 
 	
-	Write_ini_file(inifile)
-	Sleep 200
-	SetTimer, Quickview, 1000
+	;~ Write_ini_file(inifile)
+	;~ Sleep 200
+	;~ SetTimer, Quickview, 1000
+		FileInstall, C:\ArbortextMacrosn\Config.ini, C:\ArbortextMacros\Config.ini,1
+		Sleep 1000
+		Load_ini_file(inifile)
+		
 		return
 }              
 
@@ -2567,8 +2566,9 @@ Default_Settings: ; sets the settings to the default ones
 				}
 				
 				+++SetTitleMatchMode,2
-				GraphicsSearchSetup()
+				GraphicsSearchSetup(Search_by := "Graphic_Number")
 				{
+					Search_text = 
 					ErrorLevel := Win_Activate(Arbortext_Window_Title)
 					If ErrorLevel = 1 ; if the search window is not open. subroutine will stop.
 					{
@@ -2584,6 +2584,25 @@ Default_Settings: ; sets the settings to the default ones
 						Return "1" ; returns 1 to say it timed out.
 					}
 					Sleep 500
+					If Search_by = Name
+					{
+						Send {Tab}{a}{l}{l}%a_space%{L}{i}{b} ; sends keystrokes to window
+					sleep 300 ; delays program for 200 milliseconds
+					Send {tab}{g}{r} ; sends keystrokes to window
+					Sleep 200 ; delays program for 200 milliseconds
+					Send {tab 2}{right} ; sends keystrokes to window
+					Sleep 200 ; delays program for 200 milliseconds
+					Send {tab 8} ; sends 8 tab keystrokes to window
+					Sleep 400 ; delays program for 400 milliseconds
+					Send {n}{a}{m}{e}{tab}{Enter} ; sends keystrokes to window
+					Sleep 400 ; delays program for 400 milliseconds
+					Send {tab 7}  ; sends 7 tabs to window
+					Sleep 200 ; delays program for 200 milliseconds
+					Search_text := A_UserName
+						
+				}
+				else 
+					{
 					Send {Tab}{g}{r} ; sends keystrokes to window
 					sleep 200 ; delays program for 200 milliseconds
 					Send {tab}{g}{r} ; sends keystrokes to window
@@ -2600,13 +2619,17 @@ Default_Settings: ; sets the settings to the default ones
 					
 					If (RegExMatch(clipboard,"^G[0-9]{8}$")) ; finds if the number is a Gnumber with an upper case G
 					{
-						Clipboard := RegexReplace(Clipboard,"G","g") ; replaces the Uppercase G to a Lower case g so it can be found in ACM
+						Search_text := RegexReplace(Clipboard,"G","g") ; replaces the Uppercase G to a Lower case g so it can be found in ACM
 					}
 					
 					if RegExMatch(clipboard, "^g[0-9]{8}$") ; searches the clipboard for an item that has a g in the front and then 8 numbers after it (a graphics # for ACM) If found, it pastes, if not then it does nothing
 					{
-						Sendraw %Clipboard% ; send keystrokes to window
+						Search_text := Clipboard						
 					}
+				}
+				
+					Sendraw %Search_text% ; send keystrokes to window
+					
 					Return 0
 				}
 				
@@ -2669,6 +2692,7 @@ Default_Settings: ; sets the settings to the default ones
 						}
 						ErrorLevel = 0 ; reset errorlevel variable to 0
 						+++SetTitleMatchMode, 2 ; Sets the window title matching to contains the search words
+						
 						ErrorLevel := GraphicsSearchSetup() ; runs the GraphicsSearchSetup function and gets the return value of 1 or 0
 						If ErrorLevel = 1 or ErrorLevel = 2 ; if the search window is not open. GraphicsSearchSetup() will return a 1, Arbortext cannot be made active window a 2 if it opens successfully, function will return a 0
 						{
@@ -2755,13 +2779,13 @@ return
 **********************************************************************************************************************************
 */
 
-left Off here
+
 Updatechecker:
 {
 	;below is just in case the ini file isnt there. it makes a new one
-	if not (FileExist(Root_Folder_Location"\config.ini"))
+	if not (FileExist(Root_Folder_Location "\config.ini"))
 	{
-		FileAppend,,%Root_Folder_Location%"\config.ini"
+		FileAppend,,%inifile%
 		activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
 
 		Settimer, winmovemsgbox, 50
@@ -2775,10 +2799,10 @@ Updatechecker:
 		}}
 	
 	;if file does exist, then it reads the ini file for the last update check and how often it plans to update.
-	if (FileExist("C:\ArbortextMacros\ArbortextMacroSettings.ini"))
+	if (FileExist(inifile))
 	{
-		IniRead, updatestatus, C:\ArbortextMacros\ArbortextMacroSettings.ini, update,lastupdate
-		IniRead, Updaterate, C:\ArbortextMacros\ArbortextMacroSettings.ini, update,updaterate
+		;~ IniRead, updatestatus, %inifile%, update,lastupdate
+		;~ IniRead, Updaterate, %inifile%, update,updaterate
 		
 		NumberOfDays := %A_Now%		; Set to the current date first
 		EnvSub, NumberOfDays, %INIDate% , Days 	; this does a date calc, in days
@@ -2792,7 +2816,7 @@ Updatechecker:
 			ifmsgbox Yes	
 			gosub, Versioncheck
 			else
-				IniWrite, 14,  C:\ArbortextMacros\ArbortextMacroSettings.ini,update,updaterate
+				IniWrite, 14,  %inifile%,update,updaterate
 		}}
 	
 	Return
@@ -2822,7 +2846,7 @@ Versioncheck:
 	Progress, 25 ; sets progress bar to 25%
 	sleep 200 ; pauses the script for 200 miliseconds
 	
-	wb.navigate("https://docs.google.com/document/d/1RmxRdQ5NrkcYHEajabMcy6sGD19u-6qwLNbG79Fkrvg/edit?usp=sharing") ; makes the webbrowser in the gui navigate to the google docs page that has the updates in it
+	wb.navigate(Update_checker_site) ; makes the webbrowser in the gui navigate to the google docs page that has the updates in it
 	Settimer, winmovemsgbox, 50
 	Progress,  w200, Updating...,Gathering Current Version From Server, Arbortext Macro Updater ; changes the progress bar text
 	Progress, 50 ; sets the progress bar to 50%
@@ -2883,8 +2907,8 @@ Versioncheck:
 		Progress, off
 		SplashTextOff
 		Settimer, versiontimeout, off
-		IniWrite, %A_now%,  C:\ArbortextMacros\ArbortextMacroSettings.ini,  update,lastupdate
-		IniWrite, 14,  C:\ArbortextMacros\ArbortextMacroSettings.ini,update,updaterate	
+		IniWrite, %A_now%,  %inifile%,  update,lastupdate
+		IniWrite, 14,  %inifile%,update,updaterate	
 		clipboard = %cliptemp%
 	}
 	
@@ -2899,15 +2923,15 @@ Versioncheck:
 		IfMsgBox, yes 
 		{
 			gui 4:destroy
-			IniWrite, 14,  C:\ArbortextMacros\ArbortextMacroSettings.ini,update,updaterate		
-			IniWrite, %A_now%,   C:\ArbortextMacros\ArbortextMacroSettings.inii,  update,lastupdate
-			Run, https://cat.box.com/s/kbbxsf1ceyf0lo65n6s52if0op0rzok7
+			IniWrite, 14, %inifile%i,update,updaterate		
+			IniWrite, %A_now%,  %inifile%, update,lastupdate
+			Run, %Program_Site%
 		}
 		Else
 			gui 4:destroy
 		Sleep 500
-		IniWrite, 14,  C:\ArbortextMacros\ArbortextMacroSettings.ini,update,updaterate	
-		IniWrite, %A_now%,  C:\ArbortextMacros\ArbortextMacroSettings.ini,  update,lastupdate
+		IniWrite, 14,  %inifile%,update,updaterate	
+		IniWrite, %A_now%,  %inifile%,  update,lastupdate
 		
 		return
 	}
@@ -2934,8 +2958,7 @@ versiontimeout:
 		Settimer, versiontimeout, off
 		;Msgbox,,Serial Updater Timed out, Cannot connect to server for update check, please check for internet connection.
 	}
-	;clipboard := ""
-	;clipboard = %cliptemp%
+
 	Return
 }
 
@@ -2989,8 +3012,8 @@ Win_Activate(Win_title)
 Load_ini_file(inifile)
  {
 	global
-	
 	Ini_var_store_array:= Object()
+	Tab_placeholder  = 
 		loop,read,%inifile%
   {
 	If A_LoopReadLine = 
@@ -3000,8 +3023,16 @@ Load_ini_file(inifile)
       {
         Section :=regexreplace(A_loopreadline,"(\[)(.*)?(])","$2")
 		StringReplace, Section,Section, %a_space%,,All
-		continue
-      }
+		
+If Tab_PLaceholder = 
+{
+Tab_placeholder := Section
+}
+Else
+Tab_placeholder := Tab_placeholder "|" Section
+
+	continue
+  }
 
     else if A_LoopReadLine != 
       { 
@@ -3016,7 +3047,6 @@ Load_ini_file(inifile)
 	
 	return
 }
-
 
 Write_ini_file(inifile)
 {
@@ -3034,6 +3064,106 @@ Write_ini_file(inifile)
 	return
 }
 
+Config_screen()
+{
+		global
+	
+	Settimer, Quickview, Off
+	
+		If GuiNumber !=0 ; If guiscreeen vairable is not 0
+		Gui , %GuiNumber%:Destroy ; closes the gui screen
+	
+	GuiWIdth = 710 
+	GuiHeight = 525
+	Load_ini_file(inifile)
+	GuiNumber = 9
+	activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
+	
+	GUi,%GuiNumber%: Add, button, x10 y501 gsave_config, Save Settings
+	GUi,%GuiNumber%: Add, button, x200 y501 gTitle_grabber, Get window Title / ahk_class
+Gui, %GuiNumber%:add, tab2,x5 y0 w700 h500,%Tab_placeholder%
+
+
+	for index, element in Ini_var_store_array 
+	{	
+
+		StringSplit, INI_Write,element, `:
+		If INI_write2 != %INIWrites_Temp%
+		{
+		Gui,%GuiNumber%:Tab, %INI_Write2%
+		Gui, %GuiNumber%:add, Text,x10 y50,%INI_Write1%
+		GUi,%GuiNumber%:Add, Edit, xp+150 v%INI_write1%, % %Ini_write1%
+		INIWrites_Temp = %INI_write2%
+		}
+		Else
+		{
+		Gui, %GuiNumber%:add, Text,x10 yp+30,%INI_Write1%
+		GUi,%GuiNumber%:Add, Edit, xp+150 v%INI_write1%, % %Ini_write1%		
+		}
+    } 
+	gui,%GuiNumber%:show, x%Amonx% y%Amony% w%GuiWIdth% h%GuiHeight%, Configuration
+	return
+}
+
+save_config:
+{
+Gui,%GuiNumber%:Submit,NoHide
+Write_ini_file(inifile)
+Gui,%GuiNumber%: Destroy	
+Load_ini_file(inifile)
+	return
+}
+
+Title_Grabber:
+{
+	SetTimer, WatchCursor, 2000
+	Gui, 99:add, Button, x0 y0 gstoptimer,Stop	
+	Gui, 99:add, text, x50 y0 , Data is from Window under mouse cursor	
+	Gui, 99:add, Text, x10 y35 ,Window Title	
+	Gui, 99:add, Text, x155 y35 ,ahk_class	
+	
+	;~ gui,99: add, text, xp+20 h35
+Gui,99:Submit,NoHide	
+	Gui, 99:Show,w350 h50,Get Information for Macro	
+
+;~ SetTimer, WatchCursor, 1000
+return
+
+}
+	
+	Stoptimer:
+	{
+		
+		SetTimer, WatchCursor, Off
+		return
+	}
+	
+	99Guiclose:
+	{
+		gosub, Stoptimer
+		Gui,99:Destroy
+		return
+	}
+	
+WatchCursor:
+{
+Gui,99:Submit,NoHide
+MouseGetPos, , , id, control
+WinGetTitle, title, ahk_id %id%
+WinGetClass, class, ahk_id %id%
+	Gui, 99:add, Edit, x0 yp+40  h35 w200,%title%
+	Gui, 99:add, Edit, xp+210 yp h35 w150 , %class%
+	WinGetPos,,,, Height,Get Information for Macro	
+Height += 50
+	WinMove, Get Information for Macro,,,,,%Height%
+;~ GuiControlGet, WIndowtitle
+;~ GuiControlGet, classtitle
+;~ GuiControl,99:,WIndowtitle,%WIndowtitle% `n %title%
+;~ GuiControl,99:,classtitle,%classtitle% `n  %class%
+;~ MsgBox, % windowtitletemp classtemp windowtitle class
+Gui,99:Submit,NoHide
+return	
+}	
 
 /*
 ********************************************************************************************************************************************************************************************************************************************************************
