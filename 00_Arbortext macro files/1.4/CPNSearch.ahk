@@ -26,7 +26,7 @@ Scrollcount = 0
 WinActivate, Arbortext
 Sleep 500
 WinGetTitle, Temptitle,a
-Iniread, Scrolldown, C:\ArbortextMacros\ArbortextMacroSettings.ini, Autofull, autocheckbox
+Iniread, Scrolldown, C:\ArbortextMacros\config.ini, Start_up, CPN_Autosearch
 ToolTip, Loading image files for CPN search
 SetTimer, RemoveToolTip, 1500
 ;Gosub, Monitorareas
