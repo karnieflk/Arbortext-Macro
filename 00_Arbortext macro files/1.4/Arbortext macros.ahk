@@ -1030,6 +1030,7 @@ Createtable() ; CreateTable function
 		msgbox,,,Please put cursor in approiate location to create a table,.5
 		msgbox,,,Please put cursor in approiate location to create a table,.5
 		msgbox,Please put cursor in approiate location to create a table
+		
 		IfEqual, A_IsCompiled,1
 					{
 						Run, %A_ScriptFullPath% /Restart
@@ -1041,509 +1042,508 @@ Createtable() ; CreateTable function
 					Return
 		}
 		
-		
-	If String Contains id
-	{
-		Send {ctrl down}{x}{ctrl up}
-	}else  {
-		Send {SHift Down}{up} ; sends Shift down and then UP to the computer
-		sleep 200 ; pauses script for .5 seconds
-		send {shift up} ; Send shift up to the computer to release the shift key
-		sleep 200 ; pauses script for .5 seconds
-	
-		
-		Send {ctrl down}{x}{ctrl up} ; sends Ctrl + X to teh computer to cut the table contents out
-		sleep 100
-		Clipwait
-		string = %clipboard% ; stores that data into the variable "String"
-	}
-	RegExMatch(string,"id=""(.*)""", BitInTheMiddle) ; Finds the Xref number (ie.. i00000001.37)
-	newword := "`" BitInTheMiddle1 `"" ; puts that information into the "newword" variable
-	NewwordGUi := BitInTheMiddle1 ; stores for table gui screen
-	Fronttext := "<table frame=""all"" id=" ; Puts that information into the "fronttext" variable
-	NewStrfront := SubStr(newword, 1 ,1)
-	NewStrrear := SubStr(newword, 2 ,12)
-	newwordftnote := (NewStrrear + .01)
-	Newword := NewStrfront NewStrrear
-	newwordftnote := NewStrfront newwordftnote
-	;msgbox, newword is %newword%`, newwordftnote is %newwordftnote%
-	gosub, TableChoiceGUI
-	Sleep 500
-	Pausescript()
-	If Pgwd = Yes ; checks if the PGwd variable is yes
-	{
-		Pagewidecheck := " pgwide=""1""" ; adds the information to "pagewidecheck" variable
-	}
-	
-	If Pgwd = no ; checks if pgwd is no
-	{
-		Pagewidecheck := ""  ; makes the variable blank
-	}
-	;msgbox, Tabletype is %Tabletype%
-	
-	If Tabletype = C2 ; If the "tabletype" variable is C2 then this data will be stored in "reartext" variable
-	{
-		reartext := ">
-		<tgroup align=""center"" cols=""2"">
-		<colspec colname=""col1"" colwidth=""33.12pt""/>
-		<colspec colname=""col2"" colwidth=""2.00*""/>
-		<thead>
-		<row valign=""middle"">
-		<entry nameend=""col2"" namest=""col1""><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Parts List</entry>
-		</row>
-		<row valign=""middle"">
-		<entry><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt""?>Qty</entry>
-		<entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?>Part</entry>
-		</row>
-		</thead>
-		<tbody>"
-		
-		Reartextrows := "<row valign=""middle"">
-		<entry colname=""col1""></entry>
-		<entry colname=""col2""><cpn-id><partno></partno><cpn></cpn></cpn-id></entry>
-		</row>"
-		
-		Reartextrowstotal = 
-		
-		Loop, %Userrows%
-		{
-		Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
-		}
-		Reartextend := "</tbody>
-		</tgroup>
-		</table>"
-		reartext := reartext reartextrowstotal reartextend
-	}
-	
-	
-	if tabletype = toolingtableService
-	{
-			reartext := ">
-		<tgroup align=""center"" cols=""3"">
-		<colspec colname=""col1"" colwidth=""33.12pt""/>
-		<colspec colname=""col2"" colwidth=""33.12pt""/>
-		<colspec colname=""col3"" colwidth=""3.00*""/>
-		<thead>
-		<row valign=""middle"">
-		<entry nameend=""col3"" namest=""col1""><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Required Tools</entry>
-		</row>
-		<row valign=""middle"">
-		<entry><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt""?>Item</entry>
-		<entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?>Qty</entry>
-		<entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?>Part</entry>
-		</row>
-		</thead>
-		<tbody>"
-		
-		Reartextrowstotal = 
-	
+If String Contains id
+{
+   Send {ctrl down}{x}{ctrl up}
+}else  {
+   Send {SHift Down}{up} ; sends Shift down and then UP to the computer
+   sleep 200 ; pauses script for .5 seconds
+   send {shift up} ; Send shift up to the computer to release the shift key
+   sleep 200 ; pauses script for .5 seconds
+   
+   
+   Send {ctrl down}{x}{ctrl up} ; sends Ctrl + X to teh computer to cut the table contents out
+   sleep 100
+   Clipwait
+   string = %clipboard% ; stores that data into the variable "String"
+}
+RegExMatch(string,"id=""(.*)""", BitInTheMiddle) ; Finds the Xref number (ie.. i00000001.37)
+newword := "`" BitInTheMiddle1 `"" ; puts that information into the "newword" variable
+NewwordGUi := BitInTheMiddle1 ; stores for table gui screen
+Fronttext := "<table frame=""all"" id=" ; Puts that information into the "fronttext" variable
+NewStrfront := SubStr(newword, 1 ,1)
+NewStrrear := SubStr(newword, 2 ,12)
+newwordftnote := (NewStrrear + .01)
+Newword := NewStrfront NewStrrear
+newwordftnote := NewStrfront newwordftnote
+;msgbox, newword is %newword%`, newwordftnote is %newwordftnote%
+gosub, TableChoiceGUI
+Sleep 500
+Pausescript()
+If Pgwd = Yes ; checks if the PGwd variable is yes
+{
+   Pagewidecheck := " pgwide=""1""" ; adds the information to "pagewidecheck" variable
+}
 
-		Loop, %Userrows%
-		{		
-		Reartextrows := "<row valign=""middle"">
-		<entry colname=""col1"">" A_index "</entry>
-		<entry colname=""col2""></entry>
-		<entry colname=""col3""><cpn-id><partno></partno><cpn></cpn></cpn-id></entry>
-		</row>"
-	
-		
-		Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
-		}
-		
-		
-		Reartextend := "</tbody>
-		</tgroup>
-		</table>"
-		
-		reartext := reartext reartextrowstotal reartextend		
-	}
-	
-		
-	if tabletype = toolingtable
-	{
-		reartext := ">
-		<tgroup align=""center"" cols=""3"">
-		<colspec colname=""col1"" colwidth=""33.12pt""/>
-		<colspec colname=""col2"" colwidth=""33.12pt""/>
-		<colspec colname=""col3"" colwidth=""3.00*""/>
-		<thead>
-		<row valign=""middle"">
-		<entry nameend=""col3"" namest=""col1""><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Required Tools</entry>
-		</row>
-		<row valign=""middle"">
-		<entry><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt""?>Item</entry>
-		<entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?>Qty</entry>
-		<entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?>Part</entry>
-		</row>
-		</thead>
-		<tbody>"
-		
-		Reartextrowstotal = 
-		Letteroutput = 0
-		Loopcounter = 1
-		ASCII = 65	
+If Pgwd = no ; checks if pgwd is no
+{
+   Pagewidecheck := ""  ; makes the variable blank
+}
+;msgbox, Tabletype is %Tabletype%
 
-		Loop, %Userrows%
-		{
-		
-		Transform, OutputChar, Chr, %ASCII%
-		
-		If ASCii = 91
-		{
-		Ascii = 65
-		Letteroutput++
-		}
-		
-		If (ASCii = 79) || (ASCii = 81) || (ASCii = 73) 
-		{
-		Ascii++
-		Transform, OutputChar, Chr, %ASCII%
-		}
-	
-		
-		If Letteroutput != 0
-		{				
-		Asciifirst := (64 + letteroutput)
-		If Asciifirst = 73 | 79 | 81
-		{
-		Asciifirst++
-		}
-		Transform, OutputCharfirst, Chr, %Asciifirst%
-		outputchar := OutputCharfirst outputchar
-		}
-		
-		Reartextrows := "<row valign=""middle"">
-		<entry colname=""col1"">" OutputChar "</entry>
-		<entry colname=""col2""></entry>
-		<entry colname=""col3""><cpn-id><partno></partno><cpn></cpn></cpn-id></entry>
-		</row>"
-		loopcounter++
-		
-		
-		Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
-		AscII++
-		}
-		
-		
-		Reartextend := "</tbody>
-		</tgroup>
-		</table>"
-		
-		reartext := reartext reartextrowstotal reartextend
-		
-		
-	}
-	
-	If tabletype = C5 ; If the "tabletype" variable is C5 then this data will be stored in "reartext" variable
-	{
-		reartext := ">
-		<tgroup align=""center"" cols=""5"">
-		<colspec colname=""col1"" colwidth=""33.12pt""/>
-		<colspec colname=""col2"" colwidth=""33.12pt""/>
-		<colspec colname=""col3"" colwidth=""70.77pt""/>
-		<colspec colname=""col4"" colwidth=""2.51*""/>
-		<colspec colname=""col5"" colwidth=""2.51*""/>
-		<thead>
-		<row valign=""middle"">
-		<entry nameend=""col5"" namest=""col1""><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Parts List</entry>
-		</row>
-		<row valign=""middle"">
-		<entry><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt""?>Item</entry>
-		<entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?>Qty</entry>
-		<entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?><para>New Part</para><para>Number</para></entry>
-		<entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?>Part Name</entry>
-		<entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?><para>Former Part</para><para>Number</para> <fn id=""" newwordftnote """>
-		<para>The former part number listed is for reference only and may differ.</para>
-		</fn></entry>
-		</row>
-		</thead>
-		<tbody>"
-		
-		
-		Reartextrowstotal = 
-		Loopcounter = 1
-		Loop, %Userrows%
-		{
-		Reartextrows := "<row valign=""middle"">
-		<entry colname=""col1"">" loopcounter "</entry>
-		<entry colname=""col2""></entry>
-		<entry colname=""col3""><partno></partno></entry>
-		<entry colname=""col4""><cpn></cpn></entry>
-		<entry colname=""col5""><partno></partno></entry>
-		</row>"
-		
-		loopcounter++
-		Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
-		}
-		
-		Reartextend := "</tbody>
-		</tgroup>
-		</table>"
-		
-		reartext := reartext reartextrowstotal reartextend
-	}
-	
-	If tabletype = C3 ; If the "tabletype" variable is C3 then this data will be stored in "reartext" variable
-	{
-		reartext := ">
-		<tgroup align=""center"" cols=""3"">
-		<colspec colname=""col1"" colwidth=""33.12pt""/>
-		<colspec colname=""col2"" colwidth=""33.12pt""/>
-		<colspec colname=""col3"" colwidth=""3.00*""/>
-		<thead>
-		<row valign=""middle"">
-		<entry nameend=""col3"" namest=""col1""><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Parts List</entry>
-		</row>
-		<row valign=""middle"">
-		<entry><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt""?>Item</entry>
-		<entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?>Qty</entry>
-		<entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?>Part</entry>
-		</row>
-		</thead>
-		<tbody>"
-		
-		Reartextrowstotal = 
-		Loopcounter = 1
-		Loop, %Userrows%
-		{
-		Reartextrows := "<row valign=""middle"">
-		<entry colname=""col1"">" loopcounter "</entry>
-		<entry colname=""col2""></entry>
-		<entry colname=""col3""><cpn-id><partno></partno><cpn></cpn></cpn-id></entry>
-		</row>"
-		loopcounter++
-		Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
-		}
-		
-		
-		Reartextend := "</tbody>
-		</tgroup>
-		</table>"
-		
-		reartext := reartext reartextrowstotal reartextend
-		
-	}
-	If tabletype = C5 ; If the "tabletype" variable is C5 then this data will be stored in "reartext" variable
-	{
-		reartext := ">
-		<tgroup align=""center"" cols=""5"">
-		<colspec colname=""col1"" colwidth=""33.12pt""/>
-		<colspec colname=""col2"" colwidth=""33.12pt""/>
-		<colspec colname=""col3"" colwidth=""70.77pt""/>
-		<colspec colname=""col4"" colwidth=""2.51*""/>
-		<colspec colname=""col5"" colwidth=""2.51*""/>
-		<thead>
-		<row valign=""middle"">
-		<entry nameend=""col5"" namest=""col1""><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Parts List</entry>
-		</row>
-		<row valign=""middle"">
-		<entry><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt""?>Item</entry>
-		<entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?>Qty</entry>
-		<entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?><para>New Part</para><para>Number</para></entry>
-		<entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?>Part Name</entry>
-		<entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?><para>Former Part</para><para>Number</para> <fn id=""" newwordftnote """>
-		<para>The former part number listed is for reference only and may differ.</para>
-		</fn></entry>
-		</row>
-		</thead>
-		<tbody>"
-		
-		
-		Reartextrowstotal = 
-		Loopcounter = 1
-		Loop, %Userrows%
-		{
-		Reartextrows := "<row valign=""middle"">
-		<entry colname=""col1"">" loopcounter "</entry>
-		<entry colname=""col2""></entry>
-		<entry colname=""col3""><partno></partno></entry>
-		<entry colname=""col4""><cpn></cpn></entry>
-		<entry colname=""col5""><partno></partno></entry>
-		</row>"
-		
-		loopcounter++
-		Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
-		}
-		
-		Reartextend := "</tbody>
-		</tgroup>
-		</table>"
-		
-		reartext := reartext reartextrowstotal reartextend
-	}
-	
-	If tabletype = Jcode ; If the "tabletype" variable is Jcode then this data will be stored in "reartext" variable
-	{
-		reartext := ">
-		<tgroup cols=""3"">
-		<colspec colname=""col1""/>
-		<colspec colname=""col2""/>
-		<colspec colname=""col3""/>
-		<thead>
-		<row valign=""middle"">
-		<entry align=""center""><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?><para>J1939 Code and Description</para></entry>
-		<entry align=""center""><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?> <para>CDL Code and Description</para></entry>
-		<entry align=""center""><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?> <para>Comments</para></entry>
-		</row>
-		</thead>
-		<tbody>"
-		
-		Reartextrows := "<row>
-		<entry valign=""middle""><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt""?><para><code></code></para><para><codedesc></codedesc></para></entry>
-		<entry valign=""middle""><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?><para><code></code></para><para><codedesc></codedesc></para></entry>
-		<entry valign=""middle""><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?><para></para></entry>
-		</row>"
-		
-		Reartextrowstotal = 
-		
-		Loop, %Userrows%
-		{		
-		Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
-		}
-		
-		Reartextend :=  "</tbody>
-		</tgroup>
-		</table>"
-		
-		reartext := reartext reartextrowstotal reartextend
-	}
-	
-	
-	If tabletype = Troubleshoot ; If the "tabletype" variable is Troublechoot then this data will be stored in "reartext" variable
-	{
-		reartext := ">
-		<tgroup cols=""3"">
-		<colspec colname=""col1"" colwidth=""1.50*""/>
-		<colspec align=""center"" colname=""col2"" colwidth=""95.36pt""/>
-		<colspec colname=""col3"" colwidth=""1.50*""/>
-		<thead>
-		<row>
-		<entry valign=""top""><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Troubleshooting Test Steps</entry>
-		<entry valign=""middle""><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Values</entry>
-		<entry valign=""top""><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Results</entry>
-		</row>
-		</thead>
-		<tbody>"
-		
-		Userrows--
-		Reartextrowstotal = 
-		Loopcounter = 1
-		Loop, %Userrows%
-		{
-		Reartextrows := "<row>
-		<entry colname=""col1""><?Pub _newline?><para><emphasis> " Loopcounter ". </emphasis></para><?Pub _newline?><para><emphasis>A.</emphasis></para><?Pub _newline?></entry>
-		<entry colname=""col2"" valign=""middle""><?Pub _newline?><para></para></entry>
-		<entry colname=""col3""><?Pub _newline?><para><emphasis>Result:</emphasis></para><?Pub _newline?><para>Proceed to Test Step </para><?Pub _newline?><para><emphasis>Result:</emphasis></para><?Pub _newline?><para><emphasis>Repair:</emphasis></para><?Pub _newline?><para>If the problem is not resolved, proceed to Test Step</para><?Pub _newline?></entry>
-		</row>"
-		Loopcounter++
-		Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
-		}
-		
-		Reartextend := "<row>
-		<entry colname=""col1""><?Pub _newline?><para><emphasis> " Loopcounter ". </emphasis></para><?Pub _newline?><para><emphasis>A.</emphasis></para><?Pub _newline?></entry>
-		<entry colname=""col2"" valign=""middle""><?Pub _newline?><para></para></entry>
-		<entry colname=""col3""><?Pub _newline?><para><emphasis>Result:</emphasis></para><?Pub _newline?><para>Proceed to Test Step </para><?Pub _newline?><para><emphasis>Result:</emphasis></para><?Pub _newline?><para><emphasis>Repair:</emphasis></para><?Pub _newline?><para>Verify that the repair eliminated the problem.</para><?Pub _newline?></entry>
-		</row>
-		</tbody>
-		</tgroup>
-		</table>"
-		reartext := reartext reartextrowstotal reartextend
-	}
-	
-	
-	If Tabletype = Spec ; If the "tabletype" variable is spec then this data will be stored in "reartext" variable
-	{
-	
-		reartext := ">
-		<tgroup cols=""4"">
-		<?PubTbl tgroup clmarg=""2.0pt"" crmarg=""2.0pt""?>
-		<colspec colname=""col1"" colwidth=""37*""/>
-		<colspec colname=""col2"" colwidth=""39*""/>
-		<colspec colname=""col3"" colwidth=""75*""/>
-		<colspec colname=""col4"" colwidth=""229*""/>
-		<thead>
-		<row>
-		<entry align=""center"" nameend=""col4"" namest=""col1"" valign=""middle""><?Pub _cellfont Weight=""bold""?><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?><para>Specification for <cpn-id><partno></partno><cpn></cpn></cpn-id></para></entry>
-		</row>
-		<row>
-		<entry align=""center"" valign=""middle""><?Pub _cellfont Weight=""bold""?><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt""?><para>Item</para></entry>
-		<entry align=""center"" valign=""middle""><?Pub _cellfont Weight=""bold""?><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?><para>Qty</para></entry>
-		<entry align=""center"" valign=""middle""><?Pub _cellfont Weight=""bold""?><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?><para>Part</para></entry>
-		<entry align=""center"" valign=""middle""><?Pub _cellfont Weight=""bold""?><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?><para>Specification Description</para></entry>
-		</row>
-		</thead>
-		<tbody>"
+If Tabletype = C2 ; If the "tabletype" variable is C2 then this data will be stored in "reartext" variable
+{
+   reartext := ">
+   <tgroup align=""center"" cols=""2"">
+   <colspec colname=""col1"" colwidth=""33.12pt""/>
+   <colspec colname=""col2"" colwidth=""2.00*""/>
+   <thead>
+   <row valign=""middle"">
+   <entry nameend=""col2"" namest=""col1""><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Parts List</entry>
+   </row>
+   <row valign=""middle"">
+   <entry><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt""?>Qty</entry>
+   <entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?>Part</entry>
+   </row>
+   </thead>
+   <tbody>"
+   
+   Reartextrows := "<row valign=""middle"">
+   <entry colname=""col1""></entry>
+   <entry colname=""col2""><cpn-id><partno></partno><cpn></cpn></cpn-id></entry>
+   </row>"
+   
+   Reartextrowstotal = 
+   
+   Loop, %Userrows%
+   {
+      Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
+   }
+   Reartextend := "</tbody>
+   </tgroup>
+   </table>"
+   reartext := reartext reartextrowstotal reartextend
+}
 
-		
-		Reartextrowstotal = 
-		Loopcounter = 1
-		Loop, %Userrows%
-		{
-		Reartextrows := "<row>
-		<entry align=""center"" valign=""middle""><para>" Loopcounter "</para></entry>
-		<entry align=""center"" valign=""middle""><para></para></entry>
-		<entry align=""center"" valign=""middle""><para><cpn-id><partno></partno><cpn></cpn></cpn-id></para></entry>
-		<entry></entry>
-		</row>"
-				
-		loopcounter++
-		
-		Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
-		}
-		Reartextend :=  "</tbody>
-		</tgroup>
-		</table>"
-		reartext := reartext reartextrowstotal reartextend
-	}
-	
-		If Tabletype = VSPTable
-		{
-			reartext := ">
-			<tgroup cols=""4"">
-			<colspec colname=""col1"" colwidth=""0.46*""/>
-			<colspec colname=""col2"" colwidth=""0.46*""/>
-			<colspec colname=""col3"" colwidth=""1.51*""/>
-			<colspec colname=""col4"" colwidth=""1.51*""/>
-			<thead>
-			<row>
-			<entry align=""center"" valign=""middle""><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Item</entry>
-			<entry align=""center"" valign=""middle""><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Qty</entry>
-			<entry align=""center"" valign=""middle""><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Part</entry>
-			<entry align=""center"" valign=""middle""><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Illustration (sub step) Location</entry>
-			</row>
-			</thead>
-			<tbody>"
-		
-		
-		
-		Reartextrowstotal = 
-		Loopcounter = 1
-		Loop, %Userrows%
-		{
-		Reartextrows := "<row valign=""middle"">
-		<entry align=""center"" valign=""middle""><?PubTbl cell border-left-width=""0.20pt"" border-right-width=""0.20pt""?>" LoopCounter "</entry>
-		<entry align=""center"" valign=""middle""><?PubTbl cell border-right-width=""0.20pt""?></entry>
-		<entry align=""center"" valign=""middle""><?PubTbl cell border-right-width=""0.20pt""?><cpn-id><partno></partno><cpn></cpn></cpn-id></entry>
-		<entry align=""center"" valign=""middle""><?PubTbl cell border-right-width=""0.20pt""?>Illustration () </entry>
-		</row>"
-		
-		loopcounter++
-		Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
-		}
-		
-		Reartextend := "</tbody>
-		</tgroup>
-		</table>"
-		
-		reartext := reartext reartextrowstotal reartextend
-	}
 
-	Tabletext := Fronttext newword Pagewidecheck reartext ; combines all teh variables together and stores them into the "tabletext" variable
-	
-	clipboard = %Temptag% 
-	Return tabletext ; sends the Tabletext variable information back
+if tabletype = toolingtableService
+{
+   reartext := ">
+   <tgroup align=""center"" cols=""3"">
+   <colspec colname=""col1"" colwidth=""33.12pt""/>
+   <colspec colname=""col2"" colwidth=""33.12pt""/>
+   <colspec colname=""col3"" colwidth=""3.00*""/>
+   <thead>
+   <row valign=""middle"">
+   <entry nameend=""col3"" namest=""col1""><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Required Tools</entry>
+   </row>
+   <row valign=""middle"">
+   <entry><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt""?>Item</entry>
+   <entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?>Qty</entry>
+   <entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?>Part</entry>
+   </row>
+   </thead>
+   <tbody>"
+   
+   Reartextrowstotal = 
+   
+   
+   Loop, %Userrows%
+   {
+      Reartextrows := "<row valign=""middle"">
+      <entry colname=""col1"">" A_index "</entry>
+      <entry colname=""col2""></entry>
+      <entry colname=""col3""><cpn-id><partno></partno><cpn></cpn></cpn-id></entry>
+      </row>"
+      
+      
+      Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
+   }
+   
+   
+   Reartextend := "</tbody>
+   </tgroup>
+   </table>"
+   
+   reartext := reartext reartextrowstotal reartextend
+}
+
+
+if tabletype = toolingtable
+{
+   reartext := ">
+   <tgroup align=""center"" cols=""3"">
+   <colspec colname=""col1"" colwidth=""33.12pt""/>
+   <colspec colname=""col2"" colwidth=""33.12pt""/>
+   <colspec colname=""col3"" colwidth=""3.00*""/>
+   <thead>
+   <row valign=""middle"">
+   <entry nameend=""col3"" namest=""col1""><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Required Tools</entry>
+   </row>
+   <row valign=""middle"">
+   <entry><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt""?>Item</entry>
+   <entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?>Qty</entry>
+   <entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?>Part</entry>
+   </row>
+   </thead>
+   <tbody>"
+   
+   Reartextrowstotal = 
+   Letteroutput = 0
+   Loopcounter = 1
+   ASCII = 65	
+   
+   Loop, %Userrows%
+   {
+      Transform, OutputChar, Chr, %ASCII%
+      
+      If ASCii = 91
+      {
+         Ascii = 65
+         Letteroutput++
+      }
+      
+      If (ASCii = 79) || (ASCii = 81) || (ASCii = 73) 
+      {
+         Ascii++
+         Transform, OutputChar, Chr, %ASCII%
+      }
+      
+      
+      If Letteroutput != 0
+      {
+         Asciifirst := (64 + letteroutput)
+         If Asciifirst = 73 | 79 | 81
+         {
+            Asciifirst++
+         }
+         Transform, OutputCharfirst, Chr, %Asciifirst%
+         outputchar := OutputCharfirst outputchar
+      }
+      
+      Reartextrows := "<row valign=""middle"">
+      <entry colname=""col1"">" OutputChar "</entry>
+      <entry colname=""col2""></entry>
+      <entry colname=""col3""><cpn-id><partno></partno><cpn></cpn></cpn-id></entry>
+      </row>"
+      loopcounter++
+      
+      
+      Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
+      AscII++
+   }
+   
+   
+   Reartextend := "</tbody>
+   </tgroup>
+   </table>"
+   
+   reartext := reartext reartextrowstotal reartextend
+}
+
+If tabletype = C5 ; If the "tabletype" variable is C5 then this data will be stored in "reartext" variable
+{
+   reartext := ">
+   <tgroup align=""center"" cols=""5"">
+   <colspec colname=""col1"" colwidth=""33.12pt""/>
+   <colspec colname=""col2"" colwidth=""33.12pt""/>
+   <colspec colname=""col3"" colwidth=""70.77pt""/>
+   <colspec colname=""col4"" colwidth=""2.51*""/>
+   <colspec colname=""col5"" colwidth=""2.51*""/>
+   <thead>
+   <row valign=""middle"">
+   <entry nameend=""col5"" namest=""col1""><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Parts List</entry>
+   </row>
+   <row valign=""middle"">
+   <entry><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt""?>Item</entry>
+   <entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?>Qty</entry>
+   <entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?><para>New Part</para><para>Number</para></entry>
+   <entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?>Part Name</entry>
+   <entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?><para>Former Part</para><para>Number</para> <fn id=""" newwordftnote """>
+   <para>The former part number listed is for reference only and may differ.</para>
+   </fn></entry>
+   </row>
+   </thead>
+   <tbody>"
+   
+   
+   Reartextrowstotal = 
+   Loopcounter = 1
+   Loop, %Userrows%
+   {
+      Reartextrows := "<row valign=""middle"">
+      <entry colname=""col1"">" loopcounter "</entry>
+      <entry colname=""col2""></entry>
+      <entry colname=""col3""><partno></partno></entry>
+      <entry colname=""col4""><cpn></cpn></entry>
+      <entry colname=""col5""><partno></partno></entry>
+      </row>"
+      
+      loopcounter++
+      Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
+   }
+   
+   Reartextend := "</tbody>
+   </tgroup>
+   </table>"
+   
+   reartext := reartext reartextrowstotal reartextend
+}
+
+If tabletype = C3 ; If the "tabletype" variable is C3 then this data will be stored in "reartext" variable
+{
+   reartext := ">
+   <tgroup align=""center"" cols=""3"">
+   <colspec colname=""col1"" colwidth=""33.12pt""/>
+   <colspec colname=""col2"" colwidth=""33.12pt""/>
+   <colspec colname=""col3"" colwidth=""3.00*""/>
+   <thead>
+   <row valign=""middle"">
+   <entry nameend=""col3"" namest=""col1""><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Parts List</entry>
+   </row>
+   <row valign=""middle"">
+   <entry><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt""?>Item</entry>
+   <entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?>Qty</entry>
+   <entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?>Part</entry>
+   </row>
+   </thead>
+   <tbody>"
+   
+   Reartextrowstotal = 
+   Loopcounter = 1
+   Loop, %Userrows%
+   {
+      Reartextrows := "<row valign=""middle"">
+      <entry colname=""col1"">" loopcounter "</entry>
+      <entry colname=""col2""></entry>
+      <entry colname=""col3""><cpn-id><partno></partno><cpn></cpn></cpn-id></entry>
+      </row>"
+      loopcounter++
+      Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
+   }
+   
+   
+   Reartextend := "</tbody>
+   </tgroup>
+   </table>"
+   
+   reartext := reartext reartextrowstotal reartextend
+}
+If tabletype = C5 ; If the "tabletype" variable is C5 then this data will be stored in "reartext" variable
+{
+   reartext := ">
+   <tgroup align=""center"" cols=""5"">
+   <colspec colname=""col1"" colwidth=""33.12pt""/>
+   <colspec colname=""col2"" colwidth=""33.12pt""/>
+   <colspec colname=""col3"" colwidth=""70.77pt""/>
+   <colspec colname=""col4"" colwidth=""2.51*""/>
+   <colspec colname=""col5"" colwidth=""2.51*""/>
+   <thead>
+   <row valign=""middle"">
+   <entry nameend=""col5"" namest=""col1""><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Parts List</entry>
+   </row>
+   <row valign=""middle"">
+   <entry><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt""?>Item</entry>
+   <entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?>Qty</entry>
+   <entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?><para>New Part</para><para>Number</para></entry>
+   <entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?>Part Name</entry>
+   <entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?><para>Former Part</para><para>Number</para> <fn id=""" newwordftnote """>
+   <para>The former part number listed is for reference only and may differ.</para>
+   </fn></entry>
+   </row>
+   </thead>
+   <tbody>"
+   
+   
+   Reartextrowstotal = 
+   Loopcounter = 1
+   Loop, %Userrows%
+   {
+      Reartextrows := "<row valign=""middle"">
+      <entry colname=""col1"">" loopcounter "</entry>
+      <entry colname=""col2""></entry>
+      <entry colname=""col3""><partno></partno></entry>
+      <entry colname=""col4""><cpn></cpn></entry>
+      <entry colname=""col5""><partno></partno></entry>
+      </row>"
+      
+      loopcounter++
+      Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
+   }
+   
+   Reartextend := "</tbody>
+   </tgroup>
+   </table>"
+   
+   reartext := reartext reartextrowstotal reartextend
+}
+
+If tabletype = Jcode ; If the "tabletype" variable is Jcode then this data will be stored in "reartext" variable
+{
+   reartext := ">
+   <tgroup cols=""3"">
+   <colspec colname=""col1""/>
+   <colspec colname=""col2""/>
+   <colspec colname=""col3""/>
+   <thead>
+   <row valign=""middle"">
+   <entry align=""center""><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?><para>J1939 Code and Description</para></entry>
+   <entry align=""center""><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?> <para>CDL Code and Description</para></entry>
+   <entry align=""center""><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?> <para>Comments</para></entry>
+   </row>
+   </thead>
+   <tbody>"
+   
+   Reartextrows := "<row>
+   <entry valign=""middle""><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt""?><para><code></code></para><para><codedesc></codedesc></para></entry>
+   <entry valign=""middle""><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?><para><code></code></para><para><codedesc></codedesc></para></entry>
+   <entry valign=""middle""><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?><para></para></entry>
+   </row>"
+   
+   Reartextrowstotal = 
+   
+   Loop, %Userrows%
+   {
+      Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
+   }
+   
+   Reartextend :=  "</tbody>
+   </tgroup>
+   </table>"
+   
+   reartext := reartext reartextrowstotal reartextend
+}
+
+
+If tabletype = Troubleshoot ; If the "tabletype" variable is Troublechoot then this data will be stored in "reartext" variable
+{
+   reartext := ">
+   <tgroup cols=""3"">
+   <colspec colname=""col1"" colwidth=""1.50*""/>
+   <colspec align=""center"" colname=""col2"" colwidth=""95.36pt""/>
+   <colspec colname=""col3"" colwidth=""1.50*""/>
+   <thead>
+   <row>
+   <entry valign=""top""><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Troubleshooting Test Steps</entry>
+   <entry valign=""middle""><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Values</entry>
+   <entry valign=""top""><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Results</entry>
+   </row>
+   </thead>
+   <tbody>"
+   
+   Userrows--
+   Reartextrowstotal = 
+   Loopcounter = 1
+   Loop, %Userrows%
+   {
+      Reartextrows := "<row>
+      <entry colname=""col1""><?Pub _newline?><para><emphasis> " Loopcounter ". </emphasis></para><?Pub _newline?><para><emphasis>A.</emphasis></para><?Pub _newline?></entry>
+      <entry colname=""col2"" valign=""middle""><?Pub _newline?><para></para></entry>
+      <entry colname=""col3""><?Pub _newline?><para><emphasis>Result:</emphasis></para><?Pub _newline?><para>Proceed to Test Step </para><?Pub _newline?><para><emphasis>Result:</emphasis></para><?Pub _newline?><para><emphasis>Repair:</emphasis></para><?Pub _newline?><para>If the problem is not resolved, proceed to Test Step</para><?Pub _newline?></entry>
+      </row>"
+      Loopcounter++
+      Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
+   }
+   
+   Reartextend := "<row>
+   <entry colname=""col1""><?Pub _newline?><para><emphasis> " Loopcounter ". </emphasis></para><?Pub _newline?><para><emphasis>A.</emphasis></para><?Pub _newline?></entry>
+   <entry colname=""col2"" valign=""middle""><?Pub _newline?><para></para></entry>
+   <entry colname=""col3""><?Pub _newline?><para><emphasis>Result:</emphasis></para><?Pub _newline?><para>Proceed to Test Step </para><?Pub _newline?><para><emphasis>Result:</emphasis></para><?Pub _newline?><para><emphasis>Repair:</emphasis></para><?Pub _newline?><para>Verify that the repair eliminated the problem.</para><?Pub _newline?></entry>
+   </row>
+   </tbody>
+   </tgroup>
+   </table>"
+   reartext := reartext reartextrowstotal reartextend
+}
+
+
+If Tabletype = Spec ; If the "tabletype" variable is spec then this data will be stored in "reartext" variable
+{
+   reartext := ">
+   <tgroup cols=""4"">
+   <?PubTbl tgroup clmarg=""2.0pt"" crmarg=""2.0pt""?>
+   <colspec colname=""col1"" colwidth=""37*""/>
+   <colspec colname=""col2"" colwidth=""39*""/>
+   <colspec colname=""col3"" colwidth=""75*""/>
+   <colspec colname=""col4"" colwidth=""229*""/>
+   <thead>
+   <row>
+   <entry align=""center"" nameend=""col4"" namest=""col1"" valign=""middle""><?Pub _cellfont Weight=""bold""?><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?><para>Specification for <cpn-id><partno></partno><cpn></cpn></cpn-id></para></entry>
+   </row>
+   <row>
+   <entry align=""center"" valign=""middle""><?Pub _cellfont Weight=""bold""?><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt""?><para>Item</para></entry>
+   <entry align=""center"" valign=""middle""><?Pub _cellfont Weight=""bold""?><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?><para>Qty</para></entry>
+   <entry align=""center"" valign=""middle""><?Pub _cellfont Weight=""bold""?><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?><para>Part</para></entry>
+   <entry align=""center"" valign=""middle""><?Pub _cellfont Weight=""bold""?><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?><para>Specification Description</para></entry>
+   </row>
+   </thead>
+   <tbody>"
+   
+   
+   Reartextrowstotal = 
+   Loopcounter = 1
+   Loop, %Userrows%
+   {
+      Reartextrows := "<row>
+      <entry align=""center"" valign=""middle""><para>" Loopcounter "</para></entry>
+      <entry align=""center"" valign=""middle""><para></para></entry>
+      <entry align=""center"" valign=""middle""><para><cpn-id><partno></partno><cpn></cpn></cpn-id></para></entry>
+      <entry></entry>
+      </row>"
+      
+      loopcounter++
+      
+      Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
+   }
+   Reartextend :=  "</tbody>
+   </tgroup>
+   </table>"
+   reartext := reartext reartextrowstotal reartextend
+}
+
+If Tabletype = VSPTable
+{
+   reartext := ">
+   <tgroup cols=""4"">
+   <colspec colname=""col1"" colwidth=""0.46*""/>
+   <colspec colname=""col2"" colwidth=""0.46*""/>
+   <colspec colname=""col3"" colwidth=""1.51*""/>
+   <colspec colname=""col4"" colwidth=""1.51*""/>
+   <thead>
+   <row>
+   <entry align=""center"" valign=""middle""><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Item</entry>
+   <entry align=""center"" valign=""middle""><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Qty</entry>
+   <entry align=""center"" valign=""middle""><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Part</entry>
+   <entry align=""center"" valign=""middle""><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Illustration (sub step) Location</entry>
+   </row>
+   </thead>
+   <tbody>"
+   
+   
+   
+   Reartextrowstotal = 
+   Loopcounter = 1
+   Loop, %Userrows%
+   {
+      Reartextrows := "<row valign=""middle"">
+      <entry align=""center"" valign=""middle""><?PubTbl cell border-left-width=""0.20pt"" border-right-width=""0.20pt""?>" LoopCounter "</entry>
+      <entry align=""center"" valign=""middle""><?PubTbl cell border-right-width=""0.20pt""?></entry>
+      <entry align=""center"" valign=""middle""><?PubTbl cell border-right-width=""0.20pt""?><cpn-id><partno></partno><cpn></cpn></cpn-id></entry>
+      <entry align=""center"" valign=""middle""><?PubTbl cell border-right-width=""0.20pt""?>Illustration () </entry>
+      </row>"
+      
+      loopcounter++
+      Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
+   }
+   
+   Reartextend := "</tbody>
+   </tgroup>
+   </table>"
+   
+   reartext := reartext reartextrowstotal reartextend
+}
+
+Tabletext := Fronttext newword Pagewidecheck reartext ; combines all teh variables together and stores them into the "tabletext" variable
+
+clipboard = %Temptag% 
+Return tabletext ; sends the Tabletext variable information back
+}
+   Tabletext := Fronttext newword Pagewidecheck reartext ; combines all teh variables together and stores them into the "tabletext" variable
+   
+   clipboard = %Temptag% 
+   Return tabletext ; sends the Tabletext variable information back
 }              
-		
+
 		/*		
 		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
 		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== Loads HotKeys Section ======/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
