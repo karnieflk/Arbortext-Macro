@@ -1,42 +1,44 @@
 /*
-	*****************************************************************************************************************************************************************************
-	*********************************************************************** Licensing Information *******************************************************************************
-	*****************************************************************************************************************************************************************************
+*****************************************************************************************************************************************************************************
+*********************************************************************** Licensing Information *******************************************************************************
+*****************************************************************************************************************************************************************************
 */
 
 ;Unless otherwise stated, All content of this script was created by Jarett Karnia for the use of Caterpillar, Inc
 ;This script Can be used and modified as needed. But Must give credit to Orginal creaters of the content (including the libraries) and state what was changed from the orginal source code.
 
 /*
-	////////////////////////////////////////////////////////
-	Enhancements to do//////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////
-	/////////////////////////////////////////////////////////////////
-	
-	
-	
+////////////////////////////////////////////////////////
+Enhancements to do//////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+
+
+
 */
 
 /*
-	Updates to script from Version 1.3
-	***************************************
-	Updated Code a bit
+Updates to script from Version 1.3
+***************************************
+Updated Code a bit
 	- combined a bunch of the individual files to make it one large file
 	- Reduced amount of code needed and redundancies
 	
-	Added config file to help ease in updating for future proofing
-	Added option to stop asking for startup
+Added config file to help ease in updating for future proofing
+Added option to stop asking for startup
 	- changed startup question to ask just to throw in a shortcut to the file. No more adding it into the folder needed
 	
 	- Added option to search by User name in search in Arbortext only using the F4 button
+	-updated tooling table for new standard
+	-added in VSP table
 	
-	
-	
-	
-	/*
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== AutoLoad Section for startup ====== =\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+
+
+
+/*
+/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== AutoLoad Section for startup ====== =\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
 */
 
 
@@ -49,24 +51,33 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 DetectHiddenWindows, On ; Used to help find windows that that are minimized or hidden
 DetectHiddenText, on ; used to find the text on thoe minimized or hidden windows
 #KeyHistory 0 ; no key history to help improve performance since we dont need to see that the user pressed
-SetBatchLines, -1 ; to speed up script
+SetBatchLines, -1 ; to speed up script 
 ;SetKeyDelay, -1, -1, Play ; to speed up script
 SetMouseDelay, -1 ; to speed up script mouse movements
 SetDefaultMouseSpeed, 0 ; makes mouse instant
 ;SetWinDelay, 0 ; makes window functions instant
 ;SetControlDelay, 0 ; speeds up script
 
+IfNotExist,   C:\ArbortextMacros
+{
+	FileCreateDir,  C:\ArbortextMacros
+}
+
+
 IfNotExist, c:\arbortextmacros\config.ini
 {
-	;below takes the files fron the marcosn folder on computer and embeds them into the exe file.
+	;below takes the files fron the marcosn folder on computer and embeds them into the exe file. 
 	FileInstall, C:\ArbortextMacrosn\Config.ini, C:\ArbortextMacros\Config.ini
 	Firstrun = 1
 }
+Sleep 1000
 
 inifile = c:\arbortextmacros\config.ini
+Sleep 100
+
 Load_ini_file(inifile)
 
-Version_Number := "1.4 Beta" ;Version number to use for update checks
+Version_Number := "1.4.2 Beta" ;Version number to use for update checks
 
 ; The below code checks if user hit esc and restarted the macro. If they did, then the start splash screen does NOT show. IF they didn't then the start splash screen will show.
 ;This needs to be in the location becuase it checks the text in the command line, before anything else loads. It will not work if placed in another part of the script.
@@ -90,9 +101,9 @@ if !RegExMatch(CmdLine, "\/cpn")
 	Tooltip, loading CPN autofind information
 }
 /*
-	*********************************************************************************************************************************
-	******************************** Startup check section ************************************************************************
-	*********************************************************************************************************************************
+*********************************************************************************************************************************
+******************************** Startup check section ************************************************************************
+*********************************************************************************************************************************
 */
 ;Creates the needed Folders if they dont Exist
 
@@ -120,13 +131,13 @@ FileInstall, C:\ArbortextMacrosn\How to use Arbortext Macros.pdf, %Root_Folder_L
 
 IfNotExist, %Root_Folder_Location%\icons\paused.ico
 {
-	;below takes the files fron the marcosn folder on my computer and embeds them into the exe file.
+	;below takes the files fron the marcosn folder on my computer and embeds them into the exe file. 
 	FileInstall,C:\ArbortextMacrosn\icons\paused.ico, %Root_Folder_Location%\icons\paused.ico
 }
 
 IfNotExist,%Root_Folder_Location%\icons\am.ico
 {
-	;below takes the files fron the marcosn folder on my computer and embeds them into the exe file.
+	;below takes the files fron the marcosn folder on my computer and embeds them into the exe file. 
 	FileInstall,C:\ArbortextMacrosn\icons\am.ico,%Root_Folder_Location%\icons\am.ico
 }
 
@@ -134,7 +145,7 @@ IfNotExist,%Root_Folder_Location%\icons\am.ico
 
 ; INstalls the needed files for the auto search
 
-FileInstall,C:\ArbortextMacrosn\ProgramImages\Box.png,%Root_Folder_Location%\ProgramImages\Box.png,0
+FileInstall,C:\ArbortextMacrosn\ProgramImages\Box.png,%Root_Folder_Location%\ProgramImages\Box.png,0     
 
 FileInstall,C:\ArbortextMacrosn\ProgramImages\SplashinmageAM.png,%Root_Folder_Location%\ProgramImages\SplashinmageAM.png,1
 
@@ -153,8 +164,8 @@ If Reload = 0
 {
 	If Startup_Folder_Question = 1
 	{}
-	else
-	{
+		else
+		{		
 		Filename := "Arbortext Macros"
 		Folder := A_Startup
 		loop, %folder%\*.*
@@ -164,39 +175,39 @@ If Reload = 0
 				;msgbox, foudn name %A_LoopFileName%
 				Foundfile = 1
 				Break
-		}}
+			}}		
 		If foundfile !=1
 		{
 			activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
 			GUi, add, text,,Arbortext Macros is not in startup folder. Do you want to Create a shortcut in  the Startup folder?
 			GUi, add, button,gcreate_shortcut,Create shortcut in Startup folder
-			GUi, add, button,gcancel,No
+			GUi, add, button,gcancel,No 
 			GUi, add, Checkbox, vStartup_Folder_Question,Do Not ask me again
 			Gui, Show, x%amonx% y%amony%, No Startup File
 		}
-	}
-}
+		}
+}   
 
 ; Creates Menu for gui screen
-Menu, BBBB, Add, &Check For Update , Versioncheck
-Menu, BBBB, Add, &Options, Optionsmenu
-Menu, BBBB, Add,
-Menu, BBBB, Add, &Exit, exitprogram
-
-Menu, DDDD, Add, &How To Use, HowTo
-Menu, DDDD, Add, &About , Aboutmenu
-Menu, DDDD, Add, &Configuration, Config_screen
-
-Menu, MyMenuBar, Add, &File, :BBBB
-Menu, MyMenuBar, Add, &Help, :DDDD
-
-
+	Menu, BBBB, Add, &Check For Update , Versioncheck
+	Menu, BBBB, Add, &Options, Optionsmenu
+	Menu, BBBB, Add,
+	Menu, BBBB, Add, &Exit, exitprogram
+	
+	Menu, DDDD, Add, &How To Use, HowTo
+	Menu, DDDD, Add, &About , Aboutmenu
+	Menu, DDDD, Add, &Configuration, Config_screen
+	
+	Menu, MyMenuBar, Add, &File, :BBBB
+	Menu, MyMenuBar, Add, &Help, :DDDD
+	
+	
 /*
-	*********************************************************************************************************************************
-	******************************** End of Startup check section ************************************************************************
-	*********************************************************************************************************************************
+*********************************************************************************************************************************
+******************************** End of Startup check section ************************************************************************
+*********************************************************************************************************************************
 */
-
+	
 
 Listlines, off ; turns off debug lines
 
@@ -210,7 +221,7 @@ Onexit,  Quitting ; when the program restarts or exits, the script will run this
 Global CPNHotkey, METHotkey, CHKHotkey, SearchHotkey, TableHotkey, section1, section2, section3, guinumber , Tabletype, Pgwd, Userrows, NewwordGUi ; these are all global variables
 
 
-Ptoken = 0 ; sets the Ptoken variable to 0.
+Ptoken = 0 ; sets the Ptoken variable to 0. 
 guinumber = 0 ; set this variable to 0
 SkipUnitstag = 0 ; Sets teh variable to 0
 canvascount = 0
@@ -227,7 +238,7 @@ SplashImage,Off ; turns off the loading image
 
 
 ; This is here if the app restart was from the start of a autofill CPN search
-if !RegExMatch(CmdLine, "\/cpn")
+if !RegExMatch(CmdLine, "\/cpn") 
 {
 	
 }else  {
@@ -237,18 +248,28 @@ if !RegExMatch(CmdLine, "\/cpn")
 
 
 ; This section below is here to stop a bug that allowed many.. and I mean many instances of the program to be active..  Process finds the others with the same name and kills them
-PID:=DllCall("GetCurrentProcessId") ; Gets this programs Process ID
-for process in ComObjGet("winmgmts:").ExecQuery("Select * from Win32_Process where name = 'Arbortext macros.exe' and processID  <> " PID ) ; Loop to look for all the "Arbortext Macros.exe" programs in the process tree that isnt the current one.
-	process, close, % process.ProcessId ; kills the process (closed the program)
-
-
+PID:=DllCall("GetCurrentProcessId") ; Gets this programs Process ID 
+for process in ComObjGet("winmgmts:").ExecQuery("Select * from Win32_Process where name = 'Arbortext macros.exe' and processID  <> " PID ) ; Loop to look for all the "Arbortext Macros.exe" programs in the process tree that isnt the current one. 
+process, close, % process.ProcessId ; kills the process (closed the program)
+Active_Id = 
+SetTimer, Windchillhome, 10
 Return ; this stops the script so that is does not continue automatically
 
-
+SetTitleMatchMode, 2
+Windchillhome:
+{
+	IfWinExist, %Windchill_Window_Title% 
+		{
+		Winget, Active_Id, ID, %Windchill_Window_Title% ahk_class %Windchill_Class%
+		SetTimer, Windchillhome, Off
+	}
+	return
+}
+	
 create_shortcut:
 {
-	FileCreateShortcut, %A_Scriptfullpath%, %A_startup%\Arbortext Macros.lnk, C:\,%A_ScriptFullPath%, Arbortext Macros
-	gosub, Cancel
+		FileCreateShortcut, %A_Scriptfullpath%, %A_startup%\Arbortext Macros.lnk, C:\,%A_ScriptFullPath%, Arbortext Macros
+		gosub, Cancel
 	return
 }
 
@@ -261,17 +282,17 @@ Cancel:
 	return
 }
 
-/*
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== Subroutine \ Label section for main script functions ====== /=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+/*		
+/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== Subroutine \ Label section for main script functions ====== /=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
 */
 
 
 /*
-	**************************************************************************************************************************************************************************************************************
-	This section is here as I slowly make variables that work with the rest of the script for common tasks, this way if something changes, you only have to change one thing and the affected areas are corrected
-	***************************************************************************************************************************************************************************************************************
+**************************************************************************************************************************************************************************************************************
+This section is here as I slowly make variables that work with the rest of the script for common tasks, this way if something changes, you only have to change one thing and the affected areas are corrected
+***************************************************************************************************************************************************************************************************************
 */
 
 CPNSingleSearch: ; Send the keys to get a single CPN search (ALT + C, then enter twice)
@@ -293,7 +314,7 @@ CpnModSearch: ; Send the keys to get a CPN mod when in a MOD tag (Alt + C, then 
 }
 
 ;Createbookmark subroutine
-Createbookmark:
+Createbookmark: 
 {
 	Sleep 500 ; sets a .5 second delay
 	Send %Create_Bookmark%  ; sends the keystrokes to the window. This opens up the bookmark window in ACM
@@ -368,21 +389,20 @@ Englishnorm() ; Function to send the keys for a NON-TOlerance English menu (Alt 
 }
 
 /*
-	****************************************************************************************************************************************************************************
-	****************************************************************************************************************************************************************************
-	**********************************************************************************************************************************************************************************
+****************************************************************************************************************************************************************************
+****************************************************************************************************************************************************************************
+**********************************************************************************************************************************************************************************
 */
 
 
-
-;Rbutton::Rbutton ;This is here to make the right click work like normal until I find out what is messing with the right mouse button.
+SetTitleMatchMode, 2
 
 ; Win + A brings Arbortext window to front if it exists
 $#a::
 {
-	IfWinExist, %Arbortext_Window_Title% ; finds if Arbortext window exists
+	IfWinExist, %Arbortext_Window_Title% ahk_class %Windchill_Class% ; finds if Arbortext window exists
 	{
-		Win_Activate(Arbortext_Window_Title) ; makes Arbortext the active window
+		Win_Activate(Arbortext_Window_Title,Windchill_Class) ; makes Arbortext the active window
 	}
 	return
 }
@@ -391,29 +411,40 @@ $#a::
 ; Win + B brings Browser window to front if it exists
 $#b::
 {
-	IfWinExist, %Browser_Window_Title% ; finds if the browser window exists
+	IfWinExist, %Browser_Window_Title% ahk_class %Windchill_Class% ; finds if the browser window exists
 	{
-		Win_Activate(Browser_Window_Title) ; Brings the browser window to front
-	}
+		Win_Activate(Browser_Window_Title,Windchill_Class) ; Brings the browser window to front
+	}	
 	Return
 }
 
 ; Win + C brings the Windchill Canvas window to front if it exists
 $#c::
 {
-	IfWinExist, %Canvas_Window_Title% ; Finds if the canvas windchill window exists
+	IfWinExist, %Canvas_Window_Title% ahk_class %Windchill_Class%  ; Finds if the canvas windchill window exists
 	{
-		Win_Activate(Canvas_Window_Title)  ; brings the windchill canvas window to front
+		Win_Activate(Canvas_Window_Title,Windchill_Class)  ; brings the windchill canvas window to front
 	}
 	Return
 }
 
-
-$#h:: ; Win + C brings the Windchill home window to front if it exists
+;~ SetTitleMatchMode, 2
+$#h:: ; Win + h brings the Windchill  window to front if it exists
 {
-	IfWinExist, %Windchill_Window_Title% ; Finds if the  windchill home  window if it  exists
+	If (Active_Id != )  &&  (Active_Id = %Active_Id%)
 	{
-		Win_Activate(Windchill_Window_Title)  ; brings the windchill home window to front
+		WinActivate, ahk_id %Active_Id%
+	return
+	}
+	else
+		SetTimer, Windchillhome, 10
+	
+	
+	IfWinExist, %Windchill_Window_Title% ahk_class %Windchill_Class%  ; Finds if the  windchill home  window if it  exists
+	{
+		Win_Activate(Windchill_Window_Title,Windchill_Class)  ; brings the windchill home window to front
+		Sleep 500
+		SetTimer, Windchillhome, 10
 	}
 	Return
 }
@@ -437,18 +468,18 @@ $#h:: ; Win + C brings the Windchill home window to front if it exists
 	Menu, MyMenu, Add, Goto Quickmark, Quickmarkgo ; creates menu item called Quickmark. if selected it goes to quickmarkgo
 	Menu, MyMenu, Show ; shows the menu on the screen
 	Return
-}
+} 
 
 
 
-/*
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== Acrolinks Rapid hotkey funcitons ======/=\/=\/=\/=\/=\/\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+/*		
+/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== Acrolinks Rapid hotkey funcitons ======/=\/=\/=\/=\/=\/\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
 */
 
 ;CPNRapid subroutine
-CPNRapid:
+CPNRapid: 
 {
 	; Below calls on the Rapidhotkey library, each one between the quotes is the number of times you press the hotkey "CPN Singular""CPN plural""CPN MOd"
 	RapidHotKey("CPNSIngleSearch""CpnPluralSearch""CpnModSearch",1,0.5,1)
@@ -458,29 +489,29 @@ CPNRapid:
 ;CPNrapidautofill subroutine
 CPNRapidautofill:
 {
-	/*
-		Gosub, CPNsearch ; goes to the CPNSearch Subroutine
-		IfEqual, A_IsCompiled,1
-		{
-			Run, %A_ScriptFullPath% /Restart
-			Exitapp
-		}
-		
-		
-		Run, %A_ScriptFullPath% /Restart ; this methond allows the /restart to show in the command line, which prevents the splash image from loading on restart
-		exitapp ; exits this verison of the app
+/*
+	Gosub, CPNsearch ; goes to the CPNSearch Subroutine
+	IfEqual, A_IsCompiled,1
+	{
+		Run, %A_ScriptFullPath% /Restart
+		Exitapp
+	}
+	
+	
+	Run, %A_ScriptFullPath% /Restart ; this methond allows the /restart to show in the command line, which prevents the splash image from loading on restart
+	exitapp ; exits this verison of the app
 	*/
 	
 	
 	If CPN_AutoSearch = 1
 	{
-		;msgbox, send scrolldown
-		Run,%Root_Folder_Location%\CPNSearch.exe /Scrolldown
+	;msgbox, send scrolldown
+	Run,%Root_Folder_Location%\CPNSearch.exe /Scrolldown
 	}
-	Else
+	Else 
 	{
-		;msgbox, no scrolldown
-		Run,%Root_Folder_Location%\CPNSearch.exe
+	;msgbox, no scrolldown
+	Run,%Root_Folder_Location%\CPNSearch.exe
 	}
 	
 	SetTimer, KillCPNsearch, 180000
@@ -490,12 +521,12 @@ CPNRapidautofill:
 
 KillCPNsearch:
 {
-	Process, Exist, CPNSearch.exe
-	if(!errorlevel)
-		process, Close, CPNSearch.exe
-	
-	SetTimer, KillCPNsearch, Off
-	Return
+Process, Exist, CPNSearch.exe
+if(!errorlevel)
+process, Close, CPNSearch.exe
+
+SetTimer, KillCPNsearch, Off
+Return
 }
 
 
@@ -526,12 +557,12 @@ METRapidTotal:
 	If SkipUnitstag !=1 ; If SkipUnitstag is not 1, it performs the code inbetween the {}
 	{
 		Temptag = %clipboardall% ;puts all text in clipboard into a variable
-		Clipboard = ; clears the clipboard
+		Clipboard = ; clears the clipboard 
 		Send {Enter} ; sends enter to the computer
 		Sleep 200 ; Delays to app .200 seconds
 		Send {U} ;sends the U keystroke to the computer
 	}
-	
+
 	KeyWait, LButton, D T10 ; Waits for the Left mouse button to be pressed down. T10 is options for timeout after 10 seconds and continues down the script
 	If ErrorLevel = 1 ; IF the 10 second timeout happens, it creates ErrorLevel = 1, this catches the timeout for the KeyWait command
 	{
@@ -569,195 +600,203 @@ METRapidTotal:
 			EnglishTolerance()
 			Clipboard = %Temptag%
 			Return
-	}}
-	
-	else  {
-		Unittagtype := Findtags() ;goes to Findtags Function
-		If Unittagtype = 1 ; if unittagtype is set to 1 (Metric tag), do what is in between the {}
-		{
-			sleep 100 ; sets a 100 millisecond delay
-			Click %tx%, %ty%
-			sleep 250
-			Send {Lbutton up}
-			Sleep 100
-			MetricNorm()
+		}}
+		
+		else  {
+			Unittagtype := Findtags() ;goes to Findtags Function
+			If Unittagtype = 1 ; if unittagtype is set to 1 (Metric tag), do what is in between the {}
+			{
+				sleep 100 ; sets a 100 millisecond delay
+				Click %tx%, %ty%
+				sleep 250
+				Send {Lbutton up}
+				Sleep 100
+				MetricNorm()
+				Clipboard = %Temptag%
+				Return
+			}
+			
+			If Unittagtype = 2 ; if unittagtype is set to 2 (english tag), do what is in between the {}
+			{
+				sleep 100 ; sets a 100 millisecond delay
+				Click %tx%, %ty%
+				sleep 250
+				Send {Lbutton up}
+				Sleep 100
+				Englishnorm()
+				Clipboard = %Temptag%
+				Return
+			}}
 			Clipboard = %Temptag%
+			
 			Return
 		}
 		
-		If Unittagtype = 2 ; if unittagtype is set to 2 (english tag), do what is in between the {}
+		
+		
+		
+		;CHKrapid subroutine
+		CHKRapid:
 		{
-			sleep 100 ; sets a 100 millisecond delay
-			Click %tx%, %ty%
-			sleep 250
-			Send {Lbutton up}
-			Sleep 100
-			Englishnorm()
-			Clipboard = %Temptag%
+			;Below uses the Rapidhotkey library. 
+			RapidHotKey("CheckoutIE""CheckinIE""ValidateIE",1,0.5,1)
+			return
+		}
+		#If ; stops the only can be used in Arbortext.
+		
+		
+		;~ +++SetTitleMatchMode, 3 ; sets that the window title must match exactly to work
+		;~ #If WinActive(Search_Window_Title)  ; window title must only say Search
+		
+		;SearchRapidArbor subroutine
+		SearchRapidArbor:
+		{
+			+++SetTitleMatchMode,3
+			Loop,
+				{
+				IfWinNotExist,  %Search_Window_Title% ahk_class %Windchill_Class%
+					break
+				else
+				{
+				
+				Win_Activate(Search_Window_Title,Windchill_Class)
+				sleep 500 ; Delays for 500 miliseconds
+				send {esc} ;sends the esc keystroke to window to close the search window
+				sleep 500 ; delays program for .5 seconds				
+			}}
+			
+			Win_Activate(Arbortext_Window_Title,Windchill_Class)
+			+++SetTitleMatchMode,2
+			ErrorLevel = 0 ; reset errorlevel variable to 0
+			ErrorLevel := GraphicsSearchSetup(Search_By) ; runs the GraphicsSearchSetup function and gets the return value of 1 or 0
+			If ErrorLevel = 1 ; if the search window is not open. GraphicsSearchSetup() will return a 1, if it opens successfully, function will return a 0
+			{
+				Exit ; stops the subroutine
+			}		
+			
+			
+			#If ; turns off only works in search window
+			return
+		}
+		
+		
+		;canvas rapid subroutine
+		CanvasRapid:
+		{
+			RapidHotKey("Canvasstart",2,0.5,1) ; when pressed twice, it will go to canvasstart subroutine
 			Return
-	}}
-	Clipboard = %Temptag%
-	
-	Return
-}
-
-
-
-
-;CHKrapid subroutine
-CHKRapid:
-{
-	;Below uses the Rapidhotkey library.
-	RapidHotKey("CheckoutIE""CheckinIE""ValidateIE",1,0.5,1)
-	return
-}
-#If ; stops the only can be used in Arbortext.
-
-
-+++SetTitleMatchMode, 3 ; sets that the window title must match exactly to work
-#If WinActive(Search_Window_Title)  ; window title must only say Search
-
-;SearchRapidArbor subroutine
-SearchRapidArbor:
-{
-	+++SetTitleMatchMode,3
-	IfWinExist, %Search_Window_Title% ; checks to see if the search window exists
-	{
-		Win_Activate(Search_Window_Title)
-		sleep 250 ; Delays for 350 miliseconds
-		send {esc} ;sends the esc keystroke to window to close the search window
-		sleep 500 ; delays program for .5 seconds
-	}
-	+++SetTitleMatchMode,2
-	ErrorLevel = 0 ; reset errorlevel variable to 0
-	If s=Search_b=By = Name
-		ErrorLevel := GraphicsSearchSetup(Search_By) ; runs the GraphicsSearchSetup function and gets the return value of 1 or 0
-	else
-		ErrorLevel := GraphicsSearchSetup(Search_By) ; runs the GraphicsSearchSetup function and gets the return value of 1 or 0
-	
-	If ErrorLevel = 1 ; if the search window is not open. GraphicsSearchSetup() will return a 1, if it opens successfully, function will return a 0
-	{
-		Exit ; stops the subroutine
-	}
-	
-	
-	#If ; turns off only works in search window
-	return
-}
-
-
-;canvas rapid subroutine
-CanvasRapid:
-{
-	RapidHotKey("Canvasstart",2,0.5,1) ; when pressed twice, it will go to canvasstart subroutine
-	Return
-}
-
-
-;canvasstart subroutine
-Canvasstart:
-{
-	Send {f2} ; sends teh f2 key to the computer
-	WinWaitActive, %Canvas_Tools_Window_Title%,,5 ; waits for the Canvas tools window to show up. Times out in 5 seconds.
-	If ErrorLevel ; if times out, exits out of the routine.
-	{
-		exit ; stops the subroutine
-	}
-	
-	sleep 500 ; sets a 500 millisecond pause
-	Send {F} ; send F key to computer
-	return
-}
-#If
-
-+++SetTitleMatchMode, 2 ; Sets the window title matching to contains the search words
-#If WinActive(Canvas_Service_Window_Title) ; window title must only say Search
-;SearchRapidCanvas subroutine
-SearchRapidCanvas:
-{
-	;below is the amount of key presses to the sections in the option screen for canvas. 1 press = rapid Section 1, 2 press = repidsection2, 3 presses = rapidsection 3
-	RapidHotKey("RapidSection1""RapidSection2""Rapidsection3",1,0.5,1)
-	Return
-}
-
-;rapidsection1 subroutine
-RapidSection1:
-{
-	Gnumber := Rapid_section_function(Section1)	;goes to the function with the Section1 variable
-	If Gnumber = Error
-		Exit
-	#If  ;stops the need to specific window titles
-	;Exit ; stops the subroutine
-	Return
-}
-
-;rapidsection2 subroutine
-RapidSection2:
-{
-	Gnumber := Rapid_section_function(Section2)
-	If Gnumber = Error
-		Exit
-	#If ;stops the need to specific window titles
-	;Exit ; stops the subroutine
-	Return
-}
-
-;rapidsection3 subroutine
-RapidSection3:
-{
-	Gnumber := Rapid_section_function(Section3)
-	If Gnumber = Error
-		Exit
-	#If ;stops the need to specific window titles
-	Return
-}
-
+		}
+		
+		
+		;canvasstart subroutine
+		Canvasstart:
+		{
+			Send {f2} ; sends teh f2 key to the computer
+			WinWaitActive, %Canvas_Tools_Window_Title% ahk_class %Windchill_Class% ,,5 ; waits for the Canvas tools window to show up. Times out in 5 seconds.
+			If ErrorLevel ; if times out, exits out of the routine.
+			{
+				exit ; stops the subroutine
+			}
+			
+			sleep 500 ; sets a 500 millisecond pause
+			Send {F} ; send F key to computer
+			return
+		}
+		#If
+		
+		+++SetTitleMatchMode, 2 ; Sets the window title matching to contains the search words
+		#If WinActive(Canvas_Service_Window_Title) ; window title must only say Search
+		;SearchRapidCanvas subroutine
+		SearchRapidCanvas:
+		{
+			;below is the amount of key presses to the sections in the option screen for canvas. 1 press = rapid Section 1, 2 press = repidsection2, 3 presses = rapidsection 3
+			RapidHotKey("RapidSection1""RapidSection2""Rapidsection3",1,0.5,1)
+			Return
+		}
+		
+		;rapidsection1 subroutine
+		RapidSection1:
+		{
+			Gnumber := Rapid_section_function(Section1)	;goes to the function with the Section1 variable 
+			If Gnumber = Error
+			Exit
+			#If  ;stops the need to specific window titles
+			;Exit ; stops the subroutine
+			Return
+		}
+		
+		;rapidsection2 subroutine
+		RapidSection2:
+		{
+			Gnumber := Rapid_section_function(Section2)	
+			If Gnumber = Error
+			Exit
+			#If ;stops the need to specific window titles
+			;Exit ; stops the subroutine
+			Return
+		}
+		
+		;rapidsection3 subroutine
+		RapidSection3:
+		{
+			Gnumber := Rapid_section_function(Section3)	
+			If Gnumber = Error
+			Exit
+			#If ;stops the need to specific window titles
+			Return
+		}
+		
 TableChoiceGUI:
 {
-	Escapedgui = 0
-	If GuiNumber !=0
-		Gui , %GuiNumber%:Destroy
-	
-	GuiNumber = 7
-	GuiWIdth = 500
+Escapedgui = 0
+If GuiNumber !=0
+	Gui , %GuiNumber%:Destroy
+
+GuiNumber = 7
+	GuiWIdth = 550
 	GuiHeight = 300
 	activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
 	Gui , %GuiNumber%:Destroy
 	
-	Gui, %GuiNumber%:add, GroupBox,w100 h70,Table Size
-	Gui, %GuiNumber%:add, Radio, Checked xp+10 yp+20 gTableWidthCheck vTable_Width_GroupC, Column Wide
-	Gui, %GuiNumber%:add, Radio, xp yp+20  gTableWidthCheck vTable_Width_GroupW, Page Wide
-	Gui,%GuiNumber%: add, GroupBox, Xp+100 yp-40 w175 h50, Rows
-	Gui, %GuiNumber%:add, Text, xp+10 yp+25, Rows:
-	Gui,%GuiNumber%: add, Edit,  xp+32 yp-4 w50 Number Limit4,
-	Gui, %GuiNumber%:add, UpDown, Range1-3001  vUserrows,20
-	Gui, %GuiNumber%:Font, CRed
-	Gui, %GuiNumber%:Add, Text, xp+52 w75 Vmaxlimit, Max is 3000 Rows
-	Gui, %GuiNumber%:Font,
-	Gui, %GuiNumber%:add, Button, Default xp-100 yp+190 h40 w250 gTablemaker, Make My Table
-	
-	gui, %GuiNumber%:add, tab2,xp-100 yp-130 w390 h120 VTabnum, Parts Tables | Troubleshooting Tables | Tooling Tables | Spec Tables
-	Gui,  %GuiNumber%:tab,1
-	Gui, %GuiNumber%:add,  Radio,Checked xp+10 yp+30 gPartsTablecheck vpartstable2,2 Column (Qty, Part Name)
-	Gui, %GuiNumber%:add, Radio,yp+20 gPartsTablecheck vpartstable3,3 Column (Item, Qty, Part Name)
-	Gui, %GuiNumber%:add, Radio,yp+20 gPartsTablecheck vpartstable5,5 Column (Item, Qty, New Part Number, Part Name, Former Part Number)
-	
-	Gui, %GuiNumber%:tab,2
-	Gui, %GuiNumber%:add, Radio,yp-40 gTroubleshootingcheck vj1939 , J1939 Code Description
-	Gui, %GuiNumber%:add, Radio,yp+20 gTroubleshootingcheck vTroubleshotingtbl,Troubleshooting
-	
-	
-	Gui,  %GuiNumber%:Tab, 3
-	Gui, %GuiNumber%:add, Radio, yp-20 gToolingTablecheck vtooltbl, Tooling Table
-	
-	Gui,  %GuiNumber%:Tab, 4
-	Gui, %GuiNumber%:add, Radio,yp gSpectablecheck vSpectable, Specification Table
-	
-	Gui, %GuiNumber%:Show, x%amonx% y%amonY% w%GuiWIdth% h%GuiHeight%, Table Selection
-	Guicontrol,%GuiNumber%:hide, maxlimit
-	Pgwd = No
-	Tabletype = C2
-	Return
+Gui, %GuiNumber%:add, GroupBox,w100 h70,Table Size
+Gui, %GuiNumber%:add, Radio, Checked xp+10 yp+20 gTableWidthCheck vTable_Width_GroupC, Column Wide
+Gui, %GuiNumber%:add, Radio, xp yp+20  gTableWidthCheck vTable_Width_GroupW, Page Wide
+Gui,%GuiNumber%: add, GroupBox, Xp+100 yp-40 w175 h50, Rows
+Gui, %GuiNumber%:add, Text, xp+10 yp+25, Rows:
+Gui,%GuiNumber%: add, Edit,  xp+32 yp-4 w50 Number Limit4, 
+Gui, %GuiNumber%:add, UpDown, Range1-3001  vUserrows,20
+Gui, %GuiNumber%:Font, CRed
+Gui, %GuiNumber%:Add, Text, xp+52 w75 Vmaxlimit, Max is 3000 Rows 
+Gui, %GuiNumber%:Font, 
+Gui, %GuiNumber%:add, Button, Default xp-100 yp+190 h40 w250 gTablemaker, Make My Table
+
+gui, %GuiNumber%:add, tab2,xp-100 yp-130 w490 h120 VTabnum, Parts Tables | Troubleshooting Tables | Tooling Tables | Spec Tables | VSP Tables
+Gui,  %GuiNumber%:tab,1
+Gui, %GuiNumber%:add,  Radio,Checked xp+10 yp+30 gPartsTablecheck vpartstable2,2 Column (Qty, Part Name)
+Gui, %GuiNumber%:add, Radio,yp+20 gPartsTablecheck vpartstable3,3 Column (Item, Qty, Part Name)
+Gui, %GuiNumber%:add, Radio,yp+20 gPartsTablecheck vpartstable5,5 Column (Item, Qty, New Part Number, Part Name, Former Part Number)
+
+Gui, %GuiNumber%:tab,2
+Gui, %GuiNumber%:add, Radio,yp-40 gTroubleshootingcheck vj1939 , J1939 Code Description 
+Gui, %GuiNumber%:add, Radio,yp+20 gTroubleshootingcheck vTroubleshotingtbl,Troubleshooting
+
+
+Gui,  %GuiNumber%:Tab, 3
+Gui, %GuiNumber%:add, Radio, yp-20 gToolingTablecheck vtooltblService, Tooling Table (Service - T1,T2,T3)
+Gui, %GuiNumber%:add, Radio, yp+20 gToolingTablecheck vtooltbl, Tooling Table (Mech Lab - A,B,C)
+
+Gui,  %GuiNumber%:Tab, 4
+Gui, %GuiNumber%:add, Radio,yp-20 gSpectablecheck vSpectable, Specification Table
+
+Gui,  %GuiNumber%:Tab, 5
+Gui, %GuiNumber%:add, Radio,yp gVSPcheck vVSPtable, VSP Table
+
+
+Gui, %GuiNumber%:Show, x%amonx% y%amonY% w%GuiWIdth% h%GuiHeight%, Table Selection
+Guicontrol,%GuiNumber%:hide, maxlimit
+Pgwd = No
+Tabletype = C2
+Return
 }
 
 
@@ -765,319 +804,206 @@ TableChoiceGUI:
 7GuiEscape:
 7Guiclose:
 {
-	UnPausescript()
-	Gui, 7:destroy
-	Escapedgui = 1
-	return
+UnPausescript()
+Gui, 7:destroy
+Escapedgui = 1
+return
 }
 
 toolingtaBLECHECK:
 {
-	Gui,7:submit, nohide
-	
-	iF (tooltbl)
-	{
-		tabletype = toolingtable
-		guicontrol,,Table_Width_GroupW,1
-		Pgwd = Yes
-	}
-	Return
+Gui,7:submit, nohide
+
+iF (tooltbl)
+{
+tabletype = toolingtable
 }
+
+If  (tooltblservice)
+{
+tabletype = toolingtableService
+}
+
+guicontrol,,Table_Width_GroupW,1
+Pgwd = Yes
+Return
+}
+
+
+VSPcheck:
+{
+Gui,7:submit, nohide
+
+iF (VSPtable)
+{
+tabletype = VSPTable
+guicontrol,,Table_Width_GroupW,1
+Pgwd = Yes
+}
+Return
+}
+
 
 Tablemaker:
 {
-	Gui,7:submit, nohide
-	GuicontrolGet, Userrows
-	If Userarrows > 3000
-	{
-		Guicontrol,%GuiNumber%:Show, maxlimit
-		Sleep 100
-		Guicontrol,%GuiNumber%:hide, maxlimit
-		Sleep 100
-		Guicontrol,%GuiNumber%:Show, maxlimit
-		Sleep 100
-		Guicontrol,%GuiNumber%:hide, maxlimit
-		Sleep 100
-		Guicontrol,%GuiNumber%:Show, maxlimit
-		return
-	}
-	
-	Else if Userarrows < 3001
-		guicontrol, %GuiNumber%:hide, maxlimit
-	
-	UnPausescript()
-	Gui, 7:Destroy
-	Return
+Gui,7:submit, nohide
+GuicontrolGet, Userrows
+If Userarrows > 3000
+{
+Guicontrol,%GuiNumber%:Show, maxlimit
+Sleep 100
+Guicontrol,%GuiNumber%:hide, maxlimit
+Sleep 100
+Guicontrol,%GuiNumber%:Show, maxlimit
+Sleep 100
+Guicontrol,%GuiNumber%:hide, maxlimit
+Sleep 100
+Guicontrol,%GuiNumber%:Show, maxlimit
+return
+}
+
+Else if Userarrows < 3001
+guicontrol, %GuiNumber%:hide, maxlimit
+
+UnPausescript()
+Gui, 7:Destroy
+Return
 }
 
 Troubleshootingcheck:
 {
-	Gui,7:submit, nohide
-	
-	If (j1939)
-	{
-		Tabletype = jcode
-		guicontrol,,Table_Width_GroupW,1
-		Pgwd = Yes
-	}
-	If (Troubleshotingtbl)
-	{
-		tabletype = Troubleshoot
-		guicontrol,,Table_Width_GroupW,1
-		Pgwd = Yes
-	}
-	Return
+Gui,7:submit, nohide
+
+If (j1939)
+{
+Tabletype = jcode
+guicontrol,,Table_Width_GroupW,1
+Pgwd = Yes
+}
+If (Troubleshotingtbl)
+{
+tabletype = Troubleshoot
+guicontrol,,Table_Width_GroupW,1
+Pgwd = Yes
+}
+Return
 }
 
 TableWidthCheck:
 {
-	Gui,7:submit, nohide
-	
-	If (Table_Width_GroupC)
-	{
-		Pgwd = No
-	}
-	
-	If (Table_Width_GroupW)
-	{
-		Pgwd = Yes
-	}
-	
-	Return
+Gui,7:submit, nohide
+
+If (Table_Width_GroupC)
+{
+Pgwd = No
+}
+
+If (Table_Width_GroupW)
+{
+Pgwd = Yes
+}
+
+Return
 }
 
 PartsTablecheck:
 {
-	Gui,7:submit, nohide
-	
-	
-	If (partstable2)
-		Tabletype = C2
-	
-	If (partstable3)
-		Tabletype = C3
-	
-	If (partstable5)
-	{
-		Tabletype = C5
-		guicontrol,,Table_Width_GroupW,1
-		Pgwd = Yes
-	}
-	Return
+Gui,7:submit, nohide
+
+
+If (partstable2)
+Tabletype = C2
+
+If (partstable3)
+Tabletype = C3
+
+If (partstable5)
+{
+Tabletype = C5
+guicontrol,,Table_Width_GroupW,1
+Pgwd = Yes
+}
+Return
 }
 
 Spectablecheck:
 {
-	Gui,7:submit, nohide
+Gui,7:submit, nohide
+
+If (Spectable)
+{
+Tabletype = Spec
+guicontrol,,Table_Width_GroupW,1
+Pgwd = Yes
+}
+Return
+}
+
+		
 	
-	If (Spectable)
-	{
-		Tabletype = Spec
-		guicontrol,,Table_Width_GroupW,1
-		Pgwd = Yes
-	}
-	Return
-}
-
-
-
-TableRapid:
-{
-	
-	Tabletext := CreateTable()
-	If Escapedgui = 1
-	{
-		Return
-	}
-	
-	Copytable(tabletext) ; creates the table gui screen with the correct text inside it
-	return
-}
-
-
-#If ; resets needs to specific window text
-
-/*
-	CloseCPN:
-	{
-		;msgbox, close cpn ;for diagnostics
-		process, Close, CPNSearch.exe
-		SetTimer, CloseCPN, Off
-		Running_script = 0
-		Return
-	}
-*/
-
-/*
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== Search for Warnings GUI ======/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-*/
-
-+++SetTitleMatchMode,2 ; sets window title matches to contains the wording
-#If WinActive(Arbortext_Window_Title) ; following hotkey only works in Arbortext window
-
-
-$+^S:: ; Shift + ctrl + S hotkey
-{
-	; for cleaner code, the below statement is made to include the file warningGUi.ahk that is in the same folder as this script.
-	;#include warningGUI.ahk
-	gosub, Warningsgui
-	return
-}
-#If ; clears the only in Arbortext requirement
-
-/*
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== Quick View GUI ======/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-*/
-
-
-$#alt:: ; Win + Alt
-{
-	Gosub, GUIscreen ; go to GUIscreen subroutine, note the subroutine is in guiscreen.ahk
-	Return
-}
-
-
-
-/*
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== Create the  F6 Tables for the macro ======/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-*/
-
-
-
-;~ /=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== Create Column Wide Tables Section ======/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-
-
-3Column: ; Makes 3 column Table with 22 rows. Makes the top row merged and adds required parts.  Then the 2nd row has qty, part #, part description
-{
-	
-	;Tabletype = C2
-	;Tabletext := Createtable("C2",Pgwd) ; to createtable Function that passes C2 for 2 column, then the pgwd variable.
-	
-	Return
-}
-
-
-4Column: ; Makes 4 column Table with 22 rows. Makes the top row merged and adds required parts.  Then the 2nd row has item. qty, part #, part description
-{
-	;Tabletype = C3
-	;Tabletext := Createtable("C3",Pgwd) ; to createtable funciton that passed the c3 for 3 column, then the Pgwd variable contents (Yes or no)
-	Copytable(tabletext) ; creates the table gui screen with the correct text inside it
-	return
-}
-
-
-/*
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== Create Pagewide Tables Section ======/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-*/
-
-5Column: ; Makes 5 column Table pg wide with 22 rows. Makes the top row merged and adds required parts.  Then the 2nd row has qty, part #, part description, former part
-{
-	;Tabletype = C5
-	;Tabletext := Createtable("C5",Pgwd)  ;to createtable funciton that passed the c5 for 5 column, then the Pgwd variable contents (Yes or no)
-	Copytable(tabletext) ; creates the table gui screen with the correct text inside it
-	Return
-}
-
-/*
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== ENgine Troubleshooting Tables ======/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-*/
-
-EngineTbl:
-{
-	;tabletype = Troubleshoot
-	;Tabletext := Createtable("Troubleshoot",Pgwd)  ;to createtable funciton that passed the Troubleshoot for the troubleshooting table, then the Pgwd variable contents (Yes or no)
-	Copytable(tabletext) ; creates the table gui screen with the correct text inside it
-	Return
-}
-
-J1939:
-{
-	;Tabletext :=  Createtable("Jcode",Pgwd) ;to createtable funciton that passed the Jcode for the Jcode table, then the Pgwd variable contents (Yes or no)
-	Copytable(tabletext)  ; creates the table gui screen with the correct text inside it
-	
-	Return
-}
-
-
-
-TableVSP:
-{
-	/*
-		Running_script = 1
-		GOsub, ArborFullScreen
-		Sleep 500
-		Send {AltDown}{ShiftDown}{t}{ShiftUP}{altup}
-		sleep 300
-		WinwaitActive, Table Insert,,3
-		Sleep 300
-		Send {Tab}{Right}{Tab}
-		Sleep 300
-		Send {2}{1}{Tab}{5}{Enter}
-		Sleep 300
-		Send {I}{t}{e}{m}{Right}
-		Sleep 300
-		Send {Q}{t}{y}{Right}
-		Sleep 300
-		Send {Item}
-		Sleep 300
-		Send {P}{a}{r}{t}{Space}{N}{u}{m}{b}{e}{r}{right}
-		Sleep 300
-		Send {P}{a}{r}{t}{Space}{N}{a}{m}{e}{right}
-		Sleep 300
-		Send {I}{l}{l}{u}{s}{t}{r}{a}{t}{i}{o}{n}{Space}{(}{S}{u}{b}{-}{s}{t}{e}{p}{)}{Space}{L}{o}{c}{a}{t}{i}{o}{n}
-		Sleep 300
-		Send {Alt Down}{a}{s}{r}{Alt Up}
-		Sleep 300
-		Send {AltDown}{a}{h}{AltUp}
-		Sleep 300
-		Send {AltDown}{Numpad5}{AltUp}
-		Sleep 300
-		Send {AltDown}{a}{a}{altup}
-		sleep 200
-		WinwaitActive, Table Properties,,3
-		Sleep 300
-		Send {ShiftDown}{tab}{ShiftUp}{Right}{Right}{Right}{tab}{tab}{tab}{tab}{c}{e}{tab}{c}{e}{enter}{Down}{Right 4}
-		Send Illustration%A_Space%`(`)
-		Sleep 300
-		Send {Alt Down}{a}{s}{c}{Alt Up}
-		Sleep 300
-		Send {Ctrl DOwn}{C}{Ctrl Up}
-		Sleep 500
-		Send {Shift Down}{Down 19}{Shift UP}
-		Sleep 300
-		Send {Ctrl DOwn}{V}{Ctrl Up}
-		sleep 300
-		If fullscreen = 1
+		TableRapid:
 		{
-			CoordMode, mouse, Relative
-			MouseMove 300,10
-			Click
-			Click
-			Fullscreen = 0
-			Coordmode, mouse, screen
-			MouseMove, mmx, mmy
+		
+			Tabletext := CreateTable()
+			If Escapedgui = 1
+			{
+			Return
+			}
+			
+			Copytable(tabletext) ; creates the table gui screen with the correct text inside it
+			return
 		}
-		Running_script = 0
-	*/
-	
-	Return
-}
 
+		
+		#If ; resets needs to specific window text
+		
+		/*
+		CloseCPN:
+		{
+			;msgbox, close cpn ;for diagnostics
+			process, Close, CPNSearch.exe 
+			SetTimer, CloseCPN, Off
+			Running_script = 0
+			Return
+		}
+		*/
+		
+		/*		
+		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== Search for Warnings GUI ======/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+		*/
+		
+		+++SetTitleMatchMode,2 ; sets window title matches to contains the wording
+		#If WinActive(Arbortext_Window_Title) ; following hotkey only works in Arbortext window
+		
+		
+		$+^S:: ; Shift + ctrl + S hotkey
+		{
+			; for cleaner code, the below statement is made to include the file warningGUi.ahk that is in the same folder as this script.
+			;#include warningGUI.ahk
+			gosub, Warningsgui
+			return
+		}
+		#If ; clears the only in Arbortext requirement
+		
+		/*		
+		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== Quick View GUI ======/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+		*/
+		
+		
+		$#alt:: ; Win + Alt
+		{
+			Gosub, GUIscreen ; go to GUIscreen subroutine, note the subroutine is in guiscreen.ahk
+			Return
+		}
 
 Createtable() ; CreateTable function
 {
 	global
-	Temptag = %clipboardall%
+	Temptag = %clipboardall% 
 	;msgbox, tabletype is %Tabletype% `n Pgwd is %Pgwd%
 	Gui 6:Destroy ; gets rid of the gui screen
 	sleep 500 ; pauses scipt for .5 seconds
@@ -1097,25 +1023,25 @@ Createtable() ; CreateTable function
 	clipwait ;waits for the clipboard to have date in int
 	string = %clipboard% ; stores that data into the variable "String"
 	FoundPos := RegExMatch(String,"^`<table frame")
-	;msgbox, %FoundPos%
-	If FoundPos != 1
-	{
+		;msgbox, %FoundPos%
+		If FoundPos != 1
+		{
 		msgbox,,,Please put cursor in approiate location to create a table,.5
 		msgbox,,,Please put cursor in approiate location to create a table,.5
 		msgbox,,,Please put cursor in approiate location to create a table,.5
 		msgbox,Please put cursor in approiate location to create a table
 		IfEqual, A_IsCompiled,1
-		{
-			Run, %A_ScriptFullPath% /Restart
+					{
+						Run, %A_ScriptFullPath% /Restart
+					}
+					
+					
+					Run, %A_ScriptFullPath% /Restart ; this methond allows the /restart to show in the command line, which prevents the splash image from loading on restart
+					exitapp ; exits this verison of the app
+					Return
 		}
 		
 		
-		Run, %A_ScriptFullPath% /Restart ; this methond allows the /restart to show in the command line, which prevents the splash image from loading on restart
-		exitapp ; exits this verison of the app
-		Return
-	}
-	
-	
 	If String Contains id
 	{
 		Send {ctrl down}{x}{ctrl up}
@@ -1124,7 +1050,7 @@ Createtable() ; CreateTable function
 		sleep 200 ; pauses script for .5 seconds
 		send {shift up} ; Send shift up to the computer to release the shift key
 		sleep 200 ; pauses script for .5 seconds
-		
+	
 		
 		Send {ctrl down}{x}{ctrl up} ; sends Ctrl + X to teh computer to cut the table contents out
 		sleep 100
@@ -1177,11 +1103,11 @@ Createtable() ; CreateTable function
 		<entry colname=""col2""><cpn-id><partno></partno><cpn></cpn></cpn-id></entry>
 		</row>"
 		
-		Reartextrowstotal =
+		Reartextrowstotal = 
 		
 		Loop, %Userrows%
 		{
-			Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
+		Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
 		}
 		Reartextend := "</tbody>
 		</tgroup>
@@ -1189,6 +1115,50 @@ Createtable() ; CreateTable function
 		reartext := reartext reartextrowstotal reartextend
 	}
 	
+	
+	if tabletype = toolingtableService
+	{
+			reartext := ">
+		<tgroup align=""center"" cols=""3"">
+		<colspec colname=""col1"" colwidth=""33.12pt""/>
+		<colspec colname=""col2"" colwidth=""33.12pt""/>
+		<colspec colname=""col3"" colwidth=""3.00*""/>
+		<thead>
+		<row valign=""middle"">
+		<entry nameend=""col3"" namest=""col1""><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Required Tools</entry>
+		</row>
+		<row valign=""middle"">
+		<entry><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt""?>Item</entry>
+		<entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?>Qty</entry>
+		<entry><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?>Part</entry>
+		</row>
+		</thead>
+		<tbody>"
+		
+		Reartextrowstotal = 
+	
+
+		Loop, %Userrows%
+		{		
+		Reartextrows := "<row valign=""middle"">
+		<entry colname=""col1"">" A_index "</entry>
+		<entry colname=""col2""></entry>
+		<entry colname=""col3""><cpn-id><partno></partno><cpn></cpn></cpn-id></entry>
+		</row>"
+	
+		
+		Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
+		}
+		
+		
+		Reartextend := "</tbody>
+		</tgroup>
+		</table>"
+		
+		reartext := reartext reartextrowstotal reartextend		
+	}
+	
+		
 	if tabletype = toolingtable
 	{
 		reartext := ">
@@ -1208,50 +1178,50 @@ Createtable() ; CreateTable function
 		</thead>
 		<tbody>"
 		
-		Reartextrowstotal =
+		Reartextrowstotal = 
 		Letteroutput = 0
 		Loopcounter = 1
-		ASCII = 65
-		
+		ASCII = 65	
+
 		Loop, %Userrows%
 		{
-			
-			Transform, OutputChar, Chr, %ASCII%
-			
-			If ASCii = 91
-			{
-				Ascii = 65
-				Letteroutput++
-			}
-			
-			If (ASCii = 79) || (ASCii = 81) || (ASCii = 73)
-			{
-				Ascii++
-				Transform, OutputChar, Chr, %ASCII%
-			}
-			
-			
-			If Letteroutput != 0
-			{
-				Asciifirst := (64 + letteroutput)
-				If Asciifirst = 73 | 79 | 81
-				{
-					Asciifirst++
-				}
-				Transform, OutputCharfirst, Chr, %Asciifirst%
-				outputchar := OutputCharfirst outputchar
-			}
-			
-			Reartextrows := "<row valign=""middle"">
-			<entry colname=""col1"">" OutputChar "</entry>
-			<entry colname=""col2""></entry>
-			<entry colname=""col3""><cpn-id><partno></partno><cpn></cpn></cpn-id></entry>
-			</row>"
-			loopcounter++
-			
-			
-			Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
-			AscII++
+		
+		Transform, OutputChar, Chr, %ASCII%
+		
+		If ASCii = 91
+		{
+		Ascii = 65
+		Letteroutput++
+		}
+		
+		If (ASCii = 79) || (ASCii = 81) || (ASCii = 73) 
+		{
+		Ascii++
+		Transform, OutputChar, Chr, %ASCII%
+		}
+	
+		
+		If Letteroutput != 0
+		{				
+		Asciifirst := (64 + letteroutput)
+		If Asciifirst = 73 | 79 | 81
+		{
+		Asciifirst++
+		}
+		Transform, OutputCharfirst, Chr, %Asciifirst%
+		outputchar := OutputCharfirst outputchar
+		}
+		
+		Reartextrows := "<row valign=""middle"">
+		<entry colname=""col1"">" OutputChar "</entry>
+		<entry colname=""col2""></entry>
+		<entry colname=""col3""><cpn-id><partno></partno><cpn></cpn></cpn-id></entry>
+		</row>"
+		loopcounter++
+		
+		
+		Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
+		AscII++
 		}
 		
 		
@@ -1290,20 +1260,20 @@ Createtable() ; CreateTable function
 		<tbody>"
 		
 		
-		Reartextrowstotal =
+		Reartextrowstotal = 
 		Loopcounter = 1
 		Loop, %Userrows%
 		{
-			Reartextrows := "<row valign=""middle"">
-			<entry colname=""col1"">" loopcounter "</entry>
-			<entry colname=""col2""></entry>
-			<entry colname=""col3""><partno></partno></entry>
-			<entry colname=""col4""><cpn></cpn></entry>
-			<entry colname=""col5""><partno></partno></entry>
-			</row>"
-			
-			loopcounter++
-			Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
+		Reartextrows := "<row valign=""middle"">
+		<entry colname=""col1"">" loopcounter "</entry>
+		<entry colname=""col2""></entry>
+		<entry colname=""col3""><partno></partno></entry>
+		<entry colname=""col4""><cpn></cpn></entry>
+		<entry colname=""col5""><partno></partno></entry>
+		</row>"
+		
+		loopcounter++
+		Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
 		}
 		
 		Reartextend := "</tbody>
@@ -1332,17 +1302,17 @@ Createtable() ; CreateTable function
 		</thead>
 		<tbody>"
 		
-		Reartextrowstotal =
+		Reartextrowstotal = 
 		Loopcounter = 1
 		Loop, %Userrows%
 		{
-			Reartextrows := "<row valign=""middle"">
-			<entry colname=""col1"">" loopcounter "</entry>
-			<entry colname=""col2""></entry>
-			<entry colname=""col3""><cpn-id><partno></partno><cpn></cpn></cpn-id></entry>
-			</row>"
-			loopcounter++
-			Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
+		Reartextrows := "<row valign=""middle"">
+		<entry colname=""col1"">" loopcounter "</entry>
+		<entry colname=""col2""></entry>
+		<entry colname=""col3""><cpn-id><partno></partno><cpn></cpn></cpn-id></entry>
+		</row>"
+		loopcounter++
+		Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
 		}
 		
 		
@@ -1379,20 +1349,20 @@ Createtable() ; CreateTable function
 		<tbody>"
 		
 		
-		Reartextrowstotal =
+		Reartextrowstotal = 
 		Loopcounter = 1
 		Loop, %Userrows%
 		{
-			Reartextrows := "<row valign=""middle"">
-			<entry colname=""col1"">" loopcounter "</entry>
-			<entry colname=""col2""></entry>
-			<entry colname=""col3""><partno></partno></entry>
-			<entry colname=""col4""><cpn></cpn></entry>
-			<entry colname=""col5""><partno></partno></entry>
-			</row>"
-			
-			loopcounter++
-			Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
+		Reartextrows := "<row valign=""middle"">
+		<entry colname=""col1"">" loopcounter "</entry>
+		<entry colname=""col2""></entry>
+		<entry colname=""col3""><partno></partno></entry>
+		<entry colname=""col4""><cpn></cpn></entry>
+		<entry colname=""col5""><partno></partno></entry>
+		</row>"
+		
+		loopcounter++
+		Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
 		}
 		
 		Reartextend := "</tbody>
@@ -1424,11 +1394,11 @@ Createtable() ; CreateTable function
 		<entry valign=""middle""><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt""?><para></para></entry>
 		</row>"
 		
-		Reartextrowstotal =
+		Reartextrowstotal = 
 		
 		Loop, %Userrows%
-		{
-			Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
+		{		
+		Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
 		}
 		
 		Reartextend :=  "</tbody>
@@ -1456,17 +1426,17 @@ Createtable() ; CreateTable function
 		<tbody>"
 		
 		Userrows--
-		Reartextrowstotal =
+		Reartextrowstotal = 
 		Loopcounter = 1
 		Loop, %Userrows%
 		{
-			Reartextrows := "<row>
-			<entry colname=""col1""><?Pub _newline?><para><emphasis> " Loopcounter ". </emphasis></para><?Pub _newline?><para><emphasis>A.</emphasis></para><?Pub _newline?></entry>
-			<entry colname=""col2"" valign=""middle""><?Pub _newline?><para></para></entry>
-			<entry colname=""col3""><?Pub _newline?><para><emphasis>Result:</emphasis></para><?Pub _newline?><para>Proceed to Test Step </para><?Pub _newline?><para><emphasis>Result:</emphasis></para><?Pub _newline?><para><emphasis>Repair:</emphasis></para><?Pub _newline?><para>If the problem is not resolved, proceed to Test Step</para><?Pub _newline?></entry>
-			</row>"
-			Loopcounter++
-			Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
+		Reartextrows := "<row>
+		<entry colname=""col1""><?Pub _newline?><para><emphasis> " Loopcounter ". </emphasis></para><?Pub _newline?><para><emphasis>A.</emphasis></para><?Pub _newline?></entry>
+		<entry colname=""col2"" valign=""middle""><?Pub _newline?><para></para></entry>
+		<entry colname=""col3""><?Pub _newline?><para><emphasis>Result:</emphasis></para><?Pub _newline?><para>Proceed to Test Step </para><?Pub _newline?><para><emphasis>Result:</emphasis></para><?Pub _newline?><para><emphasis>Repair:</emphasis></para><?Pub _newline?><para>If the problem is not resolved, proceed to Test Step</para><?Pub _newline?></entry>
+		</row>"
+		Loopcounter++
+		Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
 		}
 		
 		Reartextend := "<row>
@@ -1483,7 +1453,7 @@ Createtable() ; CreateTable function
 	
 	If Tabletype = Spec ; If the "tabletype" variable is spec then this data will be stored in "reartext" variable
 	{
-		
+	
 		reartext := ">
 		<tgroup cols=""4"">
 		<?PubTbl tgroup clmarg=""2.0pt"" crmarg=""2.0pt""?>
@@ -1503,95 +1473,137 @@ Createtable() ; CreateTable function
 		</row>
 		</thead>
 		<tbody>"
+
 		
-		
-		Reartextrowstotal =
+		Reartextrowstotal = 
 		Loopcounter = 1
 		Loop, %Userrows%
 		{
-			Reartextrows := "<row>
-			<entry align=""center"" valign=""middle""><para>" Loopcounter "</para></entry>
-			<entry align=""center"" valign=""middle""><para></para></entry>
-			<entry align=""center"" valign=""middle""><para><cpn-id><partno></partno><cpn></cpn></cpn-id></para></entry>
-			<entry></entry>
-			</row>"
-			
-			loopcounter++
-			Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
-		}
+		Reartextrows := "<row>
+		<entry align=""center"" valign=""middle""><para>" Loopcounter "</para></entry>
+		<entry align=""center"" valign=""middle""><para></para></entry>
+		<entry align=""center"" valign=""middle""><para><cpn-id><partno></partno><cpn></cpn></cpn-id></para></entry>
+		<entry></entry>
+		</row>"
+				
+		loopcounter++
 		
+		Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
+		}
 		Reartextend :=  "</tbody>
 		</tgroup>
 		</table>"
 		reartext := reartext reartextrowstotal reartextend
 	}
 	
+		If Tabletype = VSPTable
+		{
+			reartext := ">
+			<tgroup cols=""4"">
+			<colspec colname=""col1"" colwidth=""0.46*""/>
+			<colspec colname=""col2"" colwidth=""0.46*""/>
+			<colspec colname=""col3"" colwidth=""1.51*""/>
+			<colspec colname=""col4"" colwidth=""1.51*""/>
+			<thead>
+			<row>
+			<entry align=""center"" valign=""middle""><?PubTbl cell border-bottom-width=""0.20pt"" border-left-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Item</entry>
+			<entry align=""center"" valign=""middle""><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Qty</entry>
+			<entry align=""center"" valign=""middle""><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Part</entry>
+			<entry align=""center"" valign=""middle""><?PubTbl cell border-bottom-width=""0.20pt"" border-right-width=""0.20pt"" border-top-width=""0.20pt""?>Illustration (sub step) Location</entry>
+			</row>
+			</thead>
+			<tbody>"
+		
+		
+		
+		Reartextrowstotal = 
+		Loopcounter = 1
+		Loop, %Userrows%
+		{
+		Reartextrows := "<row valign=""middle"">
+		<entry align=""center"" valign=""middle""><?PubTbl cell border-left-width=""0.20pt"" border-right-width=""0.20pt""?>" LoopCounter "</entry>
+		<entry align=""center"" valign=""middle""><?PubTbl cell border-right-width=""0.20pt""?></entry>
+		<entry align=""center"" valign=""middle""><?PubTbl cell border-right-width=""0.20pt""?><cpn-id><partno></partno><cpn></cpn></cpn-id></entry>
+		<entry align=""center"" valign=""middle""><?PubTbl cell border-right-width=""0.20pt""?>Illustration () </entry>
+		</row>"
+		
+		loopcounter++
+		Reartextrowstotal = %Reartextrowstotal%%Reartextrows%
+		}
+		
+		Reartextend := "</tbody>
+		</tgroup>
+		</table>"
+		
+		reartext := reartext reartextrowstotal reartextend
+	}
+
 	Tabletext := Fronttext newword Pagewidecheck reartext ; combines all teh variables together and stores them into the "tabletext" variable
 	
-	clipboard = %Temptag%
+	clipboard = %Temptag% 
 	Return tabletext ; sends the Tabletext variable information back
-}
-
-/*
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== Loads HotKeys Section ======/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-*/
-
-SetHotKeys:
-{
-	;~ MsgBox, hotkeys
-	+++SetTitleMatchMode, 3 ; window title has to match exactly with text
-	Hotkey, IfWinActive, %Search_Window_Title% ; hotkey only works in search window
-	Hotkey, $%SearchHotKey%, SearchRapidArbor ; makes the contents of the searchhotkey variable go to SearchrapidSearch subroutine
-	#IfWinActive ; clears the have to be in search window
-	
-	+++SetTitleMatchMode, 2 ; window title must contain the text
-	HOTKEY, IfWinActive, %Arbortext_Window_Title% ; these hotkeys work only in Arbortext
-	Hotkey, $%CPNHotKey%, CPNRapid ; makes the contents of the CPNhotkey variable go to CPNrapid subroutine, also turn the hotkey on
-	Hotkey, $^%CPNHotKey%, CPNRapidautofill  ; makes the Ctrl + contents of the  CPNhotkey variable go to CPNrapidautofill subroutine, also turn the hotkey on
-	Hotkey, $%METHotKey%, METRapid ; makes the contents of the  METhotkey variable go to METrapid subroutine, also turn the hotkey on
-	Hotkey, $%CHKHotKey%, CHKRapid ; makes the contents of the  CHKhotkey variable go to CHKRapid subroutine, also turn the hotkey on
-	Hotkey, $%TableHotKey%, TableRapid ; makes the contents of the  Tablehotkey variable go to TableRapid subroutine, also turn the hotkey on
-	Hotkey, $%SearchHotKey%, SearchRapidArbor ; makes the contents of the Searchhotkey variable go to SearchRapidArbor subroutine, also turn the hotkey on
-	
-	HotKey, IfWinActive,%Canvas_Service_Window_Title%; this hotkey only works in the cavas service window
-	Hotkey, $%SearchHotKey%, SearchRapidCanvas ; makes the contents of the Searchhotkey variable go to SearchRapidCanvas subroutine, also turn the hotkey on
-	
-	Hotkey, IfWinActive,  %Canvas_Window_Title% ; this hotkey only works in Canvas 14 for windchill
-	Hotkey, $%SearchHotKey%, CanvasRapid ; makes the contents of the Searchhotkey variable go to CanvasRapid subroutine, also turn the hotkey on
-	Return
-}
-
-/*
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== Create the  Gui screens ======/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-	/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-*/
-
-
+}              
+		
+		/*		
+		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== Loads HotKeys Section ======/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+		*/
+		
+		SetHotKeys:
+		{
+			;~ MsgBox, hotkeys
+			+++SetTitleMatchMode, 3 ; window title has to match exactly with text
+			Hotkey, IfWinActive, %Search_Window_Title% ahk_class %Windchill_Class%  ; hotkey only works in search window
+			Hotkey, $%SearchHotKey%, SearchRapidArbor ; makes the contents of the searchhotkey variable go to SearchrapidSearch subroutine
+			#IfWinActive ; clears the have to be in search window
+			
+			+++SetTitleMatchMode, 2 ; window title must contain the text
+			HOTKEY, IfWinActive, %Arbortext_Window_Title% ahk_class %Windchill_Class%  ; these hotkeys work only in Arbortext
+			Hotkey, $%CPNHotKey%, CPNRapid ; makes the contents of the CPNhotkey variable go to CPNrapid subroutine, also turn the hotkey on
+			Hotkey, $^%CPNHotKey%, CPNRapidautofill  ; makes the Ctrl + contents of the  CPNhotkey variable go to CPNrapidautofill subroutine, also turn the hotkey on
+			Hotkey, $%METHotKey%, METRapid ; makes the contents of the  METhotkey variable go to METrapid subroutine, also turn the hotkey on
+			Hotkey, $%CHKHotKey%, CHKRapid ; makes the contents of the  CHKhotkey variable go to CHKRapid subroutine, also turn the hotkey on
+			Hotkey, $%TableHotKey%, TableRapid ; makes the contents of the  Tablehotkey variable go to TableRapid subroutine, also turn the hotkey on
+			Hotkey, $%SearchHotKey%, SearchRapidArbor ; makes the contents of the Searchhotkey variable go to SearchRapidArbor subroutine, also turn the hotkey on
+			
+			HotKey, IfWinActive,%Canvas_Service_Window_Title% ahk_class %Windchill_Class% ; this hotkey only works in the cavas service window
+			Hotkey, $%SearchHotKey%, SearchRapidCanvas ; makes the contents of the Searchhotkey variable go to SearchRapidCanvas subroutine, also turn the hotkey on
+			
+			Hotkey, IfWinActive,  %Canvas_Window_Title% ahk_class %Windchill_Class%  ; this hotkey only works in Canvas  for windchill
+			Hotkey, $%SearchHotKey%, CanvasRapid ; makes the contents of the Searchhotkey variable go to CanvasRapid subroutine, also turn the hotkey on
+			Return
+		}
+		
+		/*		
+		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== Create the  Gui screens ======/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+		*/
+		
+		
 ;This makes up the win+alt screen
 Guiscreen:
 {
 	
 	
 	If GuiNumber !=0 ; If guiscreeen vairable is not 0
-		Gui , %GuiNumber%:Destroy ; closes the gui screen
-	;Below is making the menu for the gui screen
-	
+	Gui , %GuiNumber%:Destroy ; closes the gui screen
+;Below is making the menu for the gui screen
+		
 	GuiNumber = 1 ; sets the guiscreen variable to 1
 	GuiWIdth = 824  ;sets the width of the gui screen
 	GuiHeight =500 ; Sets the height of the gui screen
-	
+
 	activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
-	
+
 	Gui , %GuiNumber%:Destroy ; in case the guiscren was not destroyed already to clear and issues with duplicate variables
 	
 	sleep 200 ; pauses script for 200 miliseconds
 	Settimer, Quickview, 2000 ; Sets up a timer to close window after 2 seconds on not active
 	Load_ini_file(inifile) ; loads the settings from the ini files
-	
-	Gui , %GuiNumber%:Add, groupbox, xm+21 ym+15 Section w235 h95,
+
+	Gui , %GuiNumber%:Add, groupbox, xm+21 ym+15 Section w235 h95, 
 	Gui, %GuiNumber%:font,C131980 Bold Underline s12
 	Gui,%GuiNumber%:Add, Text, xs+5 ys+15 vCPNGui, %CPNHotKey%:
 	
@@ -1633,23 +1645,23 @@ Guiscreen:
 	
 	; 2nd column
 	
-	Gui , %GuiNumber%:Add, groupbox, xm+270 ym+15 Section w510 h140,
+	Gui , %GuiNumber%:Add, groupbox, xm+270 ym+15 Section w510 h140, 
 	Gui, %GuiNumber%:font,C0e1360 Bold Underline s12
 	Gui,%GuiNumber%:Add, Text, xs+3 ys+10  vCtrlcpngui, Ctrl + %CPNHotKey%
 	
 	Gui, %GuiNumber%:font,C0e1360 Norm s8
-	Gui ,%GuiNumber%:Add, Text, xs+3 ys+30 , Auto Find empty CPN tags within current screen and Fills them.
+	Gui ,%GuiNumber%:Add, Text, xs+3 ys+30 , Auto Find empty CPN tags within current screen and Fills them. 
 	Gui ,%GuiNumber%:Add, Text, xs+3 ys+50 , Esc: Stops auto fill
 	Gui ,%GuiNumber%:Add, Text, xs+3 ys+70 w465 ,If CPN has no Cat Part number, The CPN tag will remain blank and the Arbortext Macros program will continue on with filling the remaining empty CPN tags.
 	Gui ,%GuiNumber%:Add, Text, xs+3 ys+110 w465, If The Search Function seems to try to enter the CPN on the wrong location, Delete the image files in %Root_Folder_Location%/UserImages to reset the search parameters.
 	
 	Gui, %GuiNumber%:font,C804313 Bold Underline s12
-	Gui , %GuiNumber%:Add, groupbox, xm+270 ym+150 Section w510 h75,
+	Gui , %GuiNumber%:Add, groupbox, xm+270 ym+150 Section w510 h75, 
 	Gui, %GuiNumber%:Add, Text, xs+3 ys+11 w24 h23 vTablegui, %TableHotKey%:
 	
 	Gui, %GuiNumber%:font,C804313 Norm s8
 	Gui ,%GuiNumber%:Add, Text, xs+3 ys+40  , 1 Press : Create Table
-	
+
 	
 	Gui , %GuiNumber%:Add, groupbox, xm+270 ym+230 Section w255 h50,
 	Gui,%GuiNumber%:font, CBlack Bold Underline S12
@@ -1666,21 +1678,21 @@ Guiscreen:
 	Gui, %GuiNumber%:Add, Text, xs+3 ys+30 , Bring Arbortext Window to Front
 	
 	Gui, %GuiNumber%:font,C1d79b8 Bold Underline s11
-	Gui , %GuiNumber%:Add, groupbox, xm+270 ym+330 Section w255 h50,
+	Gui , %GuiNumber%:Add, groupbox, xm+270 ym+330 Section w255 h50, 
 	Gui, %GuiNumber%:Add, Text, xs+3 ys+10 , WIN + B
 	
 	Gui, %GuiNumber%:font,C1d79b8 Norm s8
 	Gui , %GuiNumber%:Add, Text,  xs+3 ys+30, Bring  Browser Window in Arbortext to Front
 	
 	Gui, %GuiNumber%:font,Cb81d79 Bold Underline s11
-	Gui , %GuiNumber%:Add, groupbox, xm+270 ym+380 Section w255 h50,
+	Gui , %GuiNumber%:Add, groupbox, xm+270 ym+380 Section w255 h50, 
 	Gui ,%GuiNumber%:Add, Text,xs+3 ys+10 , WIN + C
 	
 	Gui, %GuiNumber%:font,Cb81d79 Norm s8
 	Gui ,%GuiNumber%:Add, Text, xs+3 ys+30, Bring Windchill Canvas Window to Front
 	
 	Gui, %GuiNumber%:font,C1d79b8 Bold Underline s11
-	Gui , %GuiNumber%:Add, groupbox, xm+270 ym+430 Section w255 h50,
+	Gui , %GuiNumber%:Add, groupbox, xm+270 ym+430 Section w255 h50, 
 	Gui, %GuiNumber%:Add, Text, xs+3 ys+10, WIN + H
 	
 	Gui, %GuiNumber%:font,C1d79b8 Norm s8
@@ -1697,26 +1709,26 @@ Guiscreen:
 
 Optionsmenu:
 {
-	Settimer, Quickview, Off
+Settimer, Quickview, Off
 	
-	If GuiNumber !=0 ; If guiscreeen vairable is not 0
-		Gui , %GuiNumber%:Destroy ; closes the gui screen
+		If GuiNumber !=0 ; If guiscreeen vairable is not 0
+	Gui , %GuiNumber%:Destroy ; closes the gui screen
 	
 	checkvars = CPN,MET,CHK,Search,Table
-	GuiWIdth = 824
+	GuiWIdth = 824 
 	GuiHeight = 430
 	Load_ini_file(inifile)
 	GuiNumber = 2
 	activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
 	
-	sleep 200
-	
+		sleep 200
+
 	Gui, %GuiNumber%:Add, Groupbox, Section xm+5 ym+19 w800 h400
 	Gui, %GuiNumber%:Add, Groupbox, xs+10 ys+19 w470 h60
 	;Gui,2:Submit, NoHide
 	Gui, %GuiNumber%:Add, Text, xp+37 yp+27 w200 h30 , CPN Tag Fill (Single - Plural - Mod)
 	Gui, %GuiNumber%:Add, Text, xp+182 yp-13 w20 h20 , F1
-	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F2
+	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F2 
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F3
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F4
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F5
@@ -1733,7 +1745,7 @@ Optionsmenu:
 	Gui, %GuiNumber%:Add, Groupbox, xs+10 yp+35 w470 h60
 	Gui, %GuiNumber%:Add, Text, xp+40 yp+15 w160 h40 , Units Group tag and Conversion window(Click or click and hold in tag)
 	Gui, %GuiNumber%:Add, Text, xp+182 yp w20 h20 , F1
-	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F2
+	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F2 
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F3
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F4
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F5
@@ -1751,7 +1763,7 @@ Optionsmenu:
 	Gui, %GuiNumber%:Add, Groupbox, xs+10 yp+35 w470 h60
 	Gui, %GuiNumber%:Add, Text, xp+40 yp+15 w160 h30 , Check in- Check out - Validate
 	Gui, %GuiNumber%:Add, Text, xp+182 yp w20 h20 , F1
-	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F2
+	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F2 
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F3
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F4
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F5
@@ -1769,7 +1781,7 @@ Optionsmenu:
 	Gui, %GuiNumber%:Add, Groupbox, xs+10 yp+35 w470 h60
 	Gui, %GuiNumber%:Add, Text, xp+40 yp+15 w100 h30 , Graphic Search
 	Gui, %GuiNumber%:Add, Text, xp+182 yp w20 h20 , F1
-	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F2
+	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F2 
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F3
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F4
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F5
@@ -1786,7 +1798,7 @@ Optionsmenu:
 	Gui, %GuiNumber%:Add, Groupbox, xs+10  yp+35 w470 h60
 	Gui, %GuiNumber%:Add, Text, xp+40 yp+15 w160 h30 , Tables (Col wide - Pg Wide - Eng Troubleshooting - VSP)
 	Gui, %GuiNumber%:Add, Text, xp+182 yp w20 h20 , F1
-	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F2
+	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F2 
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F3
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F4
 	Gui, %GuiNumber%:Add, Text, xp+30 yp w20 h20 , F5
@@ -1819,36 +1831,36 @@ Optionsmenu:
 	; For autoCPN Fill
 	Gui, %GuiNumber%:Add, Groupbox, xs+500 ys+200 w300 h125, CPN Autofill Options
 	Gui, %GuiNumber%:Add, Checkbox,  xp+10 yp+20 checked%CPN_AutoSearch% vCPN_AutoSearch, Autoscroll down for CPN fill (ESC Key stops Autoscrolling)
-	
-	Loop, Parse, checkvars,`,
+
+Loop, Parse, checkvars,`,
 	{
-		loop, 6
+ 		loop, 6
 		{
-			
+		
 			;~ msgbox, % a_loopfield
-			If  %a_loopfield%hotkey =  F%A_Index%
+		If  %a_loopfield%hotkey =  F%A_Index%
 			{
 				If A_Index = 6
-				{
-					%a_loopfield% = %A_index%
-					GuiControl,2:,%A_LoopField%UN,1
-					;~ MsgBox, %A_loopfield% is UN
-					continue
-				}
+					{
+						%a_loopfield% = %A_index%
+						GuiControl,2:,%A_LoopField%UN,1
+						;~ MsgBox, %A_loopfield% is UN
+						continue
+					}
 				Else
 				{
-					;~ Stringreplace, temp, a_loopfield,HotKey,,
-					%A_loopfield% = %A_Index%
-					GuiControl,2:, %A_LoopField%F%A_Index%,1
-					;~ MsgBox, %A_loopfield% is  loop %A_index%
-					;~ MsgBox, temp is %Temp%
-					continue
+				;~ Stringreplace, temp, a_loopfield,HotKey,,
+				%A_loopfield% = %A_Index%
+				GuiControl,2:, %A_LoopField%F%A_Index%,1
+				;~ MsgBox, %A_loopfield% is  loop %A_index%
+				 ;~ MsgBox, temp is %Temp%
+				continue			
 				}
 			}
-		}
-		
 	}
-	Gui,%GuiNumber%:Show,  x%Amonx% y%Amony% w%GuiWIdth% h%GuiHeight%, Arbortext Hotkeys V%Version_Number%
+
+}
+Gui,%GuiNumber%:Show,  x%Amonx% y%Amony% w%GuiWIdth% h%GuiHeight%, Arbortext Hotkeys V%Version_Number%
 	Settimer, Quickview, 2000
 	return
 }
@@ -1857,9 +1869,9 @@ Optionsmenu:
 Aboutmenu:
 {
 	If GuiNumber !=0
-		Gui , %GuiNumber%:Destroy
+	Gui , %GuiNumber%:Destroy
 	GuiNumber = 3
-	GuiWIdth = 600
+	GuiWIdth = 600 
 	GuiHeight = 240
 	activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
 	Gui, %guiNumber%:Destroy
@@ -1887,7 +1899,7 @@ Aboutmenu:
 Warningsgui:
 {
 	If GuiNumber !=0
-		Gui , %GuiNumber%:Destroy
+	Gui , %GuiNumber%:Destroy
 	GuiNumber = 5
 	gui %GuiNumber%: destroy
 	activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
@@ -1895,7 +1907,7 @@ Warningsgui:
 	Gui, %GuiNumber%:Add, Text,x10 y10,Pick which type of Warning that you want to search for, or type in Warning Number below.
 	Gui, %GuiNumber%:Add, ListBox, vMyListBox gMyListBoxs w270 r27
 	Gui, %GuiNumber%:Add, Text,xp+300 yp+50, Warning Number to search for:
-	Gui, %GuiNumber%:Add, Edit,xp yp+30 w75 vWarningsnumbertext,
+	Gui, %GuiNumber%:Add, Edit,xp yp+30 w75 vWarningsnumbertext, 
 	Gui, %GuiNumber%:Add, Button, Default gButtonOK, OK
 	
 	GuiControl,%GuiNumber%:, MyListBox, Air Cleaner
@@ -1933,9 +1945,9 @@ Warningsgui:
 
 Copytable(Tabletext)
 {
-	
+
 	If GuiNumber !=0
-		Gui , %GuiNumber%:Destroy
+	Gui , %GuiNumber%:Destroy
 	
 	GuiNumber = 6
 	Gui , %GuiNumber%:Destroy
@@ -1963,7 +1975,7 @@ Copyallguitext:
 	Tooltip, Textcopied
 	Sleep 500
 	Tooltip,
-	gui 6: destroy
+	gui 6: destroy 
 	return
 }
 
@@ -1974,809 +1986,753 @@ Copyallguitext:
 	Return
 }
 
+Howto:
+{
+	splashtexton,,Arbortext Macro, Loading PDF
+	Run, %Root_Folder_Location%\How to use Arbortext Macros.pdf
+	sleep 2000
+	SplashTextOff
+	return
+} 
 
-;~ autofillcheckboxsave:
-;~ {
-	;~ gui,%GuiNumber%:Submit, Nohide
-	;~ MsgBox, % autocheckbox
-	;~ GuiControlGet, autocheckbox
+Delete_images:
+{
+	activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
 	
-	;~ If (autocheckbox)
-	;~ Scrolldown = 1
+	Settimer, winmovemsgbox, 50
+	Titletext := "Are you sure you want to reset the Cpn Search?"
+	Msgbox, 4,,Are you sure you want to reset the Cpn Search?
 	
-	;~ Else
-	;~ scrolldown = 0
-	
-	
-	;~ GuiControlGet, autocheckbox
-	;~ IniWrite, %autocheckbox%, %Root_Folder_Location%\ArbortextMacroSettings.ini, Autofull, autocheckbox
-	;~ Return
-	;~ }
-	
-	Howto:
+	IfMsgBox no
 	{
-		splashtexton,,Arbortext Macro, Loading PDF
-		Run, %Root_Folder_Location%\How to use Arbortext Macros.pdf
-		sleep 2000
-		SplashTextOff
-		return
+		Return
 	}
-	
-	Delete_images:
+	Else IfMsgBox Yes
 	{
-		activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
-		
+		dir = C:\ArbortextMacros\UserImages
+		FileDelete, %dir%\*.*
+		Loop, %dir%\*.*, 2
+		FileRemoveDir, %A_LoopFileLongPath%,1
 		Settimer, winmovemsgbox, 50
-		Titletext := "Are you sure you want to reset the Cpn Search?"
-		Msgbox, 4,,Are you sure you want to reset the Cpn Search?
+		Titletext := "CPN Autofill is now reset"
+		MsgBox, CPN Autofill is now reset
 		
-		IfMsgBox no
-		{
-			Return
-		}
-		Else IfMsgBox Yes
-		{
-			dir = C:\ArbortextMacros\UserImages
-			FileDelete, %dir%\*.*
-			Loop, %dir%\*.*, 2
-				FileRemoveDir, %A_LoopFileLongPath%,1
-			Settimer, winmovemsgbox, 50
-			Titletext := "CPN Autofill is now reset"
-			MsgBox, CPN Autofill is now reset
-			
-			Return
-		}
 		Return
 	}
-	
-	winmovemsgbox:
+	Return
+}
+
+winmovemsgbox:
+{
+	settimer, winmovemsgbox, off
+	ID:=WinExist(Titletext)
+	WinMove, ahk_id %ID%, , Amonx, Amony 
+	return
+}
+
+exitprogram:
+{
+	exitapp
+	return
+}
+
+
+Quickview:
+{
+	IfWinNotActive, Arbortext Hotkeys
 	{
-		settimer, winmovemsgbox, off
-		ID:=WinExist(Titletext)
-		WinMove, ahk_id %ID%, , Amonx, Amony
+		;Gosub, Settings_Save
+		gosub, SetHotKeys
+		if guinumber <> 0
+		Gui, %guiNumber%:Destroy
+		
+		SetTimer, Quickview, Off
 		return
 	}
+	Return
+}
+
+1GuiEscape:
+1guiclose:
+{
+	gui, 1:destroy
+	Return
+}
+
+
+
+2GuiEscape:
+2guiclose:
+{
+Gui 2:Submit
+Write_ini_file(inifile)
+	gui, 2:destroy
+	Return
+}
+
+
+3GuiEscape:
+3guiclose:
+{
+	gui, 3:destroy
+	Return
+}
+
+emaillink:
+{
+	Run,  mailto:Karnia_Jarett_S@cat?Subject=Arbortext Macros
+	return
+}
+
+boxlink:
+{
+	Run, %Program_Site%
+	return
+}
+
+
+
+5guiclose:
+{
+	Gui 5: destroy
+	Return
+}
+
+MyListBoxs:
+{
+	if A_GuiEvent <> DoubleClick
+	return
 	
-	exitprogram:
+	; Otherwise, the user double-clicked a list item, so treat that the same as pressing OK.
+	; So fall through to the next label.
+	ButtonOK:
+	GuiControlGet, MyListBox  ; Retrieve the ListBox's current selection.
+	GuiControlGet, Warningsnumbertext
+	
+	If warningsnumbertext != 
+	Mylistbox := warningsnumbertext
+	
+	; Otherwise, try to launch it:
+	Gui,5:Destroy
+	+++SetTitleMatchMode, 3
+	IfWinExist Search 
 	{
-		exitapp
-		return
+		WinActivate Search
+		sleep 300
+		WinwaitActive, Search,,5
+		sleep 500					
+		Send {Esc}
+		Sleep 500
 	}
-	
-	
-	Quickview:
+	+++SetTitleMatchMode, 2				
+	WinActivate Arbortext
+	sleep 100
+	;msgbox No search active
+	WinwaitActive, Arbortext,,5
+	sleep 500				
+	Send {Alt Down}{o}{Alt Up}{e}
+	sleep 500
+	WinWaitActive, Search,,5
+	If ErrorLevel
 	{
-		IfWinNotActive, Arbortext Hotkeys
-		{
-			;Gosub, Settings_Save
-			gosub, SetHotKeys
-			if guinumber <> 0
-				Gui, %guiNumber%:Destroy
-			
-			SetTimer, Quickview, Off
-			return
-		}
-		Return
-	}
-	
-	1GuiEscape:
-	1guiclose:
-	{
-		gui, 1:destroy
-		Return
-	}
-	
-	
-	
-	2GuiEscape:
-	2guiclose:
-	{
-		Gui 2:Submit
-		Write_ini_file(inifile)
-		gui, 2:destroy
-		Return
-	}
-	
-	
-	3GuiEscape:
-	3guiclose:
-	{
-		gui, 3:destroy
-		Return
-	}
-	
-	emaillink:
-	{
-		Run,  mailto:Karnia_Jarett_S@cat?Subject=Arbortext Macros
-		return
-	}
-	
-	boxlink:
-	{
-		Run, %Program_Site%
-		return
-	}
-	
-	
-	
-	5guiclose:
-	{
-		Gui 5: destroy
-		Return
-	}
-	
-	MyListBoxs:
-	{
-		if A_GuiEvent <> DoubleClick
-			return
-		
-		; Otherwise, the user double-clicked a list item, so treat that the same as pressing OK.
-		; So fall through to the next label.
-		ButtonOK:
-		GuiControlGet, MyListBox  ; Retrieve the ListBox's current selection.
-		GuiControlGet, Warningsnumbertext
-		
-		If warningsnumbertext !=
-			Mylistbox := warningsnumbertext
-		
-		; Otherwise, try to launch it:
-		Gui,5:Destroy
-		+++SetTitleMatchMode, 3
-		IfWinExist Search
-		{
-			WinActivate Search
-			sleep 300
-			WinwaitActive, Search,,5
-			sleep 500
-			Send {Esc}
-			Sleep 500
-		}
-		+++SetTitleMatchMode, 2
-		WinActivate Arbortext
-		sleep 100
-		;msgbox No search active
-		WinwaitActive, Arbortext,,5
+		Exit
+	}else  {
 		sleep 500
-		Send {Alt Down}{o}{Alt Up}{e}
+		Send {Tab}{S}{H}{A}{r}
 		sleep 500
-		WinWaitActive, Search,,5
-		If ErrorLevel
-		{
-			Exit
-		}else  {
-			sleep 500
-			Send {Tab}{S}{H}{A}{r}
-			sleep 500
-			Send {tab}{S}{H}{A}{r}{e}{d}{Space}{w}
-			Sleep 500
-			Send {tab 2}{right}
-			Sleep 500
-			Send {tab 8}
-			Sleep 500
-			Send {c}{a}{t}{Space}{I}{tab}{Enter}
-			Sleep 500
-			Send {tab 7}
-			Send %MyListBox%
-			Sleep 1000
-			Send {Enter}
-			sleep 500
-		}
-		return
+		Send {tab}{S}{H}{A}{r}{e}{d}{Space}{w}
+		Sleep 500
+		Send {tab 2}{right}
+		Sleep 500
+		Send {tab 8}
+		Sleep 500
+		Send {c}{a}{t}{Space}{I}{tab}{Enter}
+		Sleep 500
+		Send {tab 7} 
+		Send %MyListBox%
+		Sleep 1000
+		Send {Enter}
+		sleep 500
 	}
-	
-	
-	/*
-		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== GUI Selection Section ======/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-	*/
-	GuiSubmit:
-	{
-		Gui, 1:Submit, Nohide
-		Gui, 2:Submit, Nohide
-		;GoSub, Settings_save
-		;~ gosub, SetHotKeys
-		return
-	}
-	
-	CPNRad:
-	{
-		
-		Loop, parse, checkvars,`,
-		{
-			OldValue%A_loopfield% :=  A_loopfield  %A_loopfield%
-		}
-		
-		gui,Submit,NoHide
-		
-		Loop, parse, checkvars,`,
-		{
-			newValue%A_loopField% := A_LoopField  %A_loopfield%
-			
-			If  (Oldvalue%A_LoopField% = newValue%A_loopField%)
-				continue
-			else	{
-				Changedvalue := A_LoopField
-				Key := %A_LoopField%
-				%a_loopfield%Hotkey := "F" Key
-				break
+	return
+}
+
+
+/*		
+/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== GUI Selection Section ======/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+*/ 
+GuiSubmit:
+{
+	Gui, 1:Submit, Nohide
+	Gui, 2:Submit, Nohide
+	;GoSub, Settings_save
+	;~ gosub, SetHotKeys
+	return
+}
+
+CPNRad:
+{
+
+	Loop, parse, checkvars,`,
+{	
+	OldValue%A_loopfield% :=  A_loopfield  %A_loopfield%
+}
+
+	gui,Submit,NoHide
+
+	Loop, parse, checkvars,`,
+{	
+	newValue%A_loopField% := A_LoopField  %A_loopfield%
+
+	If  (Oldvalue%A_LoopField% = newValue%A_loopField%)
+		continue
+	else	{
+			Changedvalue := A_LoopField
+			Key := %A_LoopField%
+			%a_loopfield%Hotkey := "F" Key
+		break
 			}
-		}
-		
-		;~ MsgBox,  changed value is %Changedvalue% `n`n Key is %Key%
-		Checkhotkey(Changedvalue,Key,checkvars)
-		
-		gui,Submit,NoHide
-		return
-		
-	}
+}
+
+;~ MsgBox,  changed value is %Changedvalue% `n`n Key is %Key%
+Checkhotkey(Changedvalue,Key,checkvars)
+
+gui,Submit,NoHide
+return
+
+}
+
+
+Checkhotkey(Type,Key,checkvars)
+{
+
+	Loop, parse, checkvars,`,
+{
 	
-	
-	Checkhotkey(Type,Key,checkvars)
-	{
+	;~ MsgBox, test is %test% `n`n Type is %Type%
+Test := %A_LoopField%
+;~ MsgBox, Test is %Test% Loopfield is %A_LoopField%
+;~ If  (Type = A_LoopField)
+;~ continue
+If  (Key = Test)  && if  (Type != A_LoopField)
+{	
+GuiControl,,%a_loopfield%UN, 1
+%a_loopfield%Hotkey := "*"
+}}
+return
+}
 		
-		Loop, parse, checkvars,`,
-		{
-			
-			;~ MsgBox, test is %test% `n`n Type is %Type%
-			Test := %A_LoopField%
-			;~ MsgBox, Test is %Test% Loopfield is %A_LoopField%
-			;~ If  (Type = A_LoopField)
-			;~ continue
-			If  (Key = Test)  && if  (Type != A_LoopField)
-			{
-				GuiControl,,%a_loopfield%UN, 1
-				%a_loopfield%Hotkey := "*"
-		}}
-		return
-	}
-	
-	
-	/*
+		
+		/*		
 		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
 		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== Canvas search screen Section ======/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
 		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-	*/
-	
-	
-	+++SetTitleMatchMode, 2 ; sets window requirements to exact match
-	
-	;canvassucceed subroutine
-	CavnasSucceed:
-	{
-		IfWinExist, %Canvas_Succeeded_Window_Title% ; checks to see if the ACM Save2WC Function Succeeded window exists
+		*/
+		
+		
+		+++SetTitleMatchMode, 2 ; sets window requirements to exact match
+		
+		;canvassucceed subroutine
+		CavnasSucceed:
 		{
-			SetTimer, CavnasSucceed, off ; Turns off the timer
-			Sleep 500 ; pauses script for .5 seconds
-			Win_Activate(Canvas_Succeeded_Window_Title)
-			Send {Enter} ; sends enter to window
-			Sleep 300 ; pauses for 300 milliseconds
-			ErrorLevel := Win_Activate(Search_Window_Title)
-			If ErrorLevel = 1 ; if times out, exists subroutine
+			IfWinExist, %Canvas_Succeeded_Window_Title% ahk_class %Windchill_Class% ; checks to see if the ACM Save2WC Function Succeeded window exists
 			{
-				Exit ; stops subroutine
-			}
-			else  {
-				sleep 500
-				Send {Enter} ; send enter key to window
-				sleep 500
-				WinWaitActive, Browser_Window_Title,,10 ; waits for the browser window to be opened and active window. waits 10 seconds before timeout
-				If ErrorLevel = 1 ; if times out, stops subroutine
+				SetTimer, CavnasSucceed, off ; Turns off the timer
+				Sleep 500 ; pauses script for .5 seconds
+				Win_Activate(Canvas_Succeeded_Window_Title, Windchill_Class)
+				Send {Enter} ; sends enter to window
+				Sleep 300 ; pauses for 300 milliseconds
+				ErrorLevel := Win_Activate(Search_Window_Title, Windchill_Class)				
+				If ErrorLevel = 1 ; if times out, exists subroutine
 				{
 					Exit ; stops subroutine
-				}else  {
-					Sleep 1000 ; pauses 1 second
-					Win_Activate(Search_Window_Title)
+				}
+				else  {
+					sleep 500
+					Send {Enter} ; send enter key to window
+					sleep 500
+					WinWaitActive, %Browser_Window_Title% ahk_class %Windchill_Class%  ,,10 ; waits for the browser window to be opened and active window. waits 10 seconds before timeout
+					If ErrorLevel = 1 ; if times out, stops subroutine
+					{
+						Exit ; stops subroutine
+					}else  {
+						Sleep 1000 ; pauses 1 second
+					Win_Activate(Search_Window_Title,Windchill_Class)
 					sleep 400 ;pauses .4 second
 					Send {Esc} ; sends escape
 					Sleep 500 ; pauses 500 miliseond
-					Win_Activate(Browser_Window_Titles)
+					Win_Activate(Browser_Window_Title,Windchill_Class)
 					SetTimer, CavnasSucceed, Off ; turns off the check every .5 second for ACM Save2wc window
-		}}}
-		Else IfWinNotExist, %Canvas_Succeeded_Window_Title%  ; if window does not exists, it just goes back to the previous function
-		{
-			sleep 100
-			Canvascount++
-			If Canvascount = 100
-			{
-				SetTimer, CavnasSucceed, off ; Turns off the timer
-				canvascount = 0
-			}
-			Return
-		}
-		Return
-	}
+					}}}
+					Else IfWinNotExist, %Canvas_Succeeded_Window_Title%  ; if window does not exists, it just goes back to the previous function
+					{
+						sleep 100
+						Canvascount++
+						If Canvascount = 100
+						{
+							SetTimer, CavnasSucceed, off ; Turns off the timer
+							canvascount = 0
+						}
+						Return
+					}
+					Return
+				}
+				
+				;Arbortextfullscteen subroutine
+				ArborFullScreen:
+				{
+					Fullscreen = 0 ; sets fullscreen variable to 0
+					wingetTitle,TitlearborAM,A ; gets the window title of the active window. stores title into TitlearborAM variable
+					WinGetPos, Xarbor,yarbor,warbor,harbor, %titlearborAM% ; finds the window position on the screen
+					CurrmonAM := GetCurrentMonitor() ; goes to the GetCurrentMonitor function and gets the screen the window is on
+					SysGet,Aarea,MonitorWorkArea,%currmonAM% ; finds the four coners of the screen  the window is on
+					WidthA := AareaRight- AareaLeft ; math to find width of screen. Stores it into WidthA variable
+					HeightA := aareaBottom - aAreaTop ; Math to find the height of screen, stores it into HeightA variable
+					leftt := aAreaLeft - 4 ; gets the left most position of the screen minus 4 pixels because Oracle create a 4 pixel invisible window around ACM
+					topp := AAreaTop - 4 ; gets the top position of the window minus 4 pixes becasue oracle creates a 4 pixel invisible border aroung ACM window
+					MouseGetPos mmx,mmy ; gets the current mouse pointer position
+					If yarbor = %topp% ; checks to see if the top of the window matchs the top of the screen
+					{
+						If xarbor = %leftt% ; Checks to see if the left side of the window is on the left most side of the screen
+						;Msgbox, win maxed ; for diagnotics
+						Return ; stops and returns to the rest of the script
+					}
+					Else
+						;msgbox, not maxed ; for diagnositcs
+					CoordMode, mouse, Relative ; makes it so the mouse position is relative to the active window
+					MouseMove 300,10 ;move the mouse to the top of the active window
+					Click ; clicks the mouse
+					Click ; clicks the mouse.. This maximizes the window
+					Fullscreen = 1 ; sets the fullscreen variable to 1
+					CoordMode, mouse, screen ; sets the mouse position so relative to the screen 
+					;MouseMove, mmx, mmy ; for diagnostics
+					return
+				}
+				
+				;GetCurrentMonitor function
+				GetCurrentMonitor()
+				{
+					SysGet, numberOfMonitors, MonitorCount ; finds how many monitors the user is using
+					WinGetPos, winX, winY, winWidth, winHeight, Arbortext ; gets the window position of arbortext
+					winMidX := winX + winWidth / 2 ; math to find middle of monitor
+					winMidY := winY + winHeight / 2 ; math to find middle of monitor
+					Loop %numberOfMonitors% ; loops through all monitors
+					{
+						SysGet, monArea, Monitor, %A_Index% ; gets the monitor size of the monitor
+						if (winMidX > monAreaLeft && winMidX < monAreaRight && winMidY < monAreaBottom && winMidY > monAreaTop) ; finds the monitor that the arbortext window it on
+						return A_Index ; returns the monitor number
+					}
+					SysGet, MonitorPrimary, MonitorPrimary ; gets which monitor is the primart monitor
+					return "No Monitor Found" ; returns this to variable if arbortext is not found
+				}
+				
+				
+				;Esc key will stop any loops in arbortext.
+				+++SetTitleMatchMode, 2 ; window title must contain the wording
+				#If WinActive(Arbortext_Window_Title) ; window must contain arbortext for Esc key to work this way
+				~esc:: ; the ~ lets the esc pass through, so it act like a normal esc key as well as perform the below actions
+				{
+					reload = 1
+					BreakLoop := 1 ; sets breakloop to 1, so if loops see this, it will stop them
+					;SystemCursor("On") ; ensures the system cursor is on from CPN search. IF user excapes out of it
+					Send {Ctrl up}{shift up}{alt up} ; send keystrokes
+					
+					
+					IfEqual, A_IsCompiled,1
+					{
+						Run, %A_ScriptFullPath% /Restart
+					}
+					
+					
+					Run, %A_ScriptFullPath% /Restart ; this methond allows the /restart to show in the command line, which prevents the splash image from loading on restart
+					exitapp ; exits this verison of the app
+					Return
+					;reload ; reloads script
+				}
+				
+				#If ; stops any in only arbortext requirement
+				
+				/*		
+				/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+				/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== Saves to INI File Section ======/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+				/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+				*/
+				
+				Settings_save:
+{
+	Gui, 1:Submit, Nohide ;so the options and hotkey gui screen variables are updated
+	Gui, 2:Submit, Nohide
+	Write_ini_file(inifile)
+	Sleep 500
+	Load_ini_file(inifile)	
+	return
+}
+
+
+/*		
+/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== Defauklt Settings ection ======/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+*/
+Default_Settings: ; sets all the settings to the default ones
+{
 	
-	;Arbortextfullscteen subroutine
-	ArborFullScreen:
-	{
-		Fullscreen = 0 ; sets fullscreen variable to 0
-		wingetTitle,TitlearborAM,A ; gets the window title of the active window. stores title into TitlearborAM variable
-		WinGetPos, Xarbor,yarbor,warbor,harbor, %titlearborAM% ; finds the window position on the screen
-		CurrmonAM := GetCurrentMonitor() ; goes to the GetCurrentMonitor function and gets the screen the window is on
-		SysGet,Aarea,MonitorWorkArea,%currmonAM% ; finds the four coners of the screen  the window is on
-		WidthA := AareaRight- AareaLeft ; math to find width of screen. Stores it into WidthA variable
-		HeightA := aareaBottom - aAreaTop ; Math to find the height of screen, stores it into HeightA variable
-		leftt := aAreaLeft - 4 ; gets the left most position of the screen minus 4 pixels because Oracle create a 4 pixel invisible window around ACM
-		topp := AAreaTop - 4 ; gets the top position of the window minus 4 pixes becasue oracle creates a 4 pixel invisible border aroung ACM window
-		MouseGetPos mmx,mmy ; gets the current mouse pointer position
-		If yarbor = %topp% ; checks to see if the top of the window matchs the top of the screen
-		{
-			If xarbor = %leftt% ; Checks to see if the left side of the window is on the left most side of the screen
-				;Msgbox, win maxed ; for diagnotics
-			Return ; stops and returns to the rest of the script
-		}
-		Else
-			;msgbox, not maxed ; for diagnositcs
-		CoordMode, mouse, Relative ; makes it so the mouse position is relative to the active window
-		MouseMove 300,10 ;move the mouse to the top of the active window
-		Click ; clicks the mouse
-		Click ; clicks the mouse.. This maximizes the window
-		Fullscreen = 1 ; sets the fullscreen variable to 1
-		CoordMode, mouse, screen ; sets the mouse position so relative to the screen
-		;MouseMove, mmx, mmy ; for diagnostics
-		return
-	}
-	
-	;GetCurrentMonitor function
-	GetCurrentMonitor()
-	{
-		SysGet, numberOfMonitors, MonitorCount ; finds how many monitors the user is using
-		WinGetPos, winX, winY, winWidth, winHeight, Arbortext ; gets the window position of arbortext
-		winMidX := winX + winWidth / 2 ; math to find middle of monitor
-		winMidY := winY + winHeight / 2 ; math to find middle of monitor
-		Loop %numberOfMonitors% ; loops through all monitors
-		{
-			SysGet, monArea, Monitor, %A_Index% ; gets the monitor size of the monitor
-			if (winMidX > monAreaLeft && winMidX < monAreaRight && winMidY < monAreaBottom && winMidY > monAreaTop) ; finds the monitor that the arbortext window it on
-				return A_Index ; returns the monitor number
-		}
-		SysGet, MonitorPrimary, MonitorPrimary ; gets which monitor is the primart monitor
-		return "No Monitor Found" ; returns this to variable if arbortext is not found
-	}
-	
-	
-	;Esc key will stop any loops in arbortext.
-	+++SetTitleMatchMode, 2 ; window title must contain the wording
-	#If WinActive(Arbortext_Window_Title) ; window must contain arbortext for Esc key to work this way
-	~esc:: ; the ~ lets the esc pass through, so it act like a normal esc key as well as perform the below actions
-	{
-		reload = 1
-		BreakLoop := 1 ; sets breakloop to 1, so if loops see this, it will stop them
-		;SystemCursor("On") ; ensures the system cursor is on from CPN search. IF user excapes out of it
-		Send {Ctrl up}{shift up}{alt up} ; send keystrokes
-		
-		
-		IfEqual, A_IsCompiled,1
-		{
-			Run, %A_ScriptFullPath% /Restart
-		}
-		
-		
-		Run, %A_ScriptFullPath% /Restart ; this methond allows the /restart to show in the command line, which prevents the splash image from loading on restart
-		exitapp ; exits this verison of the app
-		Return
-		;reload ; reloads script
-	}
-	
-	#If ; stops any in only arbortext requirement
-	
-	/*
-		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== Saves to INI File Section ======/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-	*/
-	
-	Settings_save:
-	{
-		Gui, 1:Submit, Nohide ;so the options and hotkey gui screen variables are updated
-		Gui, 2:Submit, Nohide
-		Write_ini_file(inifile)
-		Sleep 500
-		Load_ini_file(inifile)
-		return
-	}
-	
-	
-	/*
-		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== Defauklt Settings ection ======/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-	*/
-	Default_Settings: ; sets the settings to the default ones
-	{
-		;~ SetTimer, Quickview, Off
-		;~ if not (FileExist(Root_Folder_Location "\ArbortextMacroSettings.ini"))
-		;~ {
-		;~ FileAppend,,%Root_Folder_Location%\ArbortextMacroSettings.ini
-		;~ Firstrun = 1
-		;~ }
-		;~ Gui, 1:Submit, Nohide
-		;~ Gui, 2:Submit, Nohide
-		;~ If Firstrun <> 1
-		;~ {
-		;~ activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
-		
-		;~ Settimer, winmovemsgbox, 50
-		;~ Titletext := "Are you sure you want to set the hotkeys to their default values"
-		;~ Msgbox,4,, Are you sure you want to set the hotkeys to their default values?
-		;~ IfMsgbox no
-		;~ return
-		;~ }
-		;~ GuiControl,, CPNF1, 1
-		;~ GuiControl,, METF2, 1
-		;~ GuiControl,, CHKF3, 1
-		;~ GuiControl,, SearchF4, 1
-		;~ GuiControl,, TableF5, 1
-		
-		;~ CPNHotKey = F1
-		;~ METHotKey = F2
-		;~ CHKHotKey = F3
-		;~ SearchHotKey = F4
-		;~ TableHotKey = F5
-		;~ Section1 = 72A
-		;~ Section2 = 72a
-		;~ Section3 = 72a
-		;~ autocheckbox = 1
-		
-		
-		;~ Write_ini_file(inifile)
-		;~ Sleep 200
-		;~ SetTimer, Quickview, 1000
 		FileInstall, C:\ArbortextMacrosn\Config.ini, C:\ArbortextMacros\Config.ini,1
 		Sleep 1000
 		Load_ini_file(inifile)
-		
+		Reload
 		return
-	}
-	
-	
-	Quitting:
-	{
-		Send {alt up}
-		Send {Ctrl up}
-		Send {Shift up}
-		Exitapp
-		Return
-	}
-	
-	/*
-		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== Function section ======/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
-	*/
-	
-	StartGDIP(Ptoken)
-	{
-		if pToken = 0 ; if the Gdip library isnt started, it will be 0
-		{
-			pToken := Gdip_Startup() ; start up the Gdip library and returns a number to the Ptoken variable
-		}
-		
-		Return pToken
-	}
-	
-	StopGdip(Ptoken)
-	{
-		If pToken !=0 ; if the gdip libraryt is in use
-		{
-			Gdip_Shutdown(pToken) ; turns the gdip library off to save memory
-		}
-		Return Ptoken
-	}
-	
-	Copytext()
-	{
-		Send {Ctrl Down}{c}{Ctrl Up} ; sends the Ctrl +C to copy the selected text
-		Return
-	}
-	
-	;findtags Function
-	Findtags()
-	{
-		Unittagtype = 0 ; sets Unittagtype variable to 0
-		tagcounter = 0 ; sets tagcounter to 0
-		Send {Lbutton UP} ; sends a Leftmouse button Up to computer if the user still has the mouse button down
-		sleep 100 ; sets a 100 miliseond delay
-		send {Shift Down}{Left}{Shift Up} ; sends keystrokes to window to get tag
-		sleep 300 ; sets a 300 millisecond delay
-		Copytext() ; Goes to function to copy the selected text
-		ClipWait, 3 ; waits for clipboard to contain text. Times out in 3 seconds
-		Sleep 100 ; sets ni a 100 millisecond delay
-		Texttemp = %Clipboard% ;puts the clipboard contents into the Texttemp variable
-		If Texttemp =
-		{
-			send {Shift Down}{Left}{Shift Up} ; sends keystrokes to window to get tag
-			sleep 300 ; sets a 300 millisecond delay
-			Copytext() ; Goes to function to copy the selected text
-			ClipWait, 3 ; waits for clipboard to contain text. Times out in 3 seconds
-			Sleep 100 ; sets ni a 100 millisecond delay
-		}
-		
-		If texttemp contains BeforeOrAfterText,Metric,English,interword ; sees if the texttemp var has BeforeorAFtertext, metric or english in the variable
-		{}
-		Else ; IF it does not contain one of the above text. exits so that it does not keep going.
-		{
-			send {Shift Down}{Left}{Shift Up} ; sends the keystrokes to the window to select the text to the left of the cursor
-			sleep 100 ; sets a 100 millisecond delay
-			Copytext() ; Goes to function to copy the selected text
-			sleep 100
-			Texttemp = %Clipboardall% ;puts the clipboard contents into the Texttemp variable
-		}
-		
-		If texttemp contains BeforeOrAfterText,Metric,English,interword ; sees if the texttemp var has BeforeorAFtertext, metric or english in the variable
-		{}
-		Else ; IF it does not contain one of the above text. exits so that it does not keep going.
-		{
-			Return "Timed_Out"
-		}
-		
-		
-		If Texttemp contains metric ; when texttemp variable contains the word metric, it does what is in between the {}
-		{
-			;click %tx%,%ty% ; clicks in the recorded mouse location
-			clipboard = %Temptag% ; sets the clipboard to the temptag variable
-			Return 2 ;sends the number 2 from funciton
-		}
-		
-		If Texttemp contains english  ; when texttemp variable contains the word english, it does what is in between the {}
-		{
-			;click %tx%,%ty% ; clicks in the recorded mouse location
-			clipboard = %Temptag% ; sets the clipboard to the temptag variable
-			Return 1 ;sends the number 1 from funciton
-		}
-		
-		
-		While Texttemp contains BeforeOrAfterText,interword ; Loop while Texttemp variable has the BeforeorAFtertext in it. This is for when Show generated text is on in ACM
-		{
-			tagcounter++ ; adds 1 to tagcounter variable
-			If tagcounter = 4 ; when tagcounter variable is set to 3, it stops the loop. This prevents the script from messing up if the user does not click in the unitsgroup tag
-			{
-				Return "Timed_Out"
-				Break ; stops the loop
-			}
-			
-			If Texttemp contains metric ; when texttemp variable contains the word metric, it does what is in between the {}
-			{
-				;click %tx%,%ty% ; clicks in the recorded mouse location
-				clipboard = %Temptag% ; sets the clipboard to the temptag variable
-				Return 2 ;sends the number 2 from funciton
-				break ; stops the while loop
-			}
-			
-			If Texttemp contains english  ; when texttemp variable contains the word english, it does what is in between the {}
-			{
-				;click %tx%,%ty% ; clicks in the recorded mouse location
-				clipboard = %Temptag% ; sets the clipboard to the temptag variable
-				Return 1 ;sends the number 1 from funciton
-				break ; stops the while loop
-			}
-			
-			send {Shift Down}{Left}{Shift Up} ; sends the keystrokes to the window to select the text to the left of the cursor
-			sleep 100 ; sets a 100 millisecond delay
-			Copytext() ; Goes to function to copy the selected text
-			ClipWait, 3 ; wait for the clipboard to contain text. Times outs after 3 seconds
-			Sleep 100 ; sets a 100 millisecond delay
-			Texttemp = %Clipboard%  ; makes the texttemp variable contain the clipboard text
-		}
-		
-		clipboard = %Temptag% ; when the subroutine is over, put the original clipboard text that was stored into the temptag variable back into the clipboard
-		temptag := ; clears the temptag variable to free up some memory
-		Return
-	}
-	
-	+++SetTitleMatchMode,2
-	GraphicsSearchSetup(Search_by := "Graphic_Number")
-	{
-		Search_text =
-		ErrorLevel := Win_Activate(Arbortext_Window_Title)
-		If ErrorLevel = 1 ; if the search window is not open. subroutine will stop.
-		{
-			msgbox, error
-			Return "2" ; returns 2 to say it timed out.
-		}
-		Sleep 500
-		Send {Alt Down}{o}{Alt Up}{e} ; sends keystrokes to computer to open the search window
-		sleep 300 ; delays program for 100 milliseconds
-		WinWaitActive, %Search_Window_Title%,,10 ;Waits for search window to be the active window. Stops wait after 5 seconds
-		If ErrorLevel = 1 ; if the search window is not open. subroutine will stop.
-		{
-			Return "1" ; returns 1 to say it timed out.
-		}
-		Sleep 500
-		If Search_by = Name
-		{
-			Send {Tab}{a}{l}{l}%a_space%{L}{i}{b} ; sends keystrokes to window
-			sleep 300 ; delays program for 200 milliseconds
-			Send {tab}{g}{r} ; sends keystrokes to window
-			Sleep 200 ; delays program for 200 milliseconds
-			Send {tab 2}{right} ; sends keystrokes to window
-			Sleep 200 ; delays program for 200 milliseconds
-			Send {tab 8} ; sends 8 tab keystrokes to window
-			Sleep 400 ; delays program for 400 milliseconds
-			Send {n}{a}{m}{e}{tab}{Enter} ; sends keystrokes to window
-			Sleep 400 ; delays program for 400 milliseconds
-			Send {tab 7}  ; sends 7 tabs to window
-			Sleep 200 ; delays program for 200 milliseconds
-			Search_text := A_UserName
-			
-		}
-		else
-		{
-			Send {Tab}{g}{r} ; sends keystrokes to window
-			sleep 200 ; delays program for 200 milliseconds
-			Send {tab}{g}{r} ; sends keystrokes to window
-			Sleep 200 ; delays program for 200 milliseconds
-			Send {tab 2}{right} ; sends keystrokes to window
-			Sleep 200 ; delays program for 200 milliseconds
-			Send {tab 8} ; sends 8 tab keystrokes to window
-			Sleep 400 ; delays program for 400 milliseconds
-			Send {c}{o}{n}{t}{r}{tab}{Enter} ; sends keystrokes to window
-			Sleep 400 ; delays program for 400 milliseconds
-			Send {tab 7}  ; sends 7 tabs to window
-			Sleep 200 ; delays program for 200 milliseconds
-			
-			
-			If (RegExMatch(clipboard,"^G[0-9]{8}$")) ; finds if the number is a Gnumber with an upper case G
-			{
-				Search_text := RegexReplace(Clipboard,"G","g") ; replaces the Uppercase G to a Lower case g so it can be found in ACM
-			}
-			
-			if RegExMatch(clipboard, "^g[0-9]{8}$") ; searches the clipboard for an item that has a g in the front and then 8 numbers after it (a graphics # for ACM) If found, it pastes, if not then it does nothing
-			{
-				Search_text := Clipboard
-			}
-		}
-		
-		Sendraw %Search_text% ; send keystrokes to window
-		
-		Return 0
-	}
-	
-	Create_Tray_Menu()
-	{
-		
-		Menu, tray, NoStandard
-		Menu, tray, Add, Arbortext Macros  ,Guiscreen ;make the title of the menu
-		Menu, tray, Default,Arbortext Macros  ; makes this the top line in the menu
-		Menu,Tray, Disable, Arbortext Macros ; disables it so it is greyed out
-		Menu, tray, add, Hotkey Cheat Sheet, Guiscreen ; Creates a new menu item. ; goes to gui screen
-		Menu, tray, add, Options, Optionsmenu ; Goes to options screen
-		Menu, tray, add, Check For Update, Versioncheck ; goes to version check
-		Menu, tray, add, About, Aboutmenu ; OPens about menu
-		Menu, tray, add, Quit, Quitapp ; quit macro
-		
-		IfExist, %Root_Folder_Location%\diag.Ini
-		{
-			IniRead, Tray_standard, %Root_Folder_Location%\diag.ini, Tray, Tray_standard
-			If Tray_standard = 0
-				Menu, tray, Standard
-		}
-		return
-	}
-	
-	QuitApp:
-	{
-		ExitApp
-		Return
-	}
-	
-	Rapid_section_function(SectionNumber)
-	{
-		Send {Ctrl Down}{Left}{Ctrl Up} ; send the keystrokes to the computer
-		Sleep 100 ; pauses for 100 milliseconds
-		Send {Ctrl Down}{Shift Down}{Right}{Ctrl Up}{Shift Up} ; sends the keystrokes to the computer
-		Sleep 100 ; pauses for 100 milliseconds
-		Copytext() ; Goes to function to copy the selected text
-		Sleep 200 ; pauses for 200 milliseconds
-		
-		If (RegExMatch(clipboard,"^G[0-9]{8}$")) ; finds if the number is a Gnumber with an upper case G
-		{
-			Clipboard := RegexReplace(Clipboard,"G","g") ; replaces the Uppercase G to a Lower case g so it can be found in ACM
-		}
-		
-		if RegExMatch(clipboard, "^g[0-9]{8}$") ; searches the clipboard for an item that has a g in the front and then 8 numbers after it (a graphics # for ACM) If found, it pastes, if not then it does nothing
-		{
-			Gnumber = %clipboard% ; takes the Gnumber from the clipboard and puts into the Gnumber variable
-		}
-		
-		IfWinExist %Arbortext_Window_Title% ; if Arbortext window exists
-		{
-			+++SetTitleMatchMode, 3 ; sets search for window titles to be exact match
-			IfWinExist %Search_Window_Title%  ; window has to say exactly Search in title and if search window is open
-			{
-				Win_Activate(Search_Window_Title)
-				sleep 200
-				Send {Alt Down}{C}{Alt UP} ; sends the keystrokes to the computer
-				Sleep 300 ; pauses for 300 milliseconds
-			}
-			ErrorLevel = 0 ; reset errorlevel variable to 0
-			+++SetTitleMatchMode, 2 ; Sets the window title matching to contains the search words
-			
-			ErrorLevel := GraphicsSearchSetup() ; runs the GraphicsSearchSetup function and gets the return value of 1 or 0
-			If ErrorLevel = 1 or ErrorLevel = 2 ; if the search window is not open. GraphicsSearchSetup() will return a 1, Arbortext cannot be made active window a 2 if it opens successfully, function will return a 0
-			{
-				Gnumber := "Error" ; makes Gnumber variable contain the text Error
-				Return Gnumber ; returns from function with the error text
-				Exit ; stops the subroutine
-				ErrorLevel = 0 ; reset errorlevel variable to 0
-				+++SetTitleMatchMode, 2 ; Sets the window title matching to contains the search words
-				ErrorLevel := GraphicsSearchSetup() ; runs the GraphicsSearchSetup function and gets the return value of 1 or 0
-				If ErrorLevel = 1 or ErrorLevel = 2 ; if the search window is not open. GraphicsSearchSetup() will return a 1, Arbortext cannot be made active window a 2 if it opens successfully, function will return a 0
+}              
+
+
+				Quitting:
 				{
-					Gnumber := "Error" ; makes Gnumber variable contain the text Error
-					Return Gnumber ; returns from function with the error text
-					Exit ; stops the subroutine
+					Send {alt up}
+					Send {Ctrl up}
+					Send {Shift up}
+					Exitapp
+					Return
+				}   
+				
+				/*		
+				/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+				/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\ /=\/=\/=\/=\/=\/=\/=\/=\/=\=========== Function section ======/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+				/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
+				*/
+				
+				StartGDIP(Ptoken)
+				{
+					if pToken = 0 ; if the Gdip library isnt started, it will be 0
+					{
+						pToken := Gdip_Startup() ; start up the Gdip library and returns a number to the Ptoken variable
+					}
+					
+					Return pToken
 				}
+				
+				StopGdip(Ptoken)
+				{
+					If pToken !=0 ; if the gdip libraryt is in use
+					{
+						Gdip_Shutdown(pToken) ; turns the gdip library off to save memory
+					}
+					Return Ptoken
+				}
+				
+				Copytext()
+				{
+					Send {Ctrl Down}{c}{Ctrl Up} ; sends the Ctrl +C to copy the selected text
+					Return
+				}
+				
+				;findtags Function
+				Findtags()
+				{
+					Unittagtype = 0 ; sets Unittagtype variable to 0
+					tagcounter = 0 ; sets tagcounter to 0
+					Send {Lbutton UP} ; sends a Leftmouse button Up to computer if the user still has the mouse button down
+					sleep 100 ; sets a 100 miliseond delay
+					send {Shift Down}{Left}{Shift Up} ; sends keystrokes to window to get tag
+					sleep 300 ; sets a 300 millisecond delay
+					Copytext() ; Goes to function to copy the selected text
+					ClipWait, 3 ; waits for clipboard to contain text. Times out in 3 seconds
+					Sleep 100 ; sets ni a 100 millisecond delay
+					Texttemp = %Clipboard% ;puts the clipboard contents into the Texttemp variable
+					If Texttemp = 
+					{
+						send {Shift Down}{Left}{Shift Up} ; sends keystrokes to window to get tag
+						sleep 300 ; sets a 300 millisecond delay
+						Copytext() ; Goes to function to copy the selected text
+						ClipWait, 3 ; waits for clipboard to contain text. Times out in 3 seconds
+						Sleep 100 ; sets ni a 100 millisecond delay
+					}
+					
+					If texttemp contains BeforeOrAfterText,Metric,English,interword ; sees if the texttemp var has BeforeorAFtertext, metric or english in the variable
+					{}
+					Else ; IF it does not contain one of the above text. exits so that it does not keep going.
+					{
+						send {Shift Down}{Left}{Shift Up} ; sends the keystrokes to the window to select the text to the left of the cursor
+						sleep 100 ; sets a 100 millisecond delay
+						Copytext() ; Goes to function to copy the selected text
+						sleep 100
+						Texttemp = %Clipboardall% ;puts the clipboard contents into the Texttemp variable
+					}
+					
+					If texttemp contains BeforeOrAfterText,Metric,English,interword ; sees if the texttemp var has BeforeorAFtertext, metric or english in the variable
+					{}
+					Else ; IF it does not contain one of the above text. exits so that it does not keep going.
+					{
+						Return "Timed_Out"
+					}
+					
+					
+					If Texttemp contains metric ; when texttemp variable contains the word metric, it does what is in between the {}
+					{
+						;click %tx%,%ty% ; clicks in the recorded mouse location
+						clipboard = %Temptag% ; sets the clipboard to the temptag variable
+						Return 2 ;sends the number 2 from funciton
+					}
+					
+					If Texttemp contains english  ; when texttemp variable contains the word english, it does what is in between the {}
+					{
+						;click %tx%,%ty% ; clicks in the recorded mouse location
+						clipboard = %Temptag% ; sets the clipboard to the temptag variable
+						Return 1 ;sends the number 1 from funciton
+					}
+					
+					
+					While Texttemp contains BeforeOrAfterText,interword ; Loop while Texttemp variable has the BeforeorAFtertext in it. This is for when Show generated text is on in ACM
+					{
+						tagcounter++ ; adds 1 to tagcounter variable
+						If tagcounter = 4 ; when tagcounter variable is set to 3, it stops the loop. This prevents the script from messing up if the user does not click in the unitsgroup tag
+						{
+							Return "Timed_Out" 
+							Break ; stops the loop
+						}
+						
+						If Texttemp contains metric ; when texttemp variable contains the word metric, it does what is in between the {}
+						{
+							;click %tx%,%ty% ; clicks in the recorded mouse location
+							clipboard = %Temptag% ; sets the clipboard to the temptag variable
+							Return 2 ;sends the number 2 from funciton
+							break ; stops the while loop
+						}
+						
+						If Texttemp contains english  ; when texttemp variable contains the word english, it does what is in between the {}
+						{
+							;click %tx%,%ty% ; clicks in the recorded mouse location
+							clipboard = %Temptag% ; sets the clipboard to the temptag variable
+							Return 1 ;sends the number 1 from funciton
+							break ; stops the while loop
+						}
+						
+						send {Shift Down}{Left}{Shift Up} ; sends the keystrokes to the window to select the text to the left of the cursor
+						sleep 100 ; sets a 100 millisecond delay
+						Copytext() ; Goes to function to copy the selected text
+						ClipWait, 3 ; wait for the clipboard to contain text. Times outs after 3 seconds
+						Sleep 100 ; sets a 100 millisecond delay
+						Texttemp = %Clipboard%  ; makes the texttemp variable contain the clipboard text
+					}
+					
+					clipboard = %Temptag% ; when the subroutine is over, put the original clipboard text that was stored into the temptag variable back into the clipboard
+					temptag := ; clears the temptag variable to free up some memory
+					Return
+				}
+				
+				+++SetTitleMatchMode,2
+				GraphicsSearchSetup(Search_by := "Graphic_Number")
+				{
+					Search_text = 
+					ErrorLevel := Win_Activate(Arbortext_Window_Title,Windchill_Class)
+					If ErrorLevel = 1 ; if the search window is not open. subroutine will stop.
+					{
+						msgbox, error
+						Return "2" ; returns 2 to say it timed out.
+					}
+					Sleep 500
+					Send {Alt Down}{o}{Alt Up}{e} ; sends keystrokes to computer to open the search window
+					sleep 300 ; delays program for 100 milliseconds
+					WinWaitActive, %Search_Window_Title%,,10 ;Waits for search window to be the active window. Stops wait after 5 seconds
+					If ErrorLevel = 1 ; if the search window is not open. subroutine will stop.
+					{
+						Return "1" ; returns 1 to say it timed out.
+					}
+					Sleep 500
+					If Search_by = Name
+					{
+						Send {Tab}{a}{l}{l}%a_space%{L}{i}{b} ; sends keystrokes to window
+					sleep 300 ; delays program for 200 milliseconds
+					Send {tab}{g}{r} ; sends keystrokes to window
+					Sleep 200 ; delays program for 200 milliseconds
+					Send {tab 2}{right} ; sends keystrokes to window
+					Sleep 200 ; delays program for 200 milliseconds
+					Send {tab 8} ; sends 8 tab keystrokes to window
+					Sleep 400 ; delays program for 400 milliseconds
+					Send {n}{a}{m}{e}{tab}{Enter} ; sends keystrokes to window
+					Sleep 400 ; delays program for 400 milliseconds
+					Send {tab 7}  ; sends 7 tabs to window
+					Sleep 200 ; delays program for 200 milliseconds
+					Search_text := A_UserName
+						
+				}
+				else 
+					{
+					Send {Tab}{g}{r} ; sends keystrokes to window
+					sleep 200 ; delays program for 200 milliseconds
+					Send {tab}{g}{r} ; sends keystrokes to window
+					Sleep 200 ; delays program for 200 milliseconds
+					Send {tab 2}{right} ; sends keystrokes to window
+					Sleep 200 ; delays program for 200 milliseconds
+					Send {tab 8} ; sends 8 tab keystrokes to window
+					Sleep 400 ; delays program for 400 milliseconds
+					Send {c}{o}{n}{t}{r}{tab}{Enter} ; sends keystrokes to window
+					Sleep 400 ; delays program for 400 milliseconds
+					Send {tab 7}  ; sends 7 tabs to window
+					Sleep 200 ; delays program for 200 milliseconds
+					
+					
+					If (RegExMatch(clipboard,"^G[0-9]{8}$")) ; finds if the number is a Gnumber with an upper case G
+					{
+						Search_text := RegexReplace(Clipboard,"G","g") ; replaces the Uppercase G to a Lower case g so it can be found in ACM
+					}
+					
+					if RegExMatch(clipboard, "^g[0-9]{8}$") ; searches the clipboard for an item that has a g in the front and then 8 numbers after it (a graphics # for ACM) If found, it pastes, if not then it does nothing
+					{
+						Search_text := Clipboard						
+					}
+				}
+				
+					Sendraw %Search_text% ; send keystrokes to window
+					
+					Return 0
+				}
+				
+				Create_Tray_Menu()
+				{
+					
+					Menu, tray, NoStandard
+					Menu, tray, Add, Arbortext Macros  ,Guiscreen ;make the title of the menu
+					Menu, tray, Default,Arbortext Macros  ; makes this the top line in the menu
+					Menu,Tray, Disable, Arbortext Macros ; disables it so it is greyed out
+					Menu, tray, add, Hotkey Cheat Sheet, Guiscreen ; Creates a new menu item. ; goes to gui screen
+					Menu, tray, add, Options, Optionsmenu ; Goes to options screen
+					Menu, tray, add, Check For Update, Versioncheck ; goes to version check
+					Menu, tray, add, About, Aboutmenu ; OPens about menu
+					Menu, tray, add, Quit, Quitapp ; quit macro
+					
+					IfExist, %Root_Folder_Location%\diag.Ini
+					{
+						IniRead, Tray_standard, %Root_Folder_Location%\diag.ini, Tray, Tray_standard
+						If Tray_standard = 0
+							Menu, tray, Standard
+					}
+					return
+				}
+				
+				QuitApp:
+{
+	ExitApp
+	Return
+}
+
+				Rapid_section_function(SectionNumber)
+				{
+					Send {Ctrl Down}{Left}{Ctrl Up} ; send the keystrokes to the computer
+					Sleep 100 ; pauses for 100 milliseconds
+					Send {Ctrl Down}{Shift Down}{Right}{Ctrl Up}{Shift Up} ; sends the keystrokes to the computer
+					Sleep 100 ; pauses for 100 milliseconds
+					Copytext() ; Goes to function to copy the selected text
+					Sleep 200 ; pauses for 200 milliseconds
+					
+					If (RegExMatch(clipboard,"^G[0-9]{8}$")) ; finds if the number is a Gnumber with an upper case G
+					{
+						Clipboard := RegexReplace(Clipboard,"G","g") ; replaces the Uppercase G to a Lower case g so it can be found in ACM
+					}
+					
+					if RegExMatch(clipboard, "^g[0-9]{8}$") ; searches the clipboard for an item that has a g in the front and then 8 numbers after it (a graphics # for ACM) If found, it pastes, if not then it does nothing
+					{
+						Gnumber = %clipboard% ; takes the Gnumber from the clipboard and puts into the Gnumber variable
+					}
+					
+					IfWinExist %Arbortext_Window_Title% ahk_class %Windchill_Class% ; if Arbortext window exists
+					{
+						+++SetTitleMatchMode, 3 ; sets search for window titles to be exact match
+						IfWinExist %Search_Window_Title% ahk_class %Windchill_Class%  ; window has to say exactly Search in title and if search window is open
+						{
+							Win_Activate(Search_Window_Title,Windchill_Class)
+							sleep 200
+							Send {Alt Down}{C}{Alt UP} ; sends the keystrokes to the computer
+							Sleep 300 ; pauses for 300 milliseconds
+						}
+						ErrorLevel = 0 ; reset errorlevel variable to 0
+						+++SetTitleMatchMode, 2 ; Sets the window title matching to contains the search words
+						
+						ErrorLevel := GraphicsSearchSetup() ; runs the GraphicsSearchSetup function and gets the return value of 1 or 0
+						If ErrorLevel = 1 or ErrorLevel = 2 ; if the search window is not open. GraphicsSearchSetup() will return a 1, Arbortext cannot be made active window a 2 if it opens successfully, function will return a 0
+						{
+							Gnumber := "Error" ; makes Gnumber variable contain the text Error
+							Return Gnumber ; returns from function with the error text
+							Exit ; stops the subroutine
+						ErrorLevel = 0 ; reset errorlevel variable to 0
+						+++SetTitleMatchMode, 2 ; Sets the window title matching to contains the search words
+						ErrorLevel := GraphicsSearchSetup() ; runs the GraphicsSearchSetup function and gets the return value of 1 or 0
+						If ErrorLevel = 1 or ErrorLevel = 2 ; if the search window is not open. GraphicsSearchSetup() will return a 1, Arbortext cannot be made active window a 2 if it opens successfully, function will return a 0
+						{
+						Gnumber := "Error" ; makes Gnumber variable contain the text Error
+						Return Gnumber ; returns from function with the error text
+						Exit ; stops the subroutine
+					}
+				}
+				
+				Win_Activate(Canvas_Service_Window_Title,Windchill_Class)
+				sleep 400
+				Send {Tab 2} ; sends the keystrokes to the computer
+				Sleep 100 ; pauses for 100 milliseconds
+				Send %SectionNumber% ; send the Section one variable to the section drop down in the canvas service screen
+				Sleep 200 ; pause for 200 milliseconds
+				Send {Down}{Tab 7} ; sends the keystrokes to the computer
+				
+				SetTimer, CavnasSucceed, 500	;turns on a timer that ever .5 seconds, script goes to the Canvassucceed subroutine
+				Return Gnumber ; returns the Gnumber variable from the clipboard
 			}
 			
-			Win_Activate(Canvas_Service_Window_Title)
-			sleep 400
-			Send {Tab 2} ; sends the keystrokes to the computer
-			Sleep 100 ; pauses for 100 milliseconds
-			Send %SectionNumber% ; send the Section one variable to the section drop down in the canvas service screen
-			Sleep 200 ; pause for 200 milliseconds
-			Send {Down}{Tab 7} ; sends the keystrokes to the computer
 			
-			SetTimer, CavnasSucceed, 500	;turns on a timer that ever .5 seconds, script goes to the Canvassucceed subroutine
-			Return Gnumber ; returns the Gnumber variable from the clipboard
-		}
 		
-		
-		
-		
+	
 	}
 	
-	
-	activeMonitorInfo( ByRef aX, ByRef aY, ByRef aWidth,  ByRef  aHeight, ByRef mouseX, ByRef mouseY  )
-	{
-		CoordMode, Mouse, Screen
-		MouseGetPos, mouseX , mouseY
-		SysGet, monCount, MonitorCount
-		Loop %monCount%
-		{ 	SysGet, curMon, Monitor, %a_index%
-		if ( mouseX >= curMonLeft and mouseX <= curMonRight and mouseY >= curMonTop and mouseY <= curMonBottom )
+
+activeMonitorInfo( ByRef aX, ByRef aY, ByRef aWidth,  ByRef  aHeight, ByRef mouseX, ByRef mouseY  )
+{
+CoordMode, Mouse, Screen
+MouseGetPos, mouseX , mouseY
+SysGet, monCount, MonitorCount
+Loop %monCount%
+{ 	SysGet, curMon, Monitor, %a_index%
+if ( mouseX >= curMonLeft and mouseX <= curMonRight and mouseY >= curMonTop and mouseY <= curMonBottom )
+{
+aHeight := (curMonBottom - curMonTop) / 2
+aWidth  := (curMonRight  - curMonLeft) / 2
+aX      := curMonLeft + (aWidth / 2)
+ay      := curMonTop + (aHeight/ 2)
+return
+}
+}
+}
+
+
+	Pausescript()
 		{
-			aHeight := (curMonBottom - curMonTop) / 2
-			aWidth  := (curMonRight  - curMonLeft) / 2
-			aX      := curMonLeft + (aWidth / 2)
-			ay      := curMonTop + (aHeight/ 2)
-			return
+			global
+			Menu,Tray,Icon, %Root_Folder_Location%\icons\paused.ico, ,1
+			Pause,on
+			Return
 		}
-	}
-}
 
+		UnPausescript()
+	{
+		global
+		Menu,Tray,Icon, %Root_Folder_Location%\icons\am.ico, ,1
+		Pause,off
+		Return
+		}
+		
+		Licensinginfo()
+			{
+				Msgbox, Unless otherwise stated, All content of this script unless otherwise noted was created by Jarett Karnia for the use of Caterpillar, Inc `n This script Can be used and modified as needed. But Must give credit to Orginal creaters of the content (including the libraries) and state what was changed from the orginal source code.
+				Return
+			}
+		
+#`::Listlines              
 
-Pausescript()
-{
-	global
-	Menu,Tray,Icon, %Root_Folder_Location%\icons\paused.ico, ,1
-	Pause,on
-	Return
-}
-
-UnPausescript()
-{
-	global
-	Menu,Tray,Icon, %Root_Folder_Location%\icons\am.ico, ,1
-	Pause,off
-	Return
-}
-
-Licensinginfo()
-{
-	Msgbox, Unless otherwise stated, All content of this script unless otherwise noted was created by Jarett Karnia for the use of Caterpillar, Inc `n This script Can be used and modified as needed. But Must give credit to Orginal creaters of the content (including the libraries) and state what was changed from the orginal source code.
-	Return
-}
-
-#`::Listlines
-
-#if
+#if 
 
 /*
-	**********************************************************************************************************************************
-	************************************************* Version check section********************************************************
-	**********************************************************************************************************************************
+**********************************************************************************************************************************
+************************************************* Version check section********************************************************
+**********************************************************************************************************************************
 */
 
 
@@ -2787,7 +2743,7 @@ Updatechecker:
 	{
 		FileAppend,,%inifile%
 		activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
-		
+
 		Settimer, winmovemsgbox, 50
 		Titletext := "Looks like This may be the first time running this application. Do you want to check for an update"
 		Msgbox,4,%A_Space%Arbortext Macro Updater, %A_Space%Looks like This may be the first time running this application. Do you want to check for an update?
@@ -2795,8 +2751,8 @@ Updatechecker:
 		{
 			gosub, Versioncheck
 		}else  {
-			updaterate = 14
-	}}
+		updaterate = 14
+		}}
 	
 	;if file does exist, then it reads the ini file for the last update check and how often it plans to update.
 	if (FileExist(inifile))
@@ -2809,15 +2765,15 @@ Updatechecker:
 		If NumberOfDays > %Updaterate% )	; More than 14 days
 		{
 			activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
-			
+		
 			Settimer, winmovemsgbox, 50
 			Titletext := "days since the last update check.`n`n Would you like to check for a new update"
 			MsgBox,4,%A_Space%Arbortext Macro Updater, It has been %NumberOfDays% days since the last update check.`n`n Would you like to check for a new update?`n`n
-			ifmsgbox Yes
-				gosub, Versioncheck
+			ifmsgbox Yes	
+			gosub, Versioncheck
 			else
 				IniWrite, 14,  %inifile%,update,updaterate
-	}}
+		}}
 	
 	Return
 }
@@ -2825,7 +2781,7 @@ Updatechecker:
 Versioncheck:
 {
 	activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
-	
+
 	Settimer, winmovemsgbox, 50
 	Titletext := "Arbortext Macro Updater"
 	Cliptemp = %clipboardall% ; sets the clipboard to a temp variable
@@ -2874,17 +2830,17 @@ Versioncheck:
 	;Progress, Off ; turns off the progress bar as everything is found
 	
 	;below is there just in case the macro goes faster than the browser in the gui window, it tries to get the tab title again if it came up blank
-	If titleup =
+	If titleup = 
 	{
 		Winactivate, Arbortext Macro Version
 		sleep 1500
 		wingettitle, titleup, A
-		StringGetPos, pos, Titleup, #, 1
+		StringGetPos, pos, Titleup, #, 1	
 		String1 := SubStr(Titleup, pos+2)
 		Checkversion := SubStr(String1,1,3) ; deletes what is after the numerical version
 	}
 	;if that try above failed, the macro cancels out of the update check.
-	If titleup =
+	If titleup = 
 	{
 		Settimer, winmovemsgbox, 50
 		Progress,  w200,Updating..., Error Occured. Update Not Able To Complete, Arbortext Macro Updater
@@ -2908,7 +2864,7 @@ Versioncheck:
 		SplashTextOff
 		Settimer, versiontimeout, off
 		IniWrite, %A_now%,  %inifile%,  update,lastupdate
-		IniWrite, 14,  %inifile%,update,updaterate
+		IniWrite, 14,  %inifile%,update,updaterate	
 		clipboard = %cliptemp%
 	}
 	
@@ -2920,17 +2876,17 @@ Versioncheck:
 		SplashTextOff
 		Settimer, winmovemsgbox, 50
 		msgbox,262148,Arbortext Macro Updater, New update found. Would you like to open the Cat Box site to download the latest version?
-		IfMsgBox, yes
+		IfMsgBox, yes 
 		{
 			gui 4:destroy
-			IniWrite, 14, %inifile%i,update,updaterate
+			IniWrite, 14, %inifile%i,update,updaterate		
 			IniWrite, %A_now%,  %inifile%, update,lastupdate
 			Run, %Program_Site%
 		}
 		Else
 			gui 4:destroy
 		Sleep 500
-		IniWrite, 14,  %inifile%,update,updaterate
+		IniWrite, 14,  %inifile%,update,updaterate	
 		IniWrite, %A_now%,  %inifile%,  update,lastupdate
 		
 		return
@@ -2958,7 +2914,7 @@ versiontimeout:
 		Settimer, versiontimeout, off
 		;Msgbox,,Serial Updater Timed out, Cannot connect to server for update check, please check for internet connection.
 	}
-	
+
 	Return
 }
 
@@ -2980,70 +2936,71 @@ create_checkgui:
 	Gui, 4:+LastFound
 	ParentGUI := WinExist()
 	Gui,4:-SysMenu -ToolWindow -Border
-	Gui,4:Color, EEAA99
-	Gui,4:+LastFound
-	WinSet, TransColor, EEAA99
-	gui 4: +ToolWindow
+	Gui,4:Color, EEAA99                                 
+	Gui,4:+LastFound                                     
+	WinSet, TransColor, EEAA99  
+	gui 4: +ToolWindow                   
 	Gui,4:show, x0 y-11 W1 H1  , Updater
 	
 	return
-}
+}              
 
 
 
-Win_Activate(Win_title)
+Win_Activate(Win_title,Win_Class)
 {
-	WinActivate %Win_title%
+	WinActivate %Win_title% ahk_class %Win_Class%
 	Sleep 50
 	WinWaitActive,  %Win_title%,,5
+	;~ MsgBox, activated %Win_title%
 	Sleep 100
 	return ErrorLevel
 }
-
+	
 
 /*
-	********************************************************************************************************************************************************************************************************************************************************************
-	****************************************************************************** Load INI File Section ************************************************************************************************************************************************************
-	*****************************************************************************************************************************************************************************************************************************************************************
+********************************************************************************************************************************************************************************************************************************************************************
+****************************************************************************** Load INI File Section ************************************************************************************************************************************************************
+*****************************************************************************************************************************************************************************************************************************************************************
 */
 
 
 
 Load_ini_file(inifile)
-{
+ {
 	global
 	Ini_var_store_array:= Object()
-	Tab_placeholder  =
-	loop,read,%inifile%
-	{
-		If A_LoopReadLine =
-			continue
+	Tab_placeholder  = 
+		loop,read,%inifile%
+  {
+	If A_LoopReadLine = 
+		continue
+	
+    if regexmatch(A_Loopreadline,"\[(.*)?]")
+      {
+        Section :=regexreplace(A_loopreadline,"(\[)(.*)?(])","$2")
+		StringReplace, Section,Section, %a_space%,,All
 		
-		if regexmatch(A_Loopreadline,"\[(.*)?]")
-		{
-			Section :=regexreplace(A_loopreadline,"(\[)(.*)?(])","$2")
-			StringReplace, Section,Section, %a_space%,,All
-			
-			If Tab_PLaceholder =
-			{
-				Tab_placeholder := Section
-			}
-			Else
-				Tab_placeholder := Tab_placeholder "|" Section
-			
-			continue
-		}
-		
-		else if A_LoopReadLine !=
-		{
-			StringGetPos, keytemppos, A_LoopReadLine, =,
-			StringLeft, keytemp, A_LoopReadLine,%keytemppos%
-			StringReplace, keytemp,keytemp,%A_SPace%,,All
-			INIstoretemp := Keytemp ":" Section
+If Tab_PLaceholder = 
+{
+Tab_placeholder := Section
+}
+Else
+Tab_placeholder := Tab_placeholder "|" Section
+
+	continue
+  }
+
+    else if A_LoopReadLine != 
+      { 
+		StringGetPos, keytemppos, A_LoopReadLine, =,
+		StringLeft, keytemp, A_LoopReadLine,%keytemppos%
+		StringReplace, keytemp,keytemp,%A_SPace%,,All
+		INIstoretemp := Keytemp ":" Section
 			Ini_var_store_array.Insert(INIstoretemp)
-			IniRead,%keytemp%, %inifile%, %Section%, %keytemp%
-		}
-	}
+		IniRead,%keytemp%, %inifile%, %Section%, %keytemp%	
+      }
+  }
 	
 	return
 }
@@ -3051,129 +3008,124 @@ Load_ini_file(inifile)
 Write_ini_file(inifile)
 {
 	global
-	
-	for index, element in Ini_var_store_array
-	{
-		StringSplit, INI_Write,element, `:
+
+	for index, element in Ini_var_store_array 
+	{	
+	StringSplit, INI_Write,element, `:
+
+	Varname := INI_Write1
+			IniWrite ,% %INI_Write1%, %inifile%, %INI_Write2%, %INI_Write1%
 		
-		Varname := INI_Write1
-		IniWrite ,% %INI_Write1%, %inifile%, %INI_Write2%, %INI_Write1%
-		
-	}
+      } 
 	
 	return
 }
 
 Config_screen()
 {
-	global
+		global
 	
 	Settimer, Quickview, Off
 	
-	If GuiNumber !=0 ; If guiscreeen vairable is not 0
+		If GuiNumber !=0 ; If guiscreeen vairable is not 0
 		Gui , %GuiNumber%:Destroy ; closes the gui screen
 	
-	GuiWIdth = 710
+	GuiWIdth = 710 
 	GuiHeight = 525
 	Load_ini_file(inifile)
 	GuiNumber = 9
 	activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
 	
 	GUi,%GuiNumber%: Add, button, x10 y501 gsave_config, Save Settings
-	GUi,%GuiNumber%: Add, button, x200 y501 gTitle_grabber, Get window Title / ahk_class
-	Gui, %GuiNumber%:add, tab2,x5 y0 w700 h500,%Tab_placeholder%
-	
-	
-	for index, element in Ini_var_store_array
-	{
-		
+	GUi,%GuiNumber%: Add, button, x200 y501 gTitle_grabber, Get window Title / Windchill_Class
+Gui, %GuiNumber%:add, tab2,x5 y0 w700 h500,%Tab_placeholder%
+
+
+	for index, element in Ini_var_store_array 
+	{	
+
 		StringSplit, INI_Write,element, `:
 		If INI_write2 != %INIWrites_Temp%
 		{
-			Gui,%GuiNumber%:Tab, %INI_Write2%
-			Gui, %GuiNumber%:add, Text,x10 y50,%INI_Write1%
-			GUi,%GuiNumber%:Add, Edit, xp+150 v%INI_write1%, % %Ini_write1%
-			INIWrites_Temp = %INI_write2%
+		Gui,%GuiNumber%:Tab, %INI_Write2%
+		Gui, %GuiNumber%:add, Text,x10 y50,%INI_Write1%
+		GUi,%GuiNumber%:Add, Edit, xp+150 v%INI_write1%, % %Ini_write1%
+		INIWrites_Temp = %INI_write2%
 		}
 		Else
 		{
-			Gui, %GuiNumber%:add, Text,x10 yp+30,%INI_Write1%
-			GUi,%GuiNumber%:Add, Edit, xp+150 v%INI_write1%, % %Ini_write1%
+		Gui, %GuiNumber%:add, Text,x10 yp+30,%INI_Write1%
+		GUi,%GuiNumber%:Add, Edit, xp+150 v%INI_write1%, % %Ini_write1%		
 		}
-	}
+    } 
 	gui,%GuiNumber%:show, x%Amonx% y%Amony% w%GuiWIdth% h%GuiHeight%, Configuration
 	return
 }
 
 save_config:
 {
-	Gui,%GuiNumber%:Submit,NoHide
-	Write_ini_file(inifile)
-	Gui,%GuiNumber%: Destroy
-	Load_ini_file(inifile)
+Gui,%GuiNumber%:Submit,NoHide
+Write_ini_file(inifile)
+Gui,%GuiNumber%: Destroy	
+Load_ini_file(inifile)
 	return
 }
 
 Title_Grabber:
 {
 	SetTimer, WatchCursor, 2000
-	Gui, 99:add, Button, x0 y0 gstoptimer,Stop
-	Gui, 99:add, text, x50 y0 , Data is from Window under mouse cursor
-	Gui, 99:add, Text, x10 y35 ,Window Title
-	Gui, 99:add, Text, x155 y35 ,ahk_class
+	Gui, 99:add, Button, x0 y0 gstoptimer,Stop	
+	Gui, 99:add, text, x50 y0 , Data is from Window under mouse cursor updates every 2 Seconds
+	Gui, 99:add, Text, x10 y35 ,Window Title	
+	Gui, 99:add, Text, x155 y35 ,ahk_class	
 	
 	;~ gui,99: add, text, xp+20 h35
-	Gui,99:Submit,NoHide
-	Gui, 99:Show,w350 h50,Get Information for Macro
-	
-	;~ SetTimer, WatchCursor, 1000
-	return
-	
-}
+Gui,99:Submit,NoHide	
+	Gui, 99:Show,w350 h50,Get Information for Macro	
 
-Stoptimer:
-{
+;~ SetTimer, WatchCursor, 1000
+return
+
+}
 	
-	SetTimer, WatchCursor, Off
-	return
-}
-
-99Guiclose:
-{
-	gosub, Stoptimer
-	Gui,99:Destroy
-	return
-}
-
+	Stoptimer:
+	{
+		
+		SetTimer, WatchCursor, Off
+		return
+	}
+	
+	99Guiclose:
+	{
+		gosub, Stoptimer
+		Gui,99:Destroy
+		return
+	}
+	
 WatchCursor:
 {
-	Gui,99:Submit,NoHide
-	MouseGetPos, , , id, control
-	WinGetTitle, title, ahk_id %id%
-	WinGetClass, class, ahk_id %id%
+Gui,99:Submit,NoHide
+MouseGetPos, , , id, control
+WinGetTitle, title, ahk_id %id%
+WinGetClass, class, ahk_id %id%
 	Gui, 99:add, Edit, x0 yp+40  h35 w200,%title%
 	Gui, 99:add, Edit, xp+210 yp h35 w150 , %class%
-	WinGetPos,,,, Height,Get Information for Macro
-	Height += 50
+	WinGetPos,,,, Height,Get Information for Macro	
+Height += 50
 	WinMove, Get Information for Macro,,,,,%Height%
-	;~ GuiControlGet, WIndowtitle
-	;~ GuiControlGet, classtitle
-	;~ GuiControl,99:,WIndowtitle,%WIndowtitle% `n %title%
-	;~ GuiControl,99:,classtitle,%classtitle% `n  %class%
-	;~ MsgBox, % windowtitletemp classtemp windowtitle class
-	Gui,99:Submit,NoHide
-	return
-}
+Gui,99:Submit,NoHide
+return	
+}	
 
 /*
-	********************************************************************************************************************************************************************************************************************************************************************
-	******************************************************************************Lib section ************************************************************************************************************************************************************
-	*****************************************************************************************************************************************************************************************************************************************************************
+********************************************************************************************************************************************************************************************************************************************************************
+******************************************************************************Lib section ************************************************************************************************************************************************************
+*****************************************************************************************************************************************************************************************************************************************************************
 */
 
 ; The credit to this library goes to HotKeyIt, who posted this code at https://autohotkey.com/board/topic/35566-rapidhotkey/
 ; His licensing information is stated as public domain and in this link: https://autohotkey.com/board/topic/60951-hotkeyits-default-license/
-; I recommed you do not mess around with it as it is stable.
+; I recommed you do not mess around with it as it is stable. 
 
 RapidHotkey(keystroke, times="1", delay=.5, IsLabel=0)
 {
@@ -3182,7 +3134,7 @@ RapidHotkey(keystroke, times="1", delay=.5, IsLabel=0)
 		Return
 	If (times = "" and InStr(keystroke, """"))
 	{
-		Loop, Parse, keystroke,""
+		Loop, Parse, keystroke,""	
 			If (StrLen(Pattern) = A_Index+1)
 				continue := A_Index, times := StrLen(Pattern)
 	}
@@ -3218,11 +3170,11 @@ RapidHotkey(keystroke, times="1", delay=.5, IsLabel=0)
 	Loop, Parse, keywait, |
 		KeyWait, %A_LoopField%
 	If ((!IsLabel or (IsLabel and IsLabel(keystr))) and InStr(A_ThisHotkey, "~") and !RegExMatch(A_ThisHotkey
-		, "i)\^[^\!\d]|![^\d]|#|Control|Ctrl|LCtrl|RCtrl|Shift|RShift|LShift|RWin|LWin|Alt|LAlt|RAlt|Escape|BackSpace|F\d\d?|"
-		. "Insert|Esc|Escape|BS|Delete|Home|End|PgDn|PgUp|Up|Down|Left|Right|ScrollLock|CapsLock|NumLock|AppsKey|"
-		. "PrintScreen|CtrlDown|Pause|Break|Help|Sleep|Browser_Back|Browser_Forward|Browser_Refresh|Browser_Stop|"
-		. "Browser_Search|Browser_Favorites|Browser_Home|Volume_Mute|Volume_Down|Volume_Up|MButton|RButton|LButton|"
-		. "Media_Next|Media_Prev|Media_Stop|Media_Play_Pause|Launch_Mail|Launch_Media|Launch_App1|Launch_App2"))
+	, "i)\^[^\!\d]|![^\d]|#|Control|Ctrl|LCtrl|RCtrl|Shift|RShift|LShift|RWin|LWin|Alt|LAlt|RAlt|Escape|BackSpace|F\d\d?|"
+	. "Insert|Esc|Escape|BS|Delete|Home|End|PgDn|PgUp|Up|Down|Left|Right|ScrollLock|CapsLock|NumLock|AppsKey|"
+	. "PrintScreen|CtrlDown|Pause|Break|Help|Sleep|Browser_Back|Browser_Forward|Browser_Refresh|Browser_Stop|"
+	. "Browser_Search|Browser_Favorites|Browser_Home|Volume_Mute|Volume_Down|Volume_Up|MButton|RButton|LButton|"
+	. "Media_Next|Media_Prev|Media_Stop|Media_Play_Pause|Launch_Mail|Launch_Media|Launch_App1|Launch_App2"))
 		Send % backspace
 	If (WinExist("AHK_class #32768") and hotkey = "RButton")
 		WinClose, AHK_class #32768
@@ -3231,29 +3183,30 @@ RapidHotkey(keystroke, times="1", delay=.5, IsLabel=0)
 	else if IsLabel(keystr)
 		Gosub, %keystr%
 	Return
-}
+}	
 Morse(timeout = 400) { ;by Laszo -> http://www.autohotkey.com/forum/viewtopic.php?t=16951 (Modified to return: KeyWait %key%, T%tout%)
-	tout := timeout/1000
-	key := RegExReplace(A_ThisHotKey,"[\*\~\$\#\+\!\^]")
-	IfInString, key, %A_Space%
+   tout := timeout/1000
+   key := RegExReplace(A_ThisHotKey,"[\*\~\$\#\+\!\^]")
+   IfInString, key, %A_Space%
 		StringTrimLeft, key, key,% InStr(key,A_Space,1,0)
 	If Key in Shift,Win,Ctrl,Alt
 		key1:="{L" key "}{R" key "}"
-	Loop {
-		t := A_TickCount
-		KeyWait %key%, T%tout%
+   Loop {
+      t := A_TickCount
+      KeyWait %key%, T%tout%
 		Pattern .= A_TickCount-t > timeout
 		If(ErrorLevel)
 			Return Pattern
-		If key in Capslock,LButton,RButton,MButton,ScrollLock,CapsLock,NumLock
-			KeyWait,%key%,T%tout% D
-		else if Asc(A_ThisHotkey)=36
-			KeyWait,%key%,T%tout% D
-		else
-			Input,pressed,T%tout% L1 V,{%key%}%key1%
-		If (ErrorLevel="Timeout" or ErrorLevel=1)
-			Return Pattern
-		else if (ErrorLevel="Max")
-			Return
-	}
+    If key in Capslock,LButton,RButton,MButton,ScrollLock,CapsLock,NumLock
+      KeyWait,%key%,T%tout% D
+    else if Asc(A_ThisHotkey)=36
+		KeyWait,%key%,T%tout% D
+    else
+      Input,pressed,T%tout% L1 V,{%key%}%key1%
+	If (ErrorLevel="Timeout" or ErrorLevel=1)
+		Return Pattern
+	else if (ErrorLevel="Max")
+		Return
+   }
 }
+
