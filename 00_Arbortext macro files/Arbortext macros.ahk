@@ -77,7 +77,7 @@ Sleep 100
 
 Load_ini_file(inifile)
 
-Version_Number := "1.4.2 Beta" ;Version number to use for update checks
+Version_Number := "1.4.3 Beta" ;Version number to use for update checks
 
 ; The below code checks if user hit esc and restarted the macro. If they did, then the start splash screen does NOT show. IF they didn't then the start splash screen will show.
 ;This needs to be in the location becuase it checks the text in the command line, before anything else loads. It will not work if placed in another part of the script.
@@ -675,10 +675,10 @@ METRapidTotal:
 			}		
 			
 			
-			#If ; turns off only works in search window
+		
 			return
 		}
-		
+			#If ; turns off only works in search window
 		
 		;canvas rapid subroutine
 		CanvasRapid:
@@ -713,14 +713,14 @@ METRapidTotal:
 			RapidHotKey("RapidSection1""RapidSection2""Rapidsection3",1,0.5,1)
 			Return
 		}
-		
+        
+			#If  ;stops the need to specific window titles
 		;rapidsection1 subroutine
 		RapidSection1:
 		{
 			Gnumber := Rapid_section_function(Section1)	;goes to the function with the Section1 variable 
 			If Gnumber = Error
-			Exit
-			#If  ;stops the need to specific window titles
+			Exit		
 			;Exit ; stops the subroutine
 			Return
 		}
@@ -1538,11 +1538,11 @@ Tabletext := Fronttext newword Pagewidecheck reartext ; combines all teh variabl
 clipboard = %Temptag% 
 Return tabletext ; sends the Tabletext variable information back
 }
-   Tabletext := Fronttext newword Pagewidecheck reartext ; combines all teh variables together and stores them into the "tabletext" variable
+   ;~ Tabletext := Fronttext newword Pagewidecheck reartext ; combines all teh variables together and stores them into the "tabletext" variable
    
-   clipboard = %Temptag% 
-   Return tabletext ; sends the Tabletext variable information back
-}              
+   ;~ clipboard = %Temptag% 
+   ;~ Return tabletext ; sends the Tabletext variable information back
+;~ }              
 
 		/*		
 		/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
@@ -2247,6 +2247,7 @@ Checkhotkey(Type,Key,checkvars)
                Win_Activate(Browser_Window_Title,Windchill_Class)
                SetTimer, CavnasSucceed, Off ; turns off the check every .5 second for ACM Save2wc window
             }}}
+            
             Else IfWinNotExist, %Canvas_Succeeded_Window_Title%  ; if window does not exists, it just goes back to the previous function
             {
                sleep 100
@@ -2594,6 +2595,8 @@ Checkhotkey(Type,Key,checkvars)
          
          Rapid_section_function(SectionNumber)
          {
+            global Search_Window_Title, Gnumber, Windchill_Class, Arbortext_Window_Title, Canvas_Service_Window_Title
+            
             Send {Ctrl Down}{Left}{Ctrl Up} ; send the keystrokes to the computer
             Sleep 100 ; pauses for 100 milliseconds
             Send {Ctrl Down}{Shift Down}{Right}{Ctrl Up}{Shift Up} ; sends the keystrokes to the computer
@@ -2610,20 +2613,23 @@ Checkhotkey(Type,Key,checkvars)
             {
                Gnumber = %clipboard% ; takes the Gnumber from the clipboard and puts into the Gnumber variable
             }
-            
-            IfWinExist %Arbortext_Window_Title% ahk_class %Windchill_Class% ; if Arbortext window exists
+            ;~ +++SetTitleMatchMode, 2
+            IfWinExist %Arbortext_Window_Title% ahk_class  %Windchill_Class% ; if Arbortext window exists
             {
+               ;~ MsgBox, Exists arbortext
                +++SetTitleMatchMode, 3 ; sets search for window titles to be exact match
                IfWinExist %Search_Window_Title% ahk_class %Windchill_Class%  ; window has to say exactly Search in title and if search window is open
                {
-                  Win_Activate(Search_Window_Title,Windchill_Class)
+                  ;~ MsgBox, Exists search
+                  Win_Activate(Search_Window_Title, Windchill_Class)
                   sleep 200
                   Send {Alt Down}{C}{Alt UP} ; sends the keystrokes to the computer
                   Sleep 300 ; pauses for 300 milliseconds
                }
                ErrorLevel = 0 ; reset errorlevel variable to 0
                +++SetTitleMatchMode, 2 ; Sets the window title matching to contains the search words
-               
+               Win_Activate(Arbortext_Window_Title, Windchill_Class)
+               Sleep 100
                ErrorLevel := GraphicsSearchSetup() ; runs the GraphicsSearchSetup function and gets the return value of 1 or 0
                If ErrorLevel = 1 or ErrorLevel = 2 ; if the search window is not open. GraphicsSearchSetup() will return a 1, Arbortext cannot be made active window a 2 if it opens successfully, function will return a 0
                {
@@ -2917,11 +2923,17 @@ Checkhotkey(Type,Key,checkvars)
                
                Win_Activate(Win_title,Win_Class)
                {
-                  WinActivate %Win_title% ahk_class %Win_Class%
+                     ;~ MsgBox %Win_title% and  %Win_Class%  Are title and class
+                  if WinExist(Win_title " ahk_class "  Win_Class )
+                 {
+               ;~ MsgBox %Win_title% and  %Win_Class%  Are title and class
+                 WinActivate 
                   Sleep 50
                   WinWaitActive,  %Win_title%,,5
                   ;~ MsgBox, activated %Win_title%
                   Sleep 100
+                  }
+                  
                   return ErrorLevel
                }
                
@@ -3086,102 +3098,86 @@ Checkhotkey(Type,Key,checkvars)
                ; The credit to this library goes to HotKeyIt, who posted this code at https://autohotkey.com/board/topic/35566-rapidhotkey/
                ; His licensing information is stated as public domain and in this link: https://autohotkey.com/board/topic/60951-hotkeyits-default-license/
                ; I recommed you do not mess around with it as it is stable. 
-               
-               RapidHotkey(keystroke, times="1", delay=.5, IsLabel=0)
-               {
-                  Pattern := Morse(delay*1000)
-                  If (StrLen(Pattern) < 2 and Chr(Asc(times)) != "1")
-                  Return
-                  If (times = "" and InStr(keystroke, """"))
-                  {
-                     Loop, Parse, keystroke,""	
-                     If (StrLen(Pattern) = A_Index+1)
-                     continue := A_Index, times := StrLen(Pattern)
-                  Pattern := Morse(delay*1000)
-                  If (StrLen(Pattern) < 2 and Chr(Asc(times)) != "1")
-                  Return
-                  If (times = "" and InStr(keystroke, """"))
-                  {
-                  Loop, Parse, keystroke,""	
-                  If (StrLen(Pattern) = A_Index+1)
-                  continue := A_Index, times := StrLen(Pattern)
-               }else  if (RegExMatch(times, "^\d+$") and InStr(keystroke, """"))
-                {
-                  Loop, Parse, keystroke,""
-                  If (StrLen(Pattern) = A_Index+times-1)
-                  times := StrLen(Pattern), continue := A_Index
-               if (RegExMatch(times, "^\d+$") and InStr(keystroke, """"))
-                {
-               Loop, Parse, keystroke,""
-               If (StrLen(Pattern) = A_Index+times-1)
-               times := StrLen(Pattern), continue := A_Index
-            }
-            Else if InStr(times, """")
-            {
-               Loop, Parse, times,""
-               If (StrLen(Pattern) = A_LoopField)
-               continue := A_Index, times := A_LoopField
-            if InStr(times, """")
-            {
-            Loop, Parse, times,""
-            If (StrLen(Pattern) = A_LoopField)
-            continue := A_Index, times := A_LoopField
-         }
-         Else if (times = "")
-            continue := 1, times := 2
-         Else if (times = StrLen(Pattern))
-         continue = 1
-         If !continue
-         Return
-         Loop, Parse, keystroke,""
-         If (continue = A_Index)
-            keystr := A_LoopField
-         Loop, Parse, IsLabel,""
-         If (continue = A_Index)
-            IsLabel := A_LoopField
-         hotkey := RegExReplace(A_ThisHotkey, "[\*\~\$\#\+\!\^]")
-         IfInString, hotkey, %A_Space%
-            StringTrimLeft, hotkey,hotkey,% InStr(hotkey,A_Space,1,0)
-         backspace := "{BS " times "}"
-         keywait = Ctrl|Alt|Shift|LWin|RWin
-         Loop, Parse, keywait, |
-         KeyWait, %A_LoopField%
-         If ((!IsLabel or (IsLabel and IsLabel(keystr))) and InStr(A_ThisHotkey, "~") and !RegExMatch(A_ThisHotkey
-         , "i)\^[^\!\d]|![^\d]|#|Control|Ctrl|LCtrl|RCtrl|Shift|RShift|LShift|RWin|LWin|Alt|LAlt|RAlt|Escape|BackSpace|F\d\d?|"
-         . "Insert|Esc|Escape|BS|Delete|Home|End|PgDn|PgUp|Up|Down|Left|Right|ScrollLock|CapsLock|NumLock|AppsKey|"
-         . "PrintScreen|CtrlDown|Pause|Break|Help|Sleep|Browser_Back|Browser_Forward|Browser_Refresh|Browser_Stop|"
-         . "Browser_Search|Browser_Favorites|Browser_Home|Volume_Mute|Volume_Down|Volume_Up|MButton|RButton|LButton|"
-         . "Media_Next|Media_Prev|Media_Stop|Media_Play_Pause|Launch_Mail|Launch_Media|Launch_App1|Launch_App2"))
-         Send % backspace
-         If (WinExist("AHK_class #32768") and hotkey = "RButton")
-         WinClose, AHK_class #32768
-         If !IsLabel
-         Send % keystr
-         else if IsLabel(keystr)
-         Gosub, %keystr%
-         Return
-      }	
-      Morse(timeout = 400) { ;by Laszo -> http://www.autohotkey.com/forum/viewtopic.php?t=16951 (Modified to return: KeyWait %key%, T%tout%)
-      tout := timeout/1000
-      key := RegExReplace(A_ThisHotKey,"[\*\~\$\#\+\!\^]")
-      IfInString, key, %A_Space%
-         StringTrimLeft, key, key,% InStr(key,A_Space,1,0)
-      If Key in Shift,Win,Ctrl,Alt
-      key1:="{L" key "}{R" key "}"
-      Loop {
+   
+RapidHotkey(keystroke, times="1", delay=.5, IsLabel=0)
+{
+	Pattern := Morse(delay*1000)
+	If (StrLen(Pattern) < 2 and Chr(Asc(times)) != "1")
+		Return
+	If (times = "" and InStr(keystroke, """"))
+	{
+		Loop, Parse, keystroke,""	
+			If (StrLen(Pattern) = A_Index+1)
+				continue := A_Index, times := StrLen(Pattern)
+	}
+	Else if (RegExMatch(times, "^\d+$") and InStr(keystroke, """"))
+	{
+		Loop, Parse, keystroke,""
+			If (StrLen(Pattern) = A_Index+times-1)
+				times := StrLen(Pattern), continue := A_Index
+	}
+	Else if InStr(times, """")
+	{
+		Loop, Parse, times,""
+			If (StrLen(Pattern) = A_LoopField)
+				continue := A_Index, times := A_LoopField
+	}
+	Else if (times = "")
+		continue := 1, times := 2
+	Else if (times = StrLen(Pattern))
+		continue = 1
+	If !continue
+		Return
+	Loop, Parse, keystroke,""
+		If (continue = A_Index)
+			keystr := A_LoopField
+	Loop, Parse, IsLabel,""
+		If (continue = A_Index)
+			IsLabel := A_LoopField
+	hotkey := RegExReplace(A_ThisHotkey, "[\*\~\$\#\+\!\^]")
+	IfInString, hotkey, %A_Space%
+		StringTrimLeft, hotkey,hotkey,% InStr(hotkey,A_Space,1,0)
+	backspace := "{BS " times "}"
+	keywait = Ctrl|Alt|Shift|LWin|RWin
+	Loop, Parse, keywait, |
+		KeyWait, %A_LoopField%
+	If ((!IsLabel or (IsLabel and IsLabel(keystr))) and InStr(A_ThisHotkey, "~") and !RegExMatch(A_ThisHotkey
+	, "i)\^[^\!\d]|![^\d]|#|Control|Ctrl|LCtrl|RCtrl|Shift|RShift|LShift|RWin|LWin|Alt|LAlt|RAlt|Escape|BackSpace|F\d\d?|"
+	. "Insert|Esc|Escape|BS|Delete|Home|End|PgDn|PgUp|Up|Down|Left|Right|ScrollLock|CapsLock|NumLock|AppsKey|"
+	. "PrintScreen|CtrlDown|Pause|Break|Help|Sleep|Browser_Back|Browser_Forward|Browser_Refresh|Browser_Stop|"
+	. "Browser_Search|Browser_Favorites|Browser_Home|Volume_Mute|Volume_Down|Volume_Up|MButton|RButton|LButton|"
+	. "Media_Next|Media_Prev|Media_Stop|Media_Play_Pause|Launch_Mail|Launch_Media|Launch_App1|Launch_App2"))
+		Send % backspace
+	If (WinExist("AHK_class #32768") and hotkey = "RButton")
+		WinClose, AHK_class #32768
+	If !IsLabel
+		Send % keystr
+	else if IsLabel(keystr)
+		Gosub, %keystr%
+	Return
+}	
+Morse(timeout = 400) { ;by Laszo -> http://www.autohotkey.com/forum/viewtopic.php?t=16951 (Modified to return: KeyWait %key%, T%tout%)
+   tout := timeout/1000
+   key := RegExReplace(A_ThisHotKey,"[\*\~\$\#\+\!\^]")
+   IfInString, key, %A_Space%
+		StringTrimLeft, key, key,% InStr(key,A_Space,1,0)
+	If Key in Shift,Win,Ctrl,Alt
+		key1:="{L" key "}{R" key "}"
+   Loop {
       t := A_TickCount
       KeyWait %key%, T%tout%
-      Pattern .= A_TickCount-t > timeout
-      If(ErrorLevel)
-         Return Pattern
-      If key in Capslock,LButton,RButton,MButton,ScrollLock,CapsLock,NumLock
+		Pattern .= A_TickCount-t > timeout
+		If(ErrorLevel)
+			Return Pattern
+    If key in Capslock,LButton,RButton,MButton,ScrollLock,CapsLock,NumLock
       KeyWait,%key%,T%tout% D
-      else if Asc(A_ThisHotkey)=36
-      KeyWait,%key%,T%tout% D
-      else
-         Input,pressed,T%tout% L1 V,{%key%}%key1%
-      If (ErrorLevel="Timeout" or ErrorLevel=1)
-         Return Pattern
-      else if (ErrorLevel="Max")
-         Return
-   }}              
+    else if Asc(A_ThisHotkey)=36
+		KeyWait,%key%,T%tout% D
+    else
+      Input,pressed,T%tout% L1 V,{%key%}%key1%
+	If (ErrorLevel="Timeout" or ErrorLevel=1)
+		Return Pattern
+	else if (ErrorLevel="Max")
+		Return
+   }
+}
