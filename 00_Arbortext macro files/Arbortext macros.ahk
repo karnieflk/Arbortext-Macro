@@ -77,7 +77,7 @@ Sleep 100
 
 Load_ini_file(inifile)
 
-Version_Number := "1.4.3 Beta" ;Version number to use for update checks
+Version_Number := "1.4.4 Beta" ;Version number to use for update checks
 
 ; The below code checks if user hit esc and restarted the macro. If they did, then the start splash screen does NOT show. IF they didn't then the start splash screen will show.
 ;This needs to be in the location becuase it checks the text in the command line, before anything else loads. It will not work if placed in another part of the script.
@@ -192,7 +192,7 @@ If Reload = 0
 	Menu, BBBB, Add, &Check For Update , Versioncheck
 	Menu, BBBB, Add, &Options, Optionsmenu
 	Menu, BBBB, Add,
-	Menu, BBBB, Add, &Exit, exitprogram
+	Menu, BBBB, Add, &Exit, Quitting
 	
 	Menu, DDDD, Add, &How To Use, HowTo
 	Menu, DDDD, Add, &About , Aboutmenu
@@ -213,12 +213,12 @@ Listlines, off ; turns off debug lines
 
 
 Listlines, on ; turns on debug lines
-Onexit,  Quitting ; when the program restarts or exits, the script will run this subroutine
+;~ Onexit,  Quitting ; when the program restarts or exits, the script will run this subroutine
 
 
 
 ; Below are the global variables that work everywhere
-Global CPNHotkey, METHotkey, CHKHotkey, SearchHotkey, TableHotkey, section1, section2, section3, guinumber , Tabletype, Pgwd, Userrows, NewwordGUi ; these are all global variables
+Global CPNHotkey, METHotkey, CHKHotkey, SearchHotkey, TableHotkey, section1, section2, section3, guinumber , Tabletype, Pgwd, Userrows, NewwordGUi, GuiNumber ; these are all global variables
 
 
 Ptoken = 0 ; sets the Ptoken variable to 0. 
@@ -251,7 +251,7 @@ if !RegExMatch(CmdLine, "\/cpn")
 PID:=DllCall("GetCurrentProcessId") ; Gets this programs Process ID 
 for process in ComObjGet("winmgmts:").ExecQuery("Select * from Win32_Process where name = 'Arbortext macros.exe' and processID  <> " PID ) ; Loop to look for all the "Arbortext Macros.exe" programs in the process tree that isnt the current one. 
 process, close, % process.ProcessId ; kills the process (closed the program)
-Active_Id = 
+Active_Id =  null
 SetTimer, Windchillhome, 10
 Return ; this stops the script so that is does not continue automatically
 
@@ -395,6 +395,7 @@ Englishnorm() ; Function to send the keys for a NON-TOlerance English menu (Alt 
 */
 
 
+
 SetTitleMatchMode, 2
 
 ; Win + A brings Arbortext window to front if it exists
@@ -404,6 +405,7 @@ $#a::
 	{
 		Win_Activate(Arbortext_Window_Title,Windchill_Class) ; makes Arbortext the active window
 	}
+
 	return
 }
 
@@ -431,23 +433,67 @@ $#c::
 ;~ SetTitleMatchMode, 2
 $#h:: ; Win + h brings the Windchill  window to front if it exists
 {
-	If (Active_Id != )  &&  (Active_Id = %Active_Id%)
+   
+	If (Active_Id = Active_Id) and (Active_Id != "null") 
 	{
 		WinActivate, ahk_id %Active_Id%
-	return
 	}
-	else
-		SetTimer, Windchillhome, 10
-	
-	
-	IfWinExist, %Windchill_Window_Title% ahk_class %Windchill_Class%  ; Finds if the  windchill home  window if it  exists
-	{
-		Win_Activate(Windchill_Window_Title,Windchill_Class)  ; brings the windchill home window to front
-		Sleep 500
-		SetTimer, Windchillhome, 10
-	}
+    else if WinExist("Ahk_class " Windchill_Class) {
+      MsgBox, Cannot find ACM Screen `, Open ACM `, and go to the Home Screen in ACM for macro to detect the Window. 
+        SetTimer, Windchillhome, 10
+     }
 	Return
 }
+
+#if WinActive("ahk_ID "  Active_Id) 
+   
+~MButton::
+{
+        
+   IF Middle_Click_Active = 1
+   {
+   If Active_Id = null
+   {
+          ToolTip, Cannot find ACM Screen `, Open ACM `, and go to the  Home Screen in ACM for macro to detect the Window for Forced active tab to work. 
+        SetTimer, Windchillhome, 10
+        ;~ Click Middle
+        Sleep 2000
+        ToolTip 
+        
+   }
+   else
+   {
+   ;~ Send %Chrome_Middle_Mouse_Button%
+   Send {Shift Down}
+;~ Sleep 250
+;~ SEnd {Click middle}
+Sleep 250
+Send {Shift Up}
+;~ CheckTAbs()
+}}
+;~ else if Middle_Click_Active = 0
+   ;~ Click middle
+
+   return
+}
+#If 
+
+CheckTAbs()
+{
+ WinGetTitle, Tab1, a
+Sleep 300       
+Send {Ctrl down}{PGUP}{CtrlUp}
+Sleep 300
+WinGetTitle, Tab2, a
+
+If tab1 = %Tab2%
+
+   Send {Ctrl Down}{F4}{Ctrl Up}
+else
+   Send {Ctrl down}{PGDN}{CtrlUp}
+   return
+}
+
 
 ;Hotkeys rapidhotkey functions
 +++SetTitleMatchMode, 2 ; sets the script to find window titles that contain some of the requested wording
@@ -470,6 +516,25 @@ $#h:: ; Win + h brings the Windchill  window to front if it exists
 	Return
 } 
 
+; the ~ lets the esc pass through, so it act like a normal esc key as well as perform the below actions
+   ~esc:: 
+         {
+            reload = 1
+            BreakLoop := 1 ; sets breakloop to 1, so if loops see this, it will stop them
+            ;SystemCursor("On") ; ensures the system cursor is on from CPN search. IF user excapes out of it
+            Send {Ctrl up}{shift up}{alt up} ; send keystrokes            
+            
+            IfEqual, A_IsCompiled,1
+            {
+               Run, %A_ScriptFullPath% /Restart
+            }
+               else {            
+            Run, %A_ScriptFullPath% /Restart ; this methond allows the /restart to show in the command line, which prevents the splash image from loading on restart
+            }
+            ;~ gosub, Quitting ; exits this verison of the app
+            Return
+            ;reload ; reloads script
+         }
 
 
 /*		
@@ -746,8 +811,10 @@ METRapidTotal:
 			Return
 		}
 		
-TableChoiceGUI:
+TableChoiceGUI(ByRef Pgwd,  ByRef Tabletype)
 {
+   global Table_Width_GroupC, Table_Width_GroupW, Userarrows, partstable2, partstable3, partstable5, J1939, Troubleshotingtbl, toolingtableService, tooltbl, Spectable, VSPTable, maxlimit, tabnum
+     
 Escapedgui = 0
 If GuiNumber !=0
 	Gui , %GuiNumber%:Destroy
@@ -764,7 +831,7 @@ Gui, %GuiNumber%:add, Radio, xp yp+20  gTableWidthCheck vTable_Width_GroupW, Pag
 Gui,%GuiNumber%: add, GroupBox, Xp+100 yp-40 w175 h50, Rows
 Gui, %GuiNumber%:add, Text, xp+10 yp+25, Rows:
 Gui,%GuiNumber%: add, Edit,  xp+32 yp-4 w50 Number Limit4, 
-Gui, %GuiNumber%:add, UpDown, Range1-3001  vUserrows,20
+Gui, %GuiNumber%:add, UpDown, Range1-3000  vUserrows,20
 Gui, %GuiNumber%:Font, CRed
 Gui, %GuiNumber%:Add, Text, xp+52 w75 Vmaxlimit, Max is 3000 Rows 
 Gui, %GuiNumber%:Font, 
@@ -799,6 +866,7 @@ Tabletype = C2
 Return
 }
 
+;~ work on getting table gui to work - Right now not passing All variables
 
 
 7GuiEscape:
@@ -833,13 +901,9 @@ Return
 VSPcheck:
 {
 Gui,7:submit, nohide
-
-iF (VSPtable)
-{
 tabletype = VSPTable
 guicontrol,,Table_Width_GroupW,1
 Pgwd = Yes
-}
 Return
 }
 
@@ -848,8 +912,10 @@ Tablemaker:
 {
 Gui,7:submit, nohide
 GuicontrolGet, Userrows
-If Userarrows > 3000
+
+while (Userarrows >= 3001)
 {
+GuiControlGet, Userrows
 Guicontrol,%GuiNumber%:Show, maxlimit
 Sleep 100
 Guicontrol,%GuiNumber%:hide, maxlimit
@@ -859,10 +925,10 @@ Sleep 100
 Guicontrol,%GuiNumber%:hide, maxlimit
 Sleep 100
 Guicontrol,%GuiNumber%:Show, maxlimit
-return
+gui, 7:Submit, NoHide
 }
 
-Else if Userarrows < 3001
+if Userarrows <= 3000
 guicontrol, %GuiNumber%:hide, maxlimit
 
 UnPausescript()
@@ -892,11 +958,6 @@ Return
 TableWidthCheck:
 {
 Gui,7:submit, nohide
-
-If (Table_Width_GroupC)
-{
-Pgwd = No
-}
 
 If (Table_Width_GroupW)
 {
@@ -944,12 +1005,17 @@ Return
 		TableRapid:
 		{
 		
-			Tabletext := CreateTable()
+			newword := Create_Arbortext_Table()
+            TableChoiceGUI(Pgwd, Tabletype)
+            Pausescript()
+            
+            Tabletext := CreateTable(newword, Pgwd, Tabletype)
 			If Escapedgui = 1
 			{
 			Return
 			}
 			
+            
 			Copytable(tabletext) ; creates the table gui screen with the correct text inside it
 			return
 		}
@@ -1000,9 +1066,9 @@ Return
 			Return
 		}
 
-Createtable() ; CreateTable function
+Create_Arbortext_Table() ; CreateTable function
 {
-	global
+	global  Pgwd, Table_Insert_Title
 	Temptag = %clipboardall% 
 	;msgbox, tabletype is %Tabletype% `n Pgwd is %Pgwd%
 	Gui 6:Destroy ; gets rid of the gui screen
@@ -1031,16 +1097,9 @@ Createtable() ; CreateTable function
 		msgbox,,,Please put cursor in approiate location to create a table,.5
 		msgbox,Please put cursor in approiate location to create a table
 		
-		IfEqual, A_IsCompiled,1
-					{
-						Run, %A_ScriptFullPath% /Restart
-					}
-					
-					
-					Run, %A_ScriptFullPath% /Restart ; this methond allows the /restart to show in the command line, which prevents the splash image from loading on restart
-					exitapp ; exits this verison of the app
-					Return
-		}
+        Exit
+        return
+	}
 		
 If String Contains id
 {
@@ -1050,8 +1109,6 @@ If String Contains id
    sleep 200 ; pauses script for .5 seconds
    send {shift up} ; Send shift up to the computer to release the shift key
    sleep 200 ; pauses script for .5 seconds
-   
-   
    Send {ctrl down}{x}{ctrl up} ; sends Ctrl + X to teh computer to cut the table contents out
    sleep 100
    Clipwait
@@ -1059,24 +1116,23 @@ If String Contains id
 }
 RegExMatch(string,"id=""(.*)""", BitInTheMiddle) ; Finds the Xref number (ie.. i00000001.37)
 newword := "`" BitInTheMiddle1 `"" ; puts that information into the "newword" variable
-NewwordGUi := BitInTheMiddle1 ; stores for table gui screen
-Fronttext := "<table frame=""all"" id=" ; Puts that information into the "fronttext" variable
-NewStrfront := SubStr(newword, 1 ,1)
-NewStrrear := SubStr(newword, 2 ,12)
-newwordftnote := (NewStrrear + .01)
-Newword := NewStrfront NewStrrear
-newwordftnote := NewStrfront newwordftnote
+;~ NewwordGUi := BitInTheMiddle1 ; stores for table gui screen
 ;msgbox, newword is %newword%`, newwordftnote is %newwordftnote%
-gosub, TableChoiceGUI
-Sleep 500
-Pausescript()
-If Pgwd = Yes ; checks if the PGwd variable is yes
+return newword 
+}
+
+
+
+Createtable(newword, Pgwd, Tabletype)
+{
+      
+Fronttext := "<table frame=""all"" id=" ; Puts that information into the "fronttext" variable
+
+If (Pgwd = "Yes") || (Tabletype = "C5") || (Tabletype = "Spec") || (Tabletype = "Jcode") || (Tabletype = "Troubleshoot") || (Tabletype = "VSPTable")   ; checks if the PGwd variable is yes
 {
    Pagewidecheck := " pgwide=""1""" ; adds the information to "pagewidecheck" variable
 }
-
-If Pgwd = no ; checks if pgwd is no
-{
+else {
    Pagewidecheck := ""  ; makes the variable blank
 }
 ;msgbox, Tabletype is %Tabletype%
@@ -1189,9 +1245,13 @@ if tabletype = toolingtable
       
       If ASCii = 91
       {
-         Ascii = 65
+         Ascii = 64
          Letteroutput++
+         continue
       }
+      
+      figure out why it is adding extra chars with Ba, etc
+      
       
       If (ASCii = 79) || (ASCii = 81) || (ASCii = 73) 
       {
@@ -1200,14 +1260,18 @@ if tabletype = toolingtable
       }
       
       
-      If Letteroutput != 0
+      If  (Letteroutput > 0)
       {
-         Asciifirst := (64 + letteroutput)
+       
+         Asciifirst := (65 + letteroutput)
+         
          If Asciifirst = 73 | 79 | 81
          {
             Asciifirst++
          }
+         
          Transform, OutputCharfirst, Chr, %Asciifirst%
+           ;~ MsgBox, letteroutput is %letteroutput% `n char is %OutputCharfirst%
          outputchar := OutputCharfirst outputchar
       }
       
@@ -1321,6 +1385,14 @@ If tabletype = C3 ; If the "tabletype" variable is C3 then this data will be sto
 }
 If tabletype = C5 ; If the "tabletype" variable is C5 then this data will be stored in "reartext" variable
 {
+   
+NewStrfront := SubStr(newword, 1 ,1)
+NewStrrear := SubStr(newword, 2 ,12)
+newwordftnote := (NewStrrear + .01)
+Newword := NewStrfront NewStrrear
+newwordftnote := NewStrfront newwordftnote
+
+
    reartext := ">
    <tgroup align=""center"" cols=""5"">
    <colspec colname=""col1"" colwidth=""33.12pt""/>
@@ -1827,8 +1899,11 @@ Optionsmenu:
    
    
    ; For autoCPN Fill
-   Gui, %GuiNumber%:Add, Groupbox, xs+500 ys+200 w300 h125, CPN Autofill Options
+   Gui, %GuiNumber%:Add, Groupbox, xs+500 ys+175 w300 h75, CPN Autofill Options
    Gui, %GuiNumber%:Add, Checkbox,  xp+10 yp+20 checked%CPN_AutoSearch% vCPN_AutoSearch, Autoscroll down for CPN fill (ESC Key stops Autoscrolling)
+   
+    Gui, %GuiNumber%:Add, Groupbox, xs+500 ys+250 w300 h75, Force New Chrome tab active
+   Gui, %GuiNumber%:Add, Checkbox,  xp+10 yp+20 checked%Middle_Click_Active% vMiddle_Click_Active, Set new  tabs in windchill Chrome to be active tab
    
    Loop, Parse, checkvars,`,
    {
@@ -1853,6 +1928,7 @@ Optionsmenu:
             }}}}
    Gui,%GuiNumber%:Show,  x%Amonx% y%Amony% w%GuiWIdth% h%GuiHeight%, Arbortext Hotkeys V%Version_Number%
    Settimer, Quickview, 2000
+   Gui, %GuiNumber%:Submit, NoHide
    return
 }
 
@@ -2020,11 +2096,11 @@ winmovemsgbox:
    return
 }
 
-exitprogram:
-{
-   exitapp
-   return
-}
+;~ exitprogram:
+;~ {
+   ;~ exitapp
+   ;~ return
+;~ }
 
 
 Quickview:
@@ -2311,30 +2387,12 @@ Checkhotkey(Type,Key,checkvars)
          }
          
          
-         ;Esc key will stop any loops in arbortext.
-         +++SetTitleMatchMode, 2 ; window title must contain the wording
-         #If WinActive(Arbortext_Window_Title) ; window must contain arbortext for Esc key to work this way
-         ~esc:: ; the ~ lets the esc pass through, so it act like a normal esc key as well as perform the below actions
-         {
-            reload = 1
-            BreakLoop := 1 ; sets breakloop to 1, so if loops see this, it will stop them
-            ;SystemCursor("On") ; ensures the system cursor is on from CPN search. IF user excapes out of it
-            Send {Ctrl up}{shift up}{alt up} ; send keystrokes
-            
-            
-            IfEqual, A_IsCompiled,1
-            {
-               Run, %A_ScriptFullPath% /Restart
-            }
-            
-            
-            Run, %A_ScriptFullPath% /Restart ; this methond allows the /restart to show in the command line, which prevents the splash image from loading on restart
-            exitapp ; exits this verison of the app
-            Return
-            ;reload ; reloads script
-         }
+         ;~ ;Esc key will stop any loops in arbortext.
+         ;~ +++SetTitleMatchMode, 2 ; window title must contain the wording
+         ;~ #If WinActive(Arbortext_Window_Title) ; window must contain arbortext for Esc key to work this way
+      
          
-         #If ; stops any in only arbortext requirement
+         ;~ #If ; stops any in only arbortext requirement
          
          /*		
          /=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\/=\
@@ -2576,7 +2634,7 @@ Checkhotkey(Type,Key,checkvars)
             Menu, tray, add, Options, Optionsmenu ; Goes to options screen
             Menu, tray, add, Check For Update, Versioncheck ; goes to version check
             Menu, tray, add, About, Aboutmenu ; OPens about menu
-            Menu, tray, add, Quit, Quitapp ; quit macro
+            Menu, tray, add, Quit, Quitting ; quit macro
             
             IfExist, %Root_Folder_Location%\diag.Ini
             {
@@ -2587,11 +2645,11 @@ Checkhotkey(Type,Key,checkvars)
             return
          }
          
-         QuitApp:
-         {
-            ExitApp
-            Return
-         }
+         ;~ QuitApp:
+         ;~ {
+            ;~ ExitApp
+            ;~ Return
+         ;~ }
          
          Rapid_section_function(SectionNumber)
          {
