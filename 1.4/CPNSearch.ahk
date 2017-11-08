@@ -16,17 +16,17 @@ SetMouseDelay, -1
 SetDefaultMouseSpeed, 0
 SetWinDelay, -1
 SetBatchLines -1
-ox = ""
-oy= ""
+ox =
+oy= 
 needlecount = 0
-CurrMon := ""
-FileCount := ""
+CurrMon := 
+FileCount := 
 Scrollcount = 0
 +++SetTitleMatchMode, 2
 WinActivate, Arbortext
 Sleep 500
 WinGetTitle, Temptitle,a
-Iniread, Scrolldown, C:\ArbortextMacros\ArbortextMacroSettings.ini, Autofull, autocheckbox
+Iniread, Scrolldown, C:\ArbortextMacros\config.ini, Start_up, CPN_Autosearch
 ToolTip, Loading image files for CPN search
 SetTimer, RemoveToolTip, 1500
 ;Gosub, Monitorareas
