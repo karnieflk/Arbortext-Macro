@@ -2538,13 +2538,13 @@ Checkhotkey(Type,Key,checkvars)
                Return "2" ; returns 2 to say it timed out.
             }
             Sleep 500
-            Send {Alt Down}{o}{Alt Up}{e} ; sends keystrokes to computer to open the search window
+              Send {Alt Down}{o}{Alt Up}{e} ; sends keystrokes to computer to open the search window
             sleep 300 ; delays program for 100 milliseconds
            Loop,
          {
             Sleep 500
             If A_Index = 20
-               Break
+               
 } until WinExist(Search_Window_Title)
 
 Sleep 250
@@ -2557,7 +2557,7 @@ Sleep 250
             If Search_by = Name
             {
               Send {Alt Down}{i}{Alt up}
-Sleep 300
+            Sleep 300
                Send {a}{l}{l}%a_space%{L}{i}{b} ; sends keystrokes to window
                sleep 400 ; delays program for 200 milliseconds
                Send {tab}{g}{r} ; sends keystrokes to window
