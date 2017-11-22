@@ -32,7 +32,6 @@ Added more delay to graphics search setup screen
 */
 
 
-
 #NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 ; #Warn  ; Enable warnings to assist with detecting common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
@@ -227,7 +226,7 @@ Load_ini_file(inifile)
 sleep 500 ;sets a .5 sec delay
 Gosub, SetHotKeys ;Set hotkeys from ini file settings
 sleep 500 ;sets a .5 sec delay
-GOsub, Updatechecker ; goes to updatechecker:
+Versioncheck()
 
 SplashImage,Off ; turns off the loading image
 
@@ -2538,24 +2537,35 @@ Checkhotkey(Type,Key,checkvars)
                Return "2" ; returns 2 to say it timed out.
             }
             Sleep 500
+            Loop
+            {
+               WinGetActiveTitle, Active_title 
+               Sleep 100
+            } until  Active_title contains %Arbortext_Window_Title%
+            
               Send {Alt Down}{o}{Alt Up}{e} ; sends keystrokes to computer to open the search window
-            sleep 300 ; delays program for 100 milliseconds
-           Loop,
+            sleep 300 ; delays program for 300 milliseconds
+           Loop
          {
-            Sleep 500
-            If A_Index = 20
-               
-} until WinExist(Search_Window_Title)
+            Sleep 250
+            WinActivate, %Search_Window_Title%
+            If A_Index = 40
+            {
+               MsgBox, Cannot find search Window. Operation will Stop
+               Exit
+            }
+} until WinActive(Search_Window_Title)
 
-Sleep 250
+            Sleep 250
             WinWaitActive, %Search_Window_Title%,,10 ;Waits for search window to be the active window. Stops wait after 5 seconds
             If ErrorLevel = 1 ; if the search window is not open. subroutine will stop.
             {
                Return "1" ; returns 1 to say it timed out.
             }
-            Sleep 1000
+            Sleep 750
             If Search_by = Name
             {
+               Active_title_check(Search_Window_Title)
               Send {Alt Down}{i}{Alt up}
             Sleep 300
                Send {a}{l}{l}%a_space%{L}{i}{b} ; sends keystrokes to window
@@ -2572,8 +2582,9 @@ Sleep 250
                Sleep 300 ; delays program for 200 milliseconds
                Search_text := A_UserName
             }else  {
-              Send {Alt Down}{i}{Alt up}
-Sleep 300
+                              Active_title_check(Search_Window_Title)
+                                 Send {Alt Down}{i}{Alt up}
+            Sleep 300
                Send {g}{r} ; sends keystrokes to window
                sleep 300 ; delays program for 200 milliseconds
                Send {tab}{g}{r} ; sends keystrokes to window
@@ -2602,6 +2613,27 @@ Sleep 300
 
             Return 0
          }
+
+
+Active_title_check(Active_title)
+{
+ Loop
+ {
+ WinGetActiveTitle, Temp_title
+ If Active_Class !=0
+   WinGetClass, Temp_Class,A
+ Sleep 100
+ If A_Index = 50
+{
+   MsgBox, Cannot find %Active_title% Window, Operation will Stop
+Exit
+}
+} until (Temp_title = Active_title)  
+
+Sleep 300
+return
+}
+
 
          Create_Tray_Menu()
          {
@@ -2746,7 +2778,101 @@ Sleep 300
          **********************************************************************************************************************************
          */
 
+	Versioncheck() ; no unit test needed
+			{
+				global Version_Number, inifile, Update_Check_URL, First_Run
 
+			Load_ini_file(inifile)
+
+IfExist, %A_desktop%\Update.txt
+FileDelete, %A_desktop%\Update.txt
+	
+				Progress,  w200, Updating..., Gathering Information, Arbortext Macro Updater
+				Progress, 0
+			
+					URLDownloadToFile,https://docs.google.com/document/d/1IAv-He0hMUdXymXYIIJu8XsJ3wxCxU9764QAiEHIwcw/export?format=txt, %A_desktop%\Update.txt
+
+				Progress,  w200, Updating..., Fetching Server Information, Arbortext Macro Updater
+				Progress, 15
+
+				Progress,  w200, Updating...,Gathering Current Version From Server, Arbortext Macro Updater
+				Progress, 50
+		
+				Progress,  w200,Updating..., Comparing Version Information, Arbortext Macro Updater
+				Progress, 60
+				
+Loop, Read, %A_desktop%\Update.txt
+{
+	If A_LoopReadLine contains Version=
+		update_Version := A_LoopReadLine
+	else
+		What_is_new_text := What_is_new_text A_LoopReadLine "`n"
+}
+
+StringReplace, update_Version,update_Version,Version=,,
+				If (update_Version <= Version_Number) and  (First_run = "0")
+				{
+					Progress,  w200,Updating..., Macro is Up to date., Arbortext Macro Updater
+					Progress, 100
+					sleep 1000
+				}
+
+				If (update_Version > Version_Number)  or (First_run = "1")
+				{
+				Progress, Off
+					gui,35: font, S15  ;Set 10-point Verdana.
+				Gui, 35:Add, Text,x5 y5, New Version available!
+				Gui, 35:Add, Text,xp yP+25, Your version is %Version_Number% 
+			gui,35: font, S15 cRED  ; Set 10-point Verdana.
+				Gui, 35:Add, Text,xp yP+25, New  version is %update_Version% 
+					gui,35: font, s10 cblack  ; Set 10-point Verdana.
+					If (First_Run)
+				Gui, 35:Add, Edit,xp yP+35 w600 h500,  Looks Like This is Your first time Running This Version. `n`n %What_is_new_text%
+				else
+				Gui, 35:Add, Edit,xp yP+35 w600 h500, %What_is_new_text%
+				If (First_run)
+				Gui, 35:Add, Button, yp+525  w100 h25 gCancel, Ok
+				else
+				{
+				Gui, 35:Add, Button, yp+525 gDownload_new_version, DOWNLOAD NEW VERSION
+				Gui, 35:Add, Button, xp+200 gCancel_Update, Cancel
+			}
+				gui, 35:Show,,New Version!
+					First_Run=0
+						Write_ini_file(Configuration_File_Location)
+				Pause, on
+				}
+Progress, Off
+
+				return
+			}
+			
+35GuiEscape:
+35GuiClose:
+{
+	gui, 35:destroy
+Pause, Off
+Return
+}
+
+Download_new_version()
+{
+	global Program_Location_Link
+	Pause, off
+	Gui 35: Destroy
+Run, %Program_Location_Link%
+	
+	return
+}
+
+Cancel_update:
+{
+	pause, off
+Gui 35:Destroy
+return
+}	
+
+/*
          Updatechecker:
          {
             ;below is just in case the ini file isnt there. it makes a new one
@@ -2957,7 +3083,7 @@ Sleep 300
                }
 
 
-
+*/
                Win_Activate(Win_title,Win_Class)
                {
                      ;~ MsgBox %Win_title% and  %Win_Class%  Are title and class
