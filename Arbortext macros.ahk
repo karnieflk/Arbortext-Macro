@@ -1,4 +1,6 @@
-﻿/*
+﻿
+
+/*
 *****************************************************************************************************************************************************************************
 *********************************************************************** Licensing Information *******************************************************************************
 *****************************************************************************************************************************************************************************
@@ -21,6 +23,7 @@ Enhancements to do//////////////////////////////////////////////////////////
 Updates to script from Version 1.4
 ***************************************
 Added more delay to graphics search setup screen
+Added checks for image search
 
 
 
@@ -47,6 +50,19 @@ SetDefaultMouseSpeed, 0 ; makes mouse instant
 ;SetWinDelay, 0 ; makes window functions instant
 ;SetControlDelay, 0 ; speeds up script
 
+
+; The below code checks if user hit esc and restarted the macro. If they did, then the start splash screen does NOT show. IF they didn't then the start splash screen will show.
+;This needs to be in the location becuase it checks the text in the command line, before anything else loads. It will not work if placed in another part of the script.
+
+
+
+if !RegExMatch(CmdLine, "\/cpn")
+{
+
+}else  {
+	Tooltip, loading CPN autofind information
+}
+
 IfNotExist,   C:\ArbortextMacros
 {
 	FileCreateDir,  C:\ArbortextMacros
@@ -66,29 +82,32 @@ Sleep 100
 
 Load_ini_file(inifile)
 
-Version_Number := "1.41" ;Version number to use for update checks
-
-; The below code checks if user hit esc and restarted the macro. If they did, then the start splash screen does NOT show. IF they didn't then the start splash screen will show.
-;This needs to be in the location becuase it checks the text in the command line, before anything else loads. It will not work if placed in another part of the script.
-CmdLine := DllCall("GetCommandLine", "Str")
-
-if !RegExMatch(CmdLine, "\/Restart")
+If (Restart = "0")
 {
-	Reload = 0
+
 	SplashImage,%Root_Folder_Location%\ProgramImages\SplashinmageAM.png, B x0 y0 h300 W500,,,Titlescreen ; places the splashimage  at the top corner  of the active monitor
 	;MsgBox, % CmdLine ; Message will not be shown if script was passed "/restart" in its command line parameters
-	sleep 1000
-}else  {
-	Reload = 1
+	sleep 1000 
 }
 
 
-if !RegExMatch(CmdLine, "\/cpn")
+
+If (CPN)
 {
-
-}else  {
-	Tooltip, loading CPN autofind information
+  Tooltip, loading CPN autofind information 
 }
+
+
+/*
+**/*/*/*/*/*/*/*/*/*/*/*/**/*/*/*/*/*/*/*/*/*/*/*/**/*/*/*/*/*/*/*/*/*/*/*/**/*/*/*/*/*/*/*/*/*/*/*/**/*/*/*/*/*/*/*/*/*/*/*/**/*/*/*/*/*/*/*/*/*/*/*/**/*/*/*/*/*/*/*/*/*/*/*/
+Version Number
+**/*/*/*/*/*/*/*/*/*/*/*/**/*/*/*/*/*/*/*/*/*/*/*/**/*/*/*/*/*/*/*/*/*/*/*/**/*/*/*/*/*/*/*/*/*/*/*/**/*/*/*/*/*/*/*/*/*/*/*/**/*/*/*/*/*/*/*/*/*/*/*/**/*/*/*/*/*/*/*/*/*/*/*/
+*/
+
+Version_Number := "1.41" ;Version number to use for update checks
+
+
+
 /*
 *********************************************************************************************************************************
 ******************************** Startup check section ************************************************************************
@@ -100,6 +119,7 @@ IfNotExist,  %Root_Folder_Location%
 {
 	FileCreateDir, %Root_Folder_Location%
 }
+
 
 IfNotExist, %Root_Folder_Location%\UserImages
 {
@@ -149,7 +169,11 @@ IfExist,%Root_Folder_Location%\Change Log.txt
 	FileDelete,%Root_Folder_Location%\Change Log.txt
 }
 
-If Reload = 0
+
+
+
+
+If Restart = 0
 {
 	If Startup_Folder_Question = 1
 	{}
@@ -226,17 +250,16 @@ Load_ini_file(inifile)
 sleep 500 ;sets a .5 sec delay
 Gosub, SetHotKeys ;Set hotkeys from ini file settings
 sleep 500 ;sets a .5 sec delay
-Versioncheck()
+
 
 SplashImage,Off ; turns off the loading image
 
 
 ; This is here if the app restart was from the start of a autofill CPN search
-if !RegExMatch(CmdLine, "\/cpn")
-{
-
-}else  {
+if CPn = 1
+ {
 	Tooltip
+    Cpn = 0
 	gosub, CPNRapidautofill
 }
 
@@ -246,6 +269,11 @@ PID:=DllCall("GetCurrentProcessId") ; Gets this programs Process ID
 for process in ComObjGet("winmgmts:").ExecQuery("Select * from Win32_Process where name = 'Arbortext macros.exe' and processID  <> " PID ) ; Loop to look for all the "Arbortext Macros.exe" programs in the process tree that isnt the current one.
 process, close, % process.ProcessId ; kills the process (closed the program)
 Active_Id =  null
+
+If Restart = 0
+Versioncheck()
+Restart = 0
+Write_ini_file(inifile)
 SetTimer, Windchillhome, 10
 Return ; this stops the script so that is does not continue automatically
 
@@ -475,21 +503,13 @@ RButton & Lbutton:: ;sets hotkey
 ; the ~ lets the esc pass through, so it act like a normal esc key as well as perform the below actions
    ~esc::
          {
-            reload = 1
+            Restart = 1
             BreakLoop := 1 ; sets breakloop to 1, so if loops see this, it will stop them
             ;SystemCursor("On") ; ensures the system cursor is on from CPN search. IF user excapes out of it
             Send {Ctrl up}{shift up}{alt up} ; send keystrokes
+            Write_ini_file(inifile)
+            Reload
 
-            IfEqual, A_IsCompiled,1
-            {
-               Run, %A_ScriptFullPath% /Restart
-            }
-               else {
-            Run, %A_ScriptFullPath% /Restart ; this methond allows the /restart to show in the command line, which prevents the splash image from loading on restart
-            }
-            ;~ gosub, Quitting ; exits this verison of the app
-            Return
-            ;reload ; reloads script
          }
 
 
@@ -2536,33 +2556,33 @@ Checkhotkey(Type,Key,checkvars)
                msgbox, error
                Return "2" ; returns 2 to say it timed out.
             }
-            Sleep 500
+            Sleep 100
             Loop
             {
                WinGetActiveTitle, Active_title 
-               Sleep 100
+               Sleep 50
             } until  Active_title contains %Arbortext_Window_Title%
             
               Send {Alt Down}{o}{Alt Up}{e} ; sends keystrokes to computer to open the search window
-            sleep 300 ; delays program for 300 milliseconds
+            sleep 150 ; delays program for 300 milliseconds
            Loop
          {
-            Sleep 250
+            Sleep 100
             WinActivate, %Search_Window_Title%
-            If A_Index = 40
+            If A_Index = 90
             {
                MsgBox, Cannot find search Window. Operation will Stop
                Exit
             }
 } until WinActive(Search_Window_Title)
 
-            Sleep 250
+            Sleep 10
             WinWaitActive, %Search_Window_Title%,,10 ;Waits for search window to be the active window. Stops wait after 5 seconds
             If ErrorLevel = 1 ; if the search window is not open. subroutine will stop.
             {
                Return "1" ; returns 1 to say it timed out.
             }
-            Sleep 750
+            Sleep 100
             If Search_by = Name
             {
                Active_title_check(Search_Window_Title)
@@ -2630,7 +2650,7 @@ Exit
 }
 } until (Temp_title = Active_title)  
 
-Sleep 300
+Sleep 200
 return
 }
 
@@ -2780,36 +2800,44 @@ return
 
 	Versioncheck() ; no unit test needed
 			{
-				global Version_Number, inifile, Update_Check_URL, First_Run
+				global  inifile, Update_Check_URL, req
 
+Internet_Status := Internet_Connection_Check()
+If (!Internet_Status)
+	exit
+    
 			Load_ini_file(inifile)
 
-IfExist, %A_desktop%\Update.txt
-FileDelete, %A_desktop%\Update.txt
-	
+
 				Progress,  w200, Updating..., Gathering Information, Arbortext Macro Updater
 				Progress, 0
-			
-					URLDownloadToFile,https://docs.google.com/document/d/1IAv-He0hMUdXymXYIIJu8XsJ3wxCxU9764QAiEHIwcw/export?format=txt, %A_desktop%\Update.txt
-
-				Progress,  w200, Updating..., Fetching Server Information, Arbortext Macro Updater
+req := ComObjCreate("Msxml2.XMLHTTP")
+Progress,  w200, Updating..., Fetching Server Information, Arbortext Macro Updater
 				Progress, 15
-
+req.open("GET", Update_Check_URL, true)
 				Progress,  w200, Updating...,Gathering Current Version From Server, Arbortext Macro Updater
-				Progress, 50
-		
+				Progress, 50	
 				Progress,  w200,Updating..., Comparing Version Information, Arbortext Macro Updater
 				Progress, 60
-				
-Loop, Read, %A_desktop%\Update.txt
+req.onreadystatechange := Func("Ready")
+; Send the request.  Ready() will be called when it's complete.
+req.send()
+return
+}
+
+UPdate_TExt(Text)
 {
-	If A_LoopReadLine contains Version=
-		update_Version := A_LoopReadLine
+global First_Run, inifile, Version_Number
+Loop, Parse, Text, `n`r
+{
+	If A_LoopField contains Version=
+		update_Version := A_LoopField
 	else
-		What_is_new_text := What_is_new_text A_LoopReadLine "`n"
+		What_is_new_text := What_is_new_text A_LoopField "`n"
 }
 
 StringReplace, update_Version,update_Version,Version=,,
+
 				If (update_Version <= Version_Number) and  (First_run = "0")
 				{
 					Progress,  w200,Updating..., Macro is Up to date., Arbortext Macro Updater
@@ -2820,30 +2848,35 @@ StringReplace, update_Version,update_Version,Version=,,
 				If (update_Version > Version_Number)  or (First_run = "1")
 				{
 				Progress, Off
+                 activeMonitorInfo(  aX,  aY,  aWidth,    aHeight,  mouseX,  mouseY  )
 					gui,35: font, S15  ;Set 10-point Verdana.
+                    If !(First_Run)
 				Gui, 35:Add, Text,x5 y5, New Version available!
 				Gui, 35:Add, Text,xp yP+25, Your version is %Version_Number% 
 			gui,35: font, S15 cRED  ; Set 10-point Verdana.
 				Gui, 35:Add, Text,xp yP+25, New  version is %update_Version% 
 					gui,35: font, s10 cblack  ; Set 10-point Verdana.
 					If (First_Run)
-				Gui, 35:Add, Edit,xp yP+35 w600 h500,  Looks Like This is Your first time Running This Version. `n`n %What_is_new_text%
+				Gui, 35:Add, Edit,xp yP+35 w600 h500 ,  Looks Like This is Your first time Running This Version. `n`n %What_is_new_text%
 				else
-				Gui, 35:Add, Edit,xp yP+35 w600 h500, %What_is_new_text%
+				Gui, 35:Add, Edit,xp yP+35 w600 h500 , %What_is_new_text%
 				If (First_run)
-				Gui, 35:Add, Button, yp+525  w100 h25 gCancel, Ok
-				else
+				{
+                Gui, 35:Add, Button, yp+525  w100 h25 gCancel, Ok
+                gui, 35:Show, x%aX% y%ay% ,First Run
+             }
+                else
 				{
 				Gui, 35:Add, Button, yp+525 gDownload_new_version, DOWNLOAD NEW VERSION
 				Gui, 35:Add, Button, xp+200 gCancel_Update, Cancel
+                	gui, 35:Show, x%aX% y%ay%, New Version!
+                    send {Home}
 			}
-				gui, 35:Show,,New Version!
 					First_Run=0
-						Write_ini_file(Configuration_File_Location)
+						Write_ini_file(inifile)
 				Pause, on
 				}
 Progress, Off
-
 				return
 			}
 			
@@ -2857,10 +2890,10 @@ Return
 
 Download_new_version()
 {
-	global Program_Location_Link
+	global Program_Site
 	Pause, off
 	Gui 35: Destroy
-Run, %Program_Location_Link%
+Run, %Program_Site%
 	
 	return
 }
@@ -2872,218 +2905,45 @@ Gui 35:Destroy
 return
 }	
 
-/*
-         Updatechecker:
-         {
-            ;below is just in case the ini file isnt there. it makes a new one
-            if not (FileExist(Root_Folder_Location "\config.ini"))
-            {
-               FileAppend,,%inifile%
-               activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
 
-               Settimer, winmovemsgbox, 50
-               Titletext := "Looks like This may be the first time running this application. Do you want to check for an update"
-               Msgbox,4,%A_Space%Arbortext Macro Updater, %A_Space%Looks like This may be the first time running this application. Do you want to check for an update?
-               ifmsgbox Yes
-               {
-                  gosub, Versioncheck
-               }else  {
-                  updaterate = 14
-               }}
+Ready() {
+    global req
+    if (req.readyState != 4)  ; Not done yet.
+        return
+    if (req.status == 200) ; OK.
+      UPdate_TExt(req.responseText)
+    else
+            UPdate_TExt("Status " req.status)    
 
-               ;if file does exist, then it reads the ini file for the last update check and how often it plans to update.
-               if (FileExist(inifile))
-               {
-                  ;~ IniRead, updatestatus, %inifile%, update,lastupdate
-                  ;~ IniRead, Updaterate, %inifile%, update,updaterate
-
-                  NumberOfDays := %A_Now%		; Set to the current date first
-                  EnvSub, NumberOfDays, %INIDate% , Days 	; this does a date calc, in days
-                  If NumberOfDays > %Updaterate% )	; More than 14 days
-                  {
-                     activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
-
-                     Settimer, winmovemsgbox, 50
-                     Titletext := "days since the last update check.`n`n Would you like to check for a new update"
-                     MsgBox,4,%A_Space%Arbortext Macro Updater, It has been %NumberOfDays% days since the last update check.`n`n Would you like to check for a new update?`n`n
-                     ifmsgbox Yes
-                     gosub, Versioncheck
-                     else
-                        IniWrite, 14,  %inifile%,update,updaterate
-                  }}
-
-                  Return
-               }
-
-               Versioncheck:
-               {
-                  activeMonitorInfo( Amonx,Amony,AmonW,AmonH,mx,my ) ;gets the coordinates of the screen where the mouse is located.
-
-                  Settimer, winmovemsgbox, 50
-                  Titletext := "Arbortext Macro Updater"
-                  Cliptemp = %clipboardall% ; sets the clipboard to a temp variable
-                  Clipboard = "%A_space%"  ; makes the clipboard a space, so it is emptied
-                  Progress,  w200, Updating..., Gathering Information, Arbortext Macro Updater ; creates a progress bar with text
-                  Progress, 0 ; sets the progress bar to 0 percent
-                  sleep 200 ; pauses the script for 200 miliseconds
-                  Versioncount = 0 ; makes the versioncount variable to 0
-                  settimer, versiontimeout, 2000 ; starts a timer that goes to versiontimeout every 2 second
-                  gosub, create_checkgui ; goes to create_checkgui to create the invisible IE browser
-                  Settimer, winmovemsgbox, 50
-                  Progress,  w200, Updating..., Fetching Server Information, Arbortext Macro Updater ; sets the progress bar text
-                  Progress, 15 ; makes the progress bar at 15%
-                  DllCall("SetParent", "uint",  hwnd, "uint", ParentGUI) ; calls some built computer functions
-                  wb.Visible := True  ;makes the webroowser that was created visable in the gui screen that is off the monitor screen
-                  WinSet, Style, -0xC00000, ahk_id %hwnd% ; makes the gui transparent
-                  Settimer, winmovemsgbox, 50
-                  Progress, 25 ; sets progress bar to 25%
-                  sleep 200 ; pauses the script for 200 miliseconds
-
-                  wb.navigate(Update_checker_site) ; makes the webbrowser in the gui navigate to the google docs page that has the updates in it
-                  Settimer, winmovemsgbox, 50
-                  Progress,  w200, Updating...,Gathering Current Version From Server, Arbortext Macro Updater ; changes the progress bar text
-                  Progress, 50 ; sets the progress bar to 50%
-
-                  Sleep, 200 ; script sleeps 200 miliseconds
-
-                  while wb.busy ; wile the browser loads the webpage, it loops until the site is loaded
-                  {
-                     Sleep 100
-                  }
-
-                  Settimer, winmovemsgbox, 50
-                  Progress,  w200,Updating..., Comparing Version Information, Arbortext Macro Updater ; changes the progress bar
-                  Progress, 60 ; makes the progress bar to 60%
-                  sleep 1000
-                  Winactivate, Arbortext Macro Version ; this is the title of the tab in the browser, so it activates it to the front window
-                  wingettitle, titleup, A ; gets the actual title with the version number
-                  ;Msgbox, Title is  %title%  ; for diagnostics
-                  StringGetPos, pos, Titleup, #, 1	 ; gets the position of the # symbol in the title
-                  String1 := SubStr(Titleup, pos+2) ; deletes everything in the title from the # symobl and whats in front of it
-                  ;msgbox, %string1% ;for diagnostics
-
-                  Checkversion := SubStr(String1,1,3) ; deletes what is after the numerical version
-                  ;msgbox, %Checkversion% ; for diagnostics
-                  ;Progress, Off ; turns off the progress bar as everything is found
-
-                  ;below is there just in case the macro goes faster than the browser in the gui window, it tries to get the tab title again if it came up blank
-                  If titleup =
-                  {
-                     Winactivate, Arbortext Macro Version
-                     sleep 1500
-                     wingettitle, titleup, A
-                     StringGetPos, pos, Titleup, #, 1
-                     String1 := SubStr(Titleup, pos+2)
-                     Checkversion := SubStr(String1,1,3) ; deletes what is after the numerical version
-                  }
-                  ;if that try above failed, the macro cancels out of the update check.
-                  If titleup =
-                  {
-                     Settimer, winmovemsgbox, 50
-                     Progress,  w200,Updating..., Error Occured. Update Not Able To Complete, Arbortext Macro Updater
-                     Progress, 0
-                     Sleep 3000
-                     Progress, off
-                     SplashTextOff
-                     msgbox, Error getting update. PLease try again later.
-                     Settimer, versiontimeout, off
-                  }
-                  ;msgbox, %Checkversion%
-                  Progress, off
-                  ;if the version online is found to be equal to the version number at the top of the arbortext macros vx.x sctipr
-                  If Version_Number >= %checkversion%
-                  {
-                     Settimer, winmovemsgbox, 50
-                     Progress,  w200,Updating..., Macro is Up to date., Arbortext Macro Updater
-                     Progress, 100
-                     Sleep 3000
-                     Progress, off
-                     SplashTextOff
-                     Settimer, versiontimeout, off
-                     IniWrite, %A_now%,  %inifile%,  update,lastupdate
-                     IniWrite, 14,  %inifile%,update,updaterate
-                     clipboard = %cliptemp%
-                  }
-
-                  ; if the version online is geater than the macro version, it will ask to go to the box site to update.
-                  If Checkversion > %Version_Number%
-                  {
-                     Settimer, versiontimeout, off
-                     Progress, off
-                     SplashTextOff
-                     Settimer, winmovemsgbox, 50
-                     msgbox,262148,Arbortext Macro Updater, New update found. Would you like to open the Cat Box site to download the latest version?
-                     IfMsgBox, yes
-                     {
-                        gui 4:destroy
-                        IniWrite, 14, %inifile%i,update,updaterate
-                        IniWrite, %A_now%,  %inifile%, update,lastupdate
-                        Run, %Program_Site%
-                     }
-                     Else
-                        gui 4:destroy
-                     Sleep 500
-                     IniWrite, 14,  %inifile%,update,updaterate
-                     IniWrite, %A_now%,  %inifile%,  update,lastupdate
-
-                     return
-                  }
-                  Gui 4:destroy
-                  ;msgbox, done
-                  Settimer, versiontimeout, off
-                  clipboard := ""
-                  clipboard = %cliptemp%
-                  return
-               }
+}
 
 
-               versiontimeout:
-               {
-                  Versioncount++
-                  If Versioncount = 10
-                  {
-                     Settimer, winmovemsgbox, 50
-                     Progress,  w200,Updating..., Error Occured.Cannot connect to server for update check, please check for internet connection., Arbortext Macro Updater
-                     Progress, 0
-                     Sleep 2000
-                     Progress, Off
-                     SplashTextOff
-                     Settimer, versiontimeout, off
-                     ;Msgbox,,Serial Updater Timed out, Cannot connect to server for update check, please check for internet connection.
-                  }
+Internet_Connection_Check()
+{
+   global req, Internet_Status
+req := ComObjCreate("Msxml2.XMLHTTP")
+; Open a request with async enabled.
+req.open("GET", "https://www.google.com", false)
+; Set our callback function (v1.1.17+).
+req.onreadystatechange := Func("Internet_check")
+; Send the request.  Ready() will be called when it's complete.
+req.send()
+Return Internet_Status
+}
 
-                  Return
-               }
-
-
-               create_checkgui:
-               {
-                  wb := ComObjCreate("InternetExplorer.Application")
-                  Wb.AddressBar := false
-                  wb.MenuBar := false
-                  wb.ToolBar := false
-                  wb.StatusBar := false
-                  wb.Resizable := false
-                  wb.Width := 10
-                  wb.Height := 10
-                  wb.Top := 0
-                  wb.Left := 0
-                  wb.Silent := true
-                  hwnd := wb.hwnd
-                  Gui, 4:+LastFound
-                  ParentGUI := WinExist()
-                  Gui,4:-SysMenu -ToolWindow -Border
-                  Gui,4:Color, EEAA99
-                  Gui,4:+LastFound
-                  WinSet, TransColor, EEAA99
-                  gui 4: +ToolWindow
-                  Gui,4:show, x0 y-11 W1 H1  , Updater
-
-                  return
-               }
+Internet_check() {
+    global req, Internet_Status
+    if (req.readyState != 4)  ; Not done yet.
+        return
+    if (req.status == 200) ; OK.
+        Internet_Status = 1
+    else
+    Internet_Status = 0
+	
+return Internet_Status
+}
 
 
-*/
                Win_Activate(Win_title,Win_Class)
                {
                      ;~ MsgBox %Win_title% and  %Win_Class%  Are title and class
